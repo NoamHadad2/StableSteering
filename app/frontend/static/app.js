@@ -312,7 +312,7 @@ if (nextRoundButton) {
       await pollJob(job.status_url, {
         onProgress: (snapshot) => {
           setStatus(snapshot.status_message);
-      setProgress(snapshot.progress, snapshot.status_message || "Generating next round");
+          setProgress(snapshot.progress, snapshot.status_message || "Generating next round");
         },
       });
       setStatus("Round generated. Refreshing session view...");
@@ -358,7 +358,7 @@ if (submitFeedbackButton) {
       await pollJob(job.status_url, {
         onProgress: (snapshot) => {
           setStatus(snapshot.status_message);
-      setProgress(snapshot.progress, snapshot.status_message || "Applying feedback");
+          setProgress(snapshot.progress, snapshot.status_message || "Applying feedback");
         },
       });
       setStatus("Feedback submitted. Refreshing session view...");

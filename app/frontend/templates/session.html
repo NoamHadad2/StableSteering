@@ -13,14 +13,14 @@
         <h1>{{ session.prompt }}</h1>
         <p class="lede">Sampler: {{ session.config.sampler }} | Updater: {{ session.config.updater }} | Feedback: {{ session.config.feedback_mode }}</p>
         <div class="badge-row">
-          <span class="status-badge">Backend: {{ runtime_diagnostics.backend }}</span>
-          <span class="status-badge">Device: {{ runtime_diagnostics.active_device or runtime_diagnostics.configured_device or "n/a" }}</span>
-          <span class="status-badge">CUDA: {{ runtime_diagnostics.cuda_available }}</span>
+          <span class="status-badge" title="The resolved generation backend for this session.">Backend: {{ runtime_diagnostics.backend }}</span>
+          <span class="status-badge" title="The device currently used for inference.">Device: {{ runtime_diagnostics.active_device or runtime_diagnostics.configured_device or "n/a" }}</span>
+          <span class="status-badge" title="Whether CUDA is available to the runtime on this machine.">CUDA: {{ runtime_diagnostics.cuda_available }}</span>
         </div>
         <div class="actions">
-          <button class="button" data-session-id="{{ session.id }}" id="next-round-button" {% if session.status == "awaiting_feedback" %}disabled{% endif %}>Generate next round</button>
-          <a class="button secondary" href="/sessions/{{ session.id }}/replay-view">Open replay</a>
-          <a class="button secondary" href="/sessions/{{ session.id }}/trace-report">Open trace report</a>
+          <button class="button" data-session-id="{{ session.id }}" id="next-round-button" title="Generate the next candidate batch. In round 1 this includes the raw prompt baseline; later rounds include the previous winner." {% if session.status == "awaiting_feedback" %}disabled{% endif %}>{% if session.current_round == 0 %}Generate first round{% else %}Generate next round{% endif %}</button>
+          <a class="button secondary" href="/sessions/{{ session.id }}/replay-view" title="Inspect persisted rounds, winners, and update summaries for this session.">Open replay</a>
+          <a class="button secondary" href="/sessions/{{ session.id }}/trace-report" title="Open the backend-saved HTML run report with images, events, and preference history.">Open trace report</a>
         </div>
       </section>
 
@@ -39,9 +39,21 @@
             <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
           </div>
         </div>
-        <p>Current steering vector: <code>{{ session.current_z }}</code></p>
-        <p>Status: <strong>{{ session.status }}</strong></p>
-        <p>Feedback mode: <strong>{{ session.config.feedback_mode }}</strong></p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Session status <span class="help-tip inline" tabindex="0" role="note" aria-label="Session status help" data-tooltip="Ready means you can generate a round. Awaiting feedback means the current round must be reviewed before continuing.">?</span></span>
+            <strong>{% if session.status == "awaiting_feedback" %}Waiting for your feedback{% elif session.current_round == 0 %}Ready to start{% else %}Ready for another round{% endif %}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Feedback mode <span class="help-tip inline" tabindex="0" role="note" aria-label="Feedback mode help" data-tooltip="This controls which feedback widget appears on each candidate card and how your selection is interpreted.">?</span></span>
+            <strong>{{ session.config.feedback_mode }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Steering vector <span class="help-tip inline" tabindex="0" role="note" aria-label="Steering vector help" data-tooltip="This is the current low-dimensional steering state that the updater moves after each round of feedback.">?</span></span>
+            <code>{{ session.current_z }}</code>
+          </div>
+        </div>
+        <p class="hint">{% if session.current_round == 0 %}Start by generating the first round. You will see one raw prompt baseline plus additional sampled variants.{% elif session.status == "awaiting_feedback" %}Review this round and submit feedback to unlock the next one.{% else %}Feedback is complete for the current round. You can continue exploring or open replay to review the history.{% endif %}</p>
       </section>
 
       <section class="card" id="round-container">
@@ -54,9 +66,12 @@
             {% for candidate in current_round.candidates %}
               <article class="image-card">
                 <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
-                <h3>{{ candidate.id }}</h3>
-                <p>Role: {{ candidate.sampler_role }}</p>
-                <p>z: {{ candidate.z }}</p>
+                <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
+                <p class="candidate-subtitle">{{ candidate.id }}</p>
+                <div class="candidate-meta">
+                  <p>Role <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate role help" data-tooltip="Baseline is the raw prompt, incumbent is the previous winner, and sampler roles describe how other candidates were proposed.">?</span>: <strong>{{ candidate.sampler_role }}</strong></p>
+                  <p>Steering <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate steering vector help" data-tooltip="This candidate's proposed steering coordinates for the current round.">?</span>: <code>{{ candidate.z }}</code></p>
+                </div>
                 <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode }}">
                   {% if session.config.feedback_mode == "scalar_rating" %}
                     <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
@@ -124,13 +139,19 @@
               {% endif %}
             </p>
             <div class="actions">
-              <button class="button" id="submit-feedback-button" data-round-id="{{ current_round.id }}" data-feedback-mode="{{ session.config.feedback_mode }}">Submit feedback</button>
+              <button class="button" id="submit-feedback-button" data-round-id="{{ current_round.id }}" data-feedback-mode="{{ session.config.feedback_mode }}" title="Submit your current preference selections and update the session model.">Submit feedback</button>
             </div>
           {% else %}
-            <p class="hint">Feedback has already been submitted for this round. Generate the next round to continue.</p>
+            <div class="soft-callout">
+              <strong>Feedback recorded</strong>
+              <p>Winner: <code>{{ current_round.update_summary.winner_candidate_id }}</code>. Generate the next round to continue or open replay to inspect the update summary.</p>
+            </div>
           {% endif %}
         {% else %}
-          <p>No rounds yet. Generate the first round to begin.</p>
+          <div class="soft-callout">
+            <strong>No rounds yet</strong>
+            <p>Generate the first round to see the raw prompt baseline and the first sampled variations side by side.</p>
+          </div>
         {% endif %}
       </section>
       <section class="card trace-card">

@@ -32,10 +32,10 @@ model_name: runwayml/stable-diffusion-v1-5`
 test.describe("StableSteering browser flow", () => {
   test("user can create a session, click through a round, and see replay content", async ({ page }) => {
     await createSessionViaBrowser(page);
-    await expect(page.getByRole("button", { name: "Generate next round" })).toBeVisible();
-    await expect(page.getByText("Current steering vector:")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
+    await expect(page.getByText(/Steering vector/)).toBeVisible();
 
-    await page.getByRole("button", { name: "Generate next round" }).click();
+    await page.getByRole("button", { name: /Generate .* round/ }).click();
 
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
     await expect(page.locator(".image-card")).toHaveCount(5);
@@ -47,7 +47,7 @@ test.describe("StableSteering browser flow", () => {
     await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 0).click();
     await page.getByRole("button", { name: "Submit feedback" }).click();
 
-    await expect(page.getByText("Status:")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
 
     await page.getByRole("link", { name: "Open replay" }).click();
@@ -65,7 +65,7 @@ test.describe("StableSteering browser flow", () => {
       prompt: "A polished red roadster in a white cyclorama",
     });
 
-    await page.getByRole("button", { name: "Generate next round" }).click();
+    await page.getByRole("button", { name: /Generate .* round/ }).click();
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
 
     await page.locator('.star-button[data-candidate-id]').nth(1 * 5 + 3).click();
@@ -73,7 +73,7 @@ test.describe("StableSteering browser flow", () => {
     await page.locator('.star-button[data-candidate-id]').nth(3 * 5 + 2).click();
     await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 1).click();
     await page.getByRole("button", { name: "Submit feedback" }).click();
-    await expect(page.getByText("Status:")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
 
     const replayResponse = await request.get(`/sessions/${sessionId}/replay`);
@@ -94,12 +94,12 @@ test.describe("StableSteering browser flow", () => {
       feedbackMode: "winner_only",
     });
 
-    await page.getByRole("button", { name: "Generate next round" }).click();
+    await page.getByRole("button", { name: /Generate .* round/ }).click();
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
     await expect(page.locator(".winner-only-input")).toHaveCount(5);
     await page.locator(".winner-only-input").nth(2).check();
     await page.getByRole("button", { name: "Submit feedback" }).click();
-    await expect(page.getByText("Status:")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
   });
 
   test("setup page can reload the default YAML template", async ({ page }) => {

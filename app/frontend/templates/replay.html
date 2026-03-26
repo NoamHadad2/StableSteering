@@ -21,18 +21,36 @@
         <section class="card">
           <div class="section-head">
             <h2>Round {{ round.round_index }}</h2>
-            <span>{{ round.render_status }}</span>
+            <span>{{ round.render_status }} · {{ round.candidates|length }} candidates</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Winner</span>
+              <strong>{{ round.update_summary.winner_candidate_id if round.update_summary else "Not selected yet" }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Feedback events</span>
+              <strong>{{ round.feedback_events|length }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Seed policy</span>
+              <strong>{{ round.seed_policy }}</strong>
+            </div>
           </div>
           <div class="image-grid">
             {% for candidate in round.candidates %}
               <article class="image-card compact-card">
                 <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
-                <p>{{ candidate.id }}</p>
-                <p>{{ candidate.sampler_role }}</p>
+                <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
+                <p class="candidate-subtitle">{{ candidate.id }}</p>
+                <p><strong>{{ candidate.sampler_role }}</strong></p>
               </article>
             {% endfor %}
           </div>
-          <pre class="code-block">{{ round.update_summary }}</pre>
+          <details class="details-block">
+            <summary>Round update summary</summary>
+            <pre class="code-block">{{ round.update_summary | tojson(indent=2) }}</pre>
+          </details>
         </section>
       {% else %}
         <section class="card"><p>No rounds recorded yet.</p></section>
