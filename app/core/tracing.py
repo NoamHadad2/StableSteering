@@ -161,6 +161,12 @@ class TraceRecorder:
             "    .events th, .events td { text-align: left; padding: 10px; border-top: 1px solid #e7ddcf; vertical-align: top; }",
             "    pre { margin: 0; white-space: pre-wrap; word-break: break-word; background: #f7f2ea; border-radius: 12px; padding: 12px; }",
             "    a { color: #7a3f13; }",
+            "    details.card { padding: 0; overflow: hidden; }",
+            "    details.card > summary { list-style: none; cursor: pointer; padding: 20px; font-weight: 700; }",
+            "    details.card > summary::-webkit-details-marker { display: none; }",
+            "    details.card > summary::after { content: '+'; float: right; color: #7a3f13; }",
+            "    details.card[open] > summary::after { content: '−'; }",
+            "    .card-body { padding: 0 20px 20px; }",
             "  </style>",
             "</head>",
             "<body>",
@@ -179,30 +185,37 @@ class TraceRecorder:
             f'      <div class="metric"><h3>Active Device</h3><p>{self._escape(str(diagnostics.get("active_device") or diagnostics.get("configured_device") or "n/a"))}</p></div>',
             "    </div>",
             "  </section>",
-            '  <section class="card section">',
-            "    <h2>Artifacts</h2>",
+            '  <details class="card section" open>',
+            "    <summary>Artifacts</summary>",
+            '    <div class="card-body">',
             f"    <p>Backend event log: <code>{self._escape(str(backend_rel))}</code></p>",
             f"    <p>Frontend event log: <code>{self._escape(str(frontend_rel))}</code></p>",
-            "  </section>",
-            '  <section class="card section">',
-            "    <h2>Runtime Diagnostics</h2>",
+            "    </div>",
+            "  </details>",
+            '  <details class="card section" open>',
+            "    <summary>Runtime Diagnostics</summary>",
+            '    <div class="card-body">',
             f"    <pre>{self._escape(json.dumps(diagnostics, indent=2, sort_keys=True))}</pre>",
-            "  </section>",
-            '  <section class="card section">',
-            "    <h2>Run Summary</h2>",
+            "    </div>",
+            "  </details>",
+            '  <details class="card section" open>',
+            "    <summary>Run Summary</summary>",
+            '    <div class="card-body">',
             f"    <p><strong>Negative prompt:</strong> {self._escape(session.get('negative_prompt') or '(none)')}</p>",
             f"    <p><strong>Model:</strong> <code>{self._escape(session.get('model_name', 'unknown'))}</code></p>",
             f"    <p><strong>Feedback mode:</strong> <code>{self._escape(str(session.get('config', {}).get('feedback_mode', 'unknown')))}</code></p>",
             f"    <p><strong>Sampler:</strong> <code>{self._escape(str(session.get('config', {}).get('sampler', 'unknown')))}</code></p>",
             f"    <p><strong>Updater:</strong> <code>{self._escape(str(session.get('config', {}).get('updater', 'unknown')))}</code></p>",
-            "  </section>",
+            "    </div>",
+            "  </details>",
         ]
 
         for round_obj in rounds:
             html_parts.extend(
                 [
-                    '  <section class="card section round">',
-                    f"    <h2>Round {round_obj.get('round_index')}</h2>",
+                    '  <details class="card section round">',
+                    f"    <summary>Round {round_obj.get('round_index')}</summary>",
+                    '    <div class="card-body">',
                     f'    <span class="pill">Round id: {self._escape(round_obj.get("id", ""))}</span>',
                     f'    <span class="pill">Render status: {self._escape(str(round_obj.get("render_status", "unknown")))}</span>',
                     f'    <span class="pill">Latency: {self._escape(str(round_obj.get("latency_ms", 0)))} ms</span>',
@@ -242,12 +255,13 @@ class TraceRecorder:
                 html_parts.append(
                     f"    <pre>{self._escape(json.dumps(round_obj.get('update_summary', {}), indent=2, sort_keys=True))}</pre>"
                 )
-            html_parts.append("  </section>")
+            html_parts.extend(["    </div>", "  </details>"])
 
         html_parts.extend(
             [
-                '  <section class="card section">',
-                "    <h2>Event Timeline</h2>",
+                '  <details class="card section">',
+                "    <summary>Event Timeline</summary>",
+                '    <div class="card-body">',
                 '    <table class="events">',
                 "      <thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Details</th></tr></thead>",
                 "      <tbody>",
@@ -270,7 +284,8 @@ class TraceRecorder:
             [
                 "      </tbody>",
                 "    </table>",
-                "  </section>",
+                "    </div>",
+                "  </details>",
                 "</main>",
                 "</body>",
                 "</html>",

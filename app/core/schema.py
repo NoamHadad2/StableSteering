@@ -59,7 +59,7 @@ class StrategyConfig(BaseModel):
     feedback_mode: FeedbackType = FeedbackType.scalar_rating
     seed_policy: str = "fixed-per-round"
     steering_mode: str = "low_dimensional"
-    candidate_count: int = 4
+    candidate_count: int = 5
     image_size: str = "512x512"
     trust_radius: float = 0.35
     anchor_strength: float = 0.15

@@ -14,7 +14,7 @@ updater: ${options.updater || "winner_average"}
 feedback_mode: ${options.feedbackMode || "scalar_rating"}
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
-candidate_count: ${options.candidateCount || 4}
+candidate_count: ${options.candidateCount || 5}
 image_size: 512x512
 trust_radius: 0.35
 anchor_strength: 0.15
@@ -36,14 +36,15 @@ test.describe("StableSteering browser flow", () => {
     await page.getByRole("button", { name: "Generate next round" }).click();
 
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
-    await expect(page.locator(".image-card")).toHaveCount(4);
+    await expect(page.locator(".image-card")).toHaveCount(5);
     await expect(page.locator(".image-card img").first()).toBeVisible();
 
     const ratings = page.locator(".rating-input");
     await ratings.nth(0).fill("2");
     await ratings.nth(1).fill("5");
     await ratings.nth(2).fill("4");
-    await ratings.nth(3).fill("1");
+    await ratings.nth(3).fill("3");
+    await ratings.nth(4).fill("1");
     await page.getByRole("button", { name: "Submit feedback" }).click();
 
     await expect(page.getByText("Status:")).toBeVisible();
@@ -54,7 +55,7 @@ test.describe("StableSteering browser flow", () => {
     await expect(page).toHaveURL(/\/sessions\/.+\/replay-view$/);
     await expect(page.getByText("Replay", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
-    await expect(page.locator(".compact-card")).toHaveCount(4);
+    await expect(page.locator(".compact-card")).toHaveCount(5);
   });
 
   test("replay export API returns the round and feedback history for a browser-created session", async ({ page, request }) => {
@@ -71,7 +72,8 @@ test.describe("StableSteering browser flow", () => {
     await ratings.nth(0).fill("1");
     await ratings.nth(1).fill("4");
     await ratings.nth(2).fill("5");
-    await ratings.nth(3).fill("2");
+    await ratings.nth(3).fill("3");
+    await ratings.nth(4).fill("2");
     await page.getByRole("button", { name: "Submit feedback" }).click();
     await expect(page.getByText("Status:")).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
@@ -82,9 +84,18 @@ test.describe("StableSteering browser flow", () => {
     const replay = await replayResponse.json();
     expect(replay.session.id).toBe(sessionId);
     expect(replay.rounds).toHaveLength(1);
-    expect(replay.rounds[0].candidates).toHaveLength(4);
+    expect(replay.rounds[0].candidates).toHaveLength(5);
     expect(replay.rounds[0].feedback_events).toHaveLength(1);
     expect(replay.rounds[0].update_summary.winner_candidate_id).toBeTruthy();
+  });
+
+  test("setup page can reload the default YAML template", async ({ page }) => {
+    await page.goto("/setup");
+    const editor = page.locator('[name="config_yaml"]');
+    await editor.fill("candidate_count: 2");
+    await page.getByRole("button", { name: "Reload default YAML" }).click();
+    await expect(editor).toContainText("candidate_count: 5");
+    await expect(editor).toContainText("sampler: random_local");
   });
 
   test("home page shows experiments after a browser-created flow", async ({ page }) => {

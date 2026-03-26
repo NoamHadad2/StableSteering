@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 
 from app.core.config import settings
 from app.core.schema import (
@@ -21,6 +22,7 @@ from app.core.schema import (
 from app.core.logging import logger
 from app.core.tracing import TraceRecorder
 from app.feedback.normalization import normalize_feedback
+from app.samplers.base import clamp_vector
 from app.samplers.exploit_orthogonal import ExploitOrthogonalSampler
 from app.samplers.random_local import RandomLocalSampler
 from app.samplers.uncertainty import UncertaintyGuidedSampler
@@ -139,6 +141,7 @@ class Orchestrator:
         carried_forward = self._build_carried_forward_candidate(session)
         baseline_candidate = self._build_baseline_prompt_candidate(session)
         proposed_candidates = sampler.propose(session, seed)
+        proposed_candidates = self._widen_first_round_candidates(session, proposed_candidates)
         candidates = self._compose_round_candidates(
             pinned_candidate=carried_forward or baseline_candidate,
             proposed_candidates=proposed_candidates,
@@ -359,6 +362,35 @@ class Orchestrator:
                 "steering_applied": False,
             },
         )
+
+    @staticmethod
+    def _widen_first_round_candidates(session: Session, proposed_candidates: list[Candidate]) -> list[Candidate]:
+        """Slightly spread first-round exploratory candidates away from the prompt baseline."""
+
+        if session.current_round != 0:
+            return proposed_candidates
+
+        boosted_candidates: list[Candidate] = []
+        boost_radius = min(session.config.trust_radius * 1.35, 0.6)
+        min_radius = min(max(session.config.trust_radius * 0.85, 0.18), boost_radius)
+        for index, candidate in enumerate(proposed_candidates):
+            scale = 1.2 + (0.12 * index)
+            boosted_z = clamp_vector([value * scale for value in candidate.z], boost_radius)
+            length = math.sqrt(sum(value * value for value in boosted_z))
+            if 0.0 < length < min_radius:
+                normalization = min_radius / length
+                boosted_z = clamp_vector([value * normalization for value in boosted_z], boost_radius)
+                length = math.sqrt(sum(value * value for value in boosted_z))
+            if length == 0.0:
+                axis = index % max(1, len(session.current_z))
+                boosted_z = [0.0 for _ in session.current_z]
+                boosted_z[axis] = min_radius
+            candidate.z = boosted_z
+            candidate.generation_params["first_round_diversity_boost"] = True
+            candidate.generation_params["first_round_diversity_scale"] = round(scale, 3)
+            candidate.generation_params["first_round_min_radius"] = round(min_radius, 3)
+            boosted_candidates.append(candidate)
+        return boosted_candidates
 
     @staticmethod
     def _compose_round_candidates(

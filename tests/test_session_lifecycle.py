@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import math
 
 
 def test_setup_session_endpoint_accepts_yaml_config(client) -> None:
@@ -83,6 +84,12 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     assert baseline["z"] == [0.0, 0.0, 0.0]
     assert baseline["generation_params"]["baseline_prompt"] is True
     assert baseline["generation_params"]["steering_applied"] is False
+    exploratory_candidates = round_payload["candidate_metadata"][1:]
+    assert exploratory_candidates
+    assert all(candidate["generation_params"]["first_round_diversity_boost"] is True for candidate in exploratory_candidates)
+    assert all(
+        math.sqrt(sum(value * value for value in candidate["z"])) > 0.18 for candidate in exploratory_candidates
+    )
 
     blocked_round = client.post(f"/sessions/{session_id}/rounds/next")
     assert blocked_round.status_code == 409

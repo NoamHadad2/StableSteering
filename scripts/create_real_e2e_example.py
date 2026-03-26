@@ -33,10 +33,13 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[0]: 2,
             candidate_ids[1]: 5,
             candidate_ids[2]: 4,
+            candidate_ids[3]: 3,
+            candidate_ids[4]: 1,
         }
         critique = (
             "The unmodified prompt baseline is promising, but candidate 2 has the clearest silhouette, "
-            "the strongest sunrise rim light, and the most premium hero-shot composition."
+            "the strongest sunrise rim light, and the most premium hero-shot composition. "
+            "The extra alternatives are useful, but they do not beat the top two."
         )
         return ratings, critique
 
@@ -45,6 +48,8 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[0]: 5,
             candidate_ids[1]: 4,
             candidate_ids[2]: 2,
+            candidate_ids[3]: 3,
+            candidate_ids[4]: 1,
         }
         critique = "Keep the carried-forward winner, but push harder toward cleaner panel detail and a stronger studio-product framing."
         return ratings, critique
@@ -54,6 +59,8 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[0]: 4,
             candidate_ids[1]: 5,
             candidate_ids[2]: 3,
+            candidate_ids[3]: 2,
+            candidate_ids[4]: 1,
         }
         critique = "Candidate 2 improves the bodywork and surfacing. It feels more like a premium launch image while staying true to the concept."
         return ratings, critique
@@ -63,6 +70,8 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[0]: 4,
             candidate_ids[1]: 5,
             candidate_ids[2]: 3,
+            candidate_ids[3]: 2,
+            candidate_ids[4]: 1,
         }
         critique = "Candidate 2 has the best balance of dramatic lighting and realistic product geometry. Keep that direction for the next phase."
         return ratings, critique
@@ -71,6 +80,8 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
         candidate_ids[0]: 5,
         candidate_ids[1]: 4,
         candidate_ids[2]: 3,
+        candidate_ids[3]: 2,
+        candidate_ids[4]: 1,
     }
     critique = "The incumbent now reads like the strongest finished hero image, so preserve it as the final preferred direction."
     return ratings, critique
@@ -233,6 +244,12 @@ def _render_html(
         "    pre { white-space: pre-wrap; word-break: break-word; background: #f7f1e9; border-radius: 14px; padding: 14px; font-size: 0.88rem; }",
         "    table { width: 100%; border-collapse: collapse; }",
         "    th, td { text-align: left; vertical-align: top; padding: 10px; border-top: 1px solid #e7dbce; }",
+        "    details.card { padding: 0; overflow: hidden; }",
+        "    details.card > summary { list-style: none; cursor: pointer; padding: 22px 24px; font-family: 'Segoe UI', sans-serif; font-weight: 700; }",
+        "    details.card > summary::-webkit-details-marker { display: none; }",
+        "    details.card > summary::after { content: '+'; float: right; color: #87562a; }",
+        "    details.card[open] > summary::after { content: '−'; }",
+        "    .card-body { padding: 0 24px 24px; }",
         "  </style>",
         "</head>",
         "<body>",
@@ -251,12 +268,14 @@ def _render_html(
         f'      <div class="metric"><strong>Unique images</strong><span>{escape(str(visual_checks["summary"]["unique_image_count"]))}</span></div>',
         "    </div>",
         "  </section>",
-        '  <section class="card stack">',
-        '    <div class="callout">',
+        '  <details class="card" open>',
+        "    <summary>Demonstration Overview</summary>",
+        '    <div class="card-body stack">',
+        '      <div class="callout">',
         "      <h2>Demonstration Objective</h2>",
         f"      <p>{escape(objective)}</p>",
-        "    </div>",
-        '    <div class="columns">',
+        "      </div>",
+        '      <div class="columns">',
         "      <div>",
         "        <h3>Success Criteria</h3>",
         "        <ul>",
@@ -270,29 +289,35 @@ def _render_html(
         "        </ol>",
         "      </div>",
         "    </div>",
-        "  </section>",
-        '  <section class="card stack">',
-        "    <div>",
+        "    </div>",
+        "  </details>",
+        '  <details class="card" open>',
+        "    <summary>Run Setup</summary>",
+        '    <div class="card-body stack">',
+        "      <div>",
         "      <h2>Run Setup</h2>",
         f"      <p><strong>Prompt:</strong> {escape(session['prompt'])}</p>",
         f"      <p><strong>Negative prompt:</strong> {escape(session.get('negative_prompt') or '(none)')}</p>",
         f"      <p><strong>Sampler:</strong> <code>{escape(session['config']['sampler'])}</code> | <strong>Updater:</strong> <code>{escape(session['config']['updater'])}</code> | <strong>Feedback mode:</strong> <code>{escape(session['config']['feedback_mode'])}</code></p>",
         f"      <p><strong>Output file:</strong> <code>{escape(str(output_path))}</code></p>",
+        "      </div>",
+        f"      <pre>{escape(json.dumps(diagnostics, indent=2, sort_keys=True))}</pre>",
         "    </div>",
-        f"    <pre>{escape(json.dumps(diagnostics, indent=2, sort_keys=True))}</pre>",
-        "  </section>",
-        '  <section class="card stack">',
-        "    <div>",
+        "  </details>",
+        '  <details class="card" open>',
+        "    <summary>Automated Visual Checks</summary>",
+        '    <div class="card-body stack">',
+        "      <div>",
         "      <h2>Automated Visual Checks</h2>",
         "      <p>These checks do not prove semantic correctness, but they do catch common generation failures such as blank-looking outputs, unreadable files, low-detail artifacts, and accidental duplication.</p>",
-        "    </div>",
-        '    <div class="metrics">',
+        "      </div>",
+        '      <div class="metrics">',
         f'      <div class="metric"><strong>Unique image files</strong><span>{escape(str(visual_checks["summary"]["unique_image_count"]))}</span></div>',
         f'      <div class="metric"><strong>Reused candidates</strong><span>{escape(str(visual_checks["summary"]["reused_candidate_count"]))}</span></div>',
         f'      <div class="metric"><strong>Flagged images</strong><span>{escape(str(visual_checks["summary"]["failing_image_count"]))}</span></div>',
         f'      <div class="metric"><strong>Duplicate groups</strong><span>{escape(str(visual_checks["summary"]["duplicate_image_group_count"]))}</span></div>',
-        "    </div>",
-        "    <table>",
+        "      </div>",
+        "      <table>",
         "      <thead><tr><th>Image</th><th>Candidates</th><th>Size</th><th>Entropy</th><th>Contrast</th><th>Edges</th><th>Status</th></tr></thead>",
         "      <tbody>",
         *[
@@ -310,11 +335,12 @@ def _render_html(
         "      </tbody>",
         "    </table>",
         (
-            f"    <pre>{escape(json.dumps(visual_checks, indent=2, sort_keys=True))}</pre>"
+            f"      <pre>{escape(json.dumps(visual_checks, indent=2, sort_keys=True))}</pre>"
             if visual_checks["failing_images"] or visual_checks["duplicate_groups"]
-            else "    <p>All automated visual sanity checks passed for the unique generated images in this bundle.</p>"
+            else "      <p>All automated visual sanity checks passed for the unique generated images in this bundle.</p>"
         ),
-        "  </section>",
+        "    </div>",
+        "  </details>",
     ]
 
     for round_obj in rounds:
@@ -322,9 +348,10 @@ def _render_html(
         winner_id = round_obj.get("update_summary", {}).get("winner_candidate_id")
         sections.extend(
             [
-                '  <section class="card round">',
+                '  <details class="card round">',
+                f"    <summary>Phase {round_obj['round_index']}: propose, inspect, choose, update</summary>",
+                '    <div class="card-body">',
                 f"    <p class=\"eyebrow\">Round {round_obj['round_index']}</p>",
-                f"    <h2>Phase {round_obj['round_index']}: propose, inspect, choose, update</h2>",
                 f"    <p><span class=\"pill\">Round id: {escape(round_obj['id'])}</span><span class=\"pill\">Latency: {escape(str(round_obj.get('latency_ms', 0)))} ms</span><span class=\"pill\">Incumbent z before update: {escape(json.dumps(round_obj.get('incumbent_z', [])))}</span></p>",
                 '    <div class="candidate-grid">',
             ]
@@ -369,16 +396,19 @@ def _render_html(
                     f"    <pre>{escape(json.dumps(round_obj['update_summary'], indent=2, sort_keys=True))}</pre>",
                 ]
             )
-        sections.append("  </section>")
+        sections.extend(["    </div>", "  </details>"])
 
     sections.extend(
         [
-            '  <section class="card">',
+            '  <details class="card" open>',
+            "    <summary>Outcome</summary>",
+            '    <div class="card-body">',
             "    <h2>Outcome</h2>",
             f"    <p>The session ended at round <strong>{len(rounds)}</strong> with incumbent candidate <code>{escape(str(session.get('incumbent_candidate_id') or 'n/a'))}</code>.</p>",
             "    <p>This report demonstrates system value by showing that the workflow does not stop at one prompt and one image. It keeps the user in a controlled compare-select-update loop with visible evidence for what was proposed, what was preferred, and how the next state was chosen.</p>",
             f"    <p>Backend session traces and the auto-generated audit report also exist under <code>{escape(str((output_path.parent / 'data' / 'traces').resolve()))}</code>.</p>",
-            "  </section>",
+            "    </div>",
+            "  </details>",
             "</main>",
             "</body>",
             "</html>",
@@ -422,7 +452,7 @@ def main() -> int:
             name="Premium product hero image demo",
             description="A scripted user steering walkthrough that demonstrates creative refinement on the real Diffusers backend.",
             config=StrategyConfig(
-                candidate_count=3,
+                candidate_count=5,
                 image_size="512x512",
                 sampler="random_local",
                 updater="winner_average",

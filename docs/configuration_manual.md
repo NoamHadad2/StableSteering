@@ -103,7 +103,7 @@ updater: winner_average
 feedback_mode: scalar_rating
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
-candidate_count: 4
+candidate_count: 5
 image_size: 512x512
 trust_radius: 0.35
 anchor_strength: 0.15
@@ -331,7 +331,7 @@ updater: winner_average
 feedback_mode: scalar_rating
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
-candidate_count: 4
+candidate_count: 5
 image_size: 512x512
 trust_radius: 0.25
 anchor_strength: 0.15
