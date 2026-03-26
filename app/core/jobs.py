@@ -3,6 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from enum import Enum
+from inspect import signature
 from threading import Lock
 from typing import Any, Callable
 from uuid import uuid4
@@ -62,9 +63,16 @@ class AsyncJobManager:
     def _run_sync(self, job_id: str, fn: Callable[[], Any]) -> None:
         """Execute one submitted job and persist its status transitions."""
 
-        self._update(job_id, state=JobState.running, progress=15, status_message="Running")
+        self._update(job_id, state=JobState.running, progress=12, status_message="Starting work")
         try:
-            result = fn()
+            try:
+                arity = len(signature(fn).parameters)
+            except (TypeError, ValueError):
+                arity = 0
+            if arity >= 1:
+                result = fn(lambda progress, message: self.update_progress(job_id, progress, message))
+            else:
+                result = fn()
         except Exception as exc:
             self._update(
                 job_id,
@@ -80,10 +88,15 @@ class AsyncJobManager:
             job_id,
             state=JobState.succeeded,
             progress=100,
-            status_message="Completed",
+            status_message="Completed successfully",
             result=payload,
             error=None,
         )
+
+    def update_progress(self, job_id: str, progress: int, status_message: str) -> None:
+        """Expose safe phase-level progress updates to long-running jobs."""
+
+        self._update(job_id, state=JobState.running, progress=progress, status_message=status_message)
 
     def _update(self, job_id: str, **changes: Any) -> None:
         """Mutate one job record in place under the manager lock."""

@@ -128,7 +128,8 @@ def index(request: Request) -> HTMLResponse:
     """Render the experiment dashboard."""
 
     experiments = request.app.state.orchestrator.list_experiments()
-    return templates.TemplateResponse("index.html", {"request": request, "experiments": experiments})
+    sessions = request.app.state.orchestrator.list_sessions()
+    return templates.TemplateResponse("index.html", {"request": request, "experiments": experiments, "sessions": sessions[:10]})
 
 
 @app.get("/diagnostics")
@@ -337,7 +338,7 @@ async def next_round_async(session_id: str):
         app.state.orchestrator._assert_round_generation_allowed(session_id)
         job = await app.state.job_manager.submit(
             operation=f"generate_round:{session_id}",
-            fn=lambda: app.state.orchestrator.generate_round(session_id),
+            fn=lambda progress: app.state.orchestrator.generate_round(session_id, progress),
         )
     except KeyError as exc:
         return api_error_response(404, "not_found", str(exc))
@@ -368,7 +369,7 @@ async def submit_feedback_async(round_id: str, request: FeedbackRequest):
         app.state.orchestrator._assert_feedback_submission_allowed(round_id, request)
         job = await app.state.job_manager.submit(
             operation=f"submit_feedback:{round_id}",
-            fn=lambda: app.state.orchestrator.submit_feedback(round_id, request),
+            fn=lambda progress: app.state.orchestrator.submit_feedback(round_id, request, progress),
         )
     except KeyError as exc:
         return api_error_response(404, "not_found", str(exc))

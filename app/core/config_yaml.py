@@ -18,6 +18,7 @@ CONFIG_COMMENT_BLOCK = dedent(
     # updater: winner_average | winner_copy | linear_preference
     # feedback_mode: scalar_rating | pairwise | top_k | winner_only | approve_reject
     # seed_policy: fixed-per-round | fixed-per-candidate | fixed-per-candidate-role
+    # steering_dimension: low-dimensional steering vector size, for example 3 or 5
     # image_size: WIDTHxHEIGHT, for example 512x512
     # guidance_scale: classifier-free guidance strength, for example 7.5
     # num_inference_steps: diffusion denoising steps, for example 15 or 30

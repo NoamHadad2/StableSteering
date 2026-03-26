@@ -85,6 +85,7 @@ class StrategyConfig(BaseModel):
     feedback_mode: FeedbackType = FeedbackType.scalar_rating
     seed_policy: SeedPolicy = SeedPolicy.fixed_per_round
     steering_mode: SteeringMode = SteeringMode.low_dimensional
+    steering_dimension: int = Field(default=3, ge=1, le=16)
     candidate_count: int = Field(default=5, ge=1, le=12)
     image_size: str = "512x512"
     trust_radius: float = Field(default=0.35, gt=0.0, le=1.0)
@@ -189,7 +190,7 @@ class Session(BaseModel):
     status: SessionStatus = SessionStatus.created
     basis_type: str = "random_orthonormal"
     current_round: int = 0
-    current_z: list[float] = Field(default_factory=lambda: [0.0, 0.0, 0.0])
+    current_z: list[float] = Field(default_factory=list)
     incumbent_candidate_id: str | None = None
     final_selected_candidate: str | None = None
     base_embedding_cache_key: str = Field(default_factory=lambda: new_id("emb"))

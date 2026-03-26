@@ -19,6 +19,7 @@ updater: linear_preference
 feedback_mode: pairwise
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
+steering_dimension: 5
 candidate_count: 3
 image_size: 512x512
 trust_radius: 0.25
@@ -32,6 +33,7 @@ model_name: runwayml/stable-diffusion-v1-5
     assert payload["experiment"]["config"]["sampler"] == "exploit_orthogonal"
     assert payload["experiment"]["config"]["updater"] == "linear_preference"
     assert payload["session"]["config"]["feedback_mode"] == "pairwise"
+    assert payload["session"]["config"]["steering_dimension"] == 5
     assert payload["session"]["config"]["candidate_count"] == 3
 
 
@@ -149,6 +151,32 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
         json={"feedback_type": "scalar_rating", "payload": {"ratings": ratings}},
     )
     assert duplicate_feedback.status_code == 409
+
+
+def test_session_steering_dimension_comes_from_config(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Dimension test",
+            "description": "Steering dimension test",
+            "config": {
+                "steering_dimension": 5,
+                "candidate_count": 4,
+            },
+        },
+    ).json()
+
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A configurable steering vector", "negative_prompt": ""},
+    ).json()
+    assert session["config"]["steering_dimension"] == 5
+    assert session["current_z"] == [0.0, 0.0, 0.0, 0.0, 0.0]
+
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    baseline = round_payload["candidate_metadata"][0]
+    assert baseline["z"] == [0.0, 0.0, 0.0, 0.0, 0.0]
+    assert all(len(candidate["z"]) == 5 for candidate in round_payload["candidate_metadata"])
 
 
 def test_replay_export_contains_rounds(client) -> None:

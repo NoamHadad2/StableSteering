@@ -370,7 +370,28 @@ Success signal:
 
 ## 9. R2: Strategy Research Expansions
 
-### 9.1 Add richer steering representations
+### 9.1 Study steering-dimension selection methods
+
+Why it matters:
+
+- steering dimension controls the size and geometry of the search space the user is trying to navigate
+- too few dimensions may cap attainable quality or controllability, while too many may increase noise, redundancy, and cognitive burden
+- strong results on one fixed dimension do not automatically transfer to other tasks, prompts, or diffusion workflows
+
+Implementation notes:
+
+- compare fixed low dimensions such as 2, 3, 5, 8, and 16 across matched prompts, seeds, and feedback budgets
+- test adaptive dimension schedules, for example start low for stability and expand capacity only after early convergence
+- compare basis-construction methods such as random orthogonal axes, PCA-style data-driven axes, learned steering dictionaries, and semantically aligned attribute axes
+- measure not only final preference outcome but also rounds-to-satisfaction, duplicate rate, diversity, preference consistency, and subjective user burden
+- analyze whether optimal dimension depends on task family, prompt complexity, feedback mode, sampler family, or diffusion workflow
+- study whether dimension interacts strongly with incumbent carry-forward and trust-radius policies
+
+Success signal:
+
+- the project can recommend steering-dimension choices for specific task classes with empirical justification
+
+### 9.2 Add richer steering representations
 
 Why it matters:
 
@@ -386,7 +407,7 @@ Success signal:
 
 - representation changes are justified by measurable gains rather than novelty alone
 
-### 9.2 Add stronger samplers
+### 9.3 Add stronger samplers
 
 Why it matters:
 
@@ -405,7 +426,7 @@ Success signal:
 
 - sampler comparisons reveal clear tradeoffs in exploration, stability, and user burden
 
-### 9.3 Add stronger preference and reward models
+### 9.4 Add stronger preference and reward models
 
 Why it matters:
 
@@ -424,7 +445,7 @@ Success signal:
 
 - the project has evidence about which preference-model family best converts user judgments into useful steering signals
 
-### 9.4 Add stronger updaters
+### 9.5 Add stronger updaters
 
 Why it matters:
 
@@ -461,6 +482,7 @@ Success signal:
 
 ### Milestone R-C: Comparative Research
 
+- compare steering-dimension selection methods
 - compare samplers
 - compare preference and reward models
 - compare updaters
@@ -487,7 +509,8 @@ Success signal:
 13. build synthetic stress-test corpora
 14. evaluate synthetic-user realism
 15. extend studies to image-prompt, inpainting, and ControlNet workflows
-16. compare richer representations, samplers, preference models, and updaters
+16. compare steering-dimension selection methods
+17. compare richer representations, samplers, preference models, and updaters
 
 ## 12. Summary
 

@@ -355,6 +355,26 @@
 <ul>
 <li>the system can switch between heuristic update rules and explicit learned preference models through one stable contract</li>
 </ul>
+<h3 id="68-add-steering-dimension-selection-methods">6.8 Add steering-dimension selection methods</h3>
+<p>Why it matters:</p>
+<ul>
+<li>steering dimension is now configurable, but choosing it well still depends too much on operator intuition</li>
+<li>dimensions that are too small can block controllability, while dimensions that are too large can create noisy search and harder user judgments</li>
+<li>a practical system should help users pick a dimension that matches the task, model, and feedback budget</li>
+</ul>
+<p>Implementation notes:</p>
+<ul>
+<li>add preset dimension profiles such as fast-explore, balanced, and high-capacity, with clear documentation of their tradeoffs</li>
+<li>log steering dimension together with prompt family, sampler, feedback mode, round count, and outcome quality so dimension choices can be audited later</li>
+<li>add diagnostics and analysis summaries that compare session behavior across dimensions, including convergence speed, diversity, and preference consistency</li>
+<li>support dimension sweep runs in scripts and sample-generation utilities so several dimensions can be compared under one prompt/config preset</li>
+<li>add optional basis-construction helpers so larger dimensions can be initialized from PCA, random orthogonal bases, learned dictionaries, or attribute-aligned axes instead of arbitrary coordinates</li>
+<li>expose dimension-selection guidance in the setup YAML template and configuration manual</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>the system can compare and recommend steering dimensions with evidence rather than ad hoc guesses</li>
+</ul>
 <h2 id="7-p1-synthetic-data-infrastructure-and-tooling">7. P1: Synthetic Data Infrastructure and Tooling</h2>
 <h3 id="71-support-anchor-seeking-synthetic-user-simulation">7.1 Support anchor-seeking synthetic-user simulation</h3>
 <p>Why it matters:</p>
@@ -490,6 +510,7 @@
 <li>richer elicitation modes and critique-aware UI</li>
 <li>better async progress states</li>
 <li>improved replay and trace navigation</li>
+<li>first steering-dimension selection and sweep tooling</li>
 <li>first synthetic-data pipeline for anchor-seeking and diversity-seeking corpora</li>
 <li>first multi-pipeline steering support for image prompt, inpainting, and ControlNet workflows</li>
 <li>first advanced sampler family</li>
@@ -511,6 +532,7 @@
 <li>add richer elicitation modes and critique-aware UI</li>
 <li>refine async progress states</li>
 <li>improve replay and trace navigation</li>
+<li>add steering-dimension selection and sweep tooling</li>
 <li>add stronger sampler families</li>
 <li>add stronger preference-model implementations</li>
 <li>reduce pipeline warm-up cost</li>

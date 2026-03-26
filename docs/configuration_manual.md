@@ -105,6 +105,7 @@ updater: winner_average
 feedback_mode: scalar_rating
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
+steering_dimension: 3
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.35
@@ -227,6 +228,27 @@ Effect:
 
 - selects the steering representation contract used by generation
 - the current implementation supports only `low_dimensional`, so this field is validated but not yet a multi-mode switch
+
+### `steering_dimension`
+
+Controls the size of the low-dimensional steering vector for the session.
+
+Typical values:
+
+- `3`
+- `5`
+- `8`
+
+Effect:
+
+- changes the length of the session steering vector `current_z`
+- changes the dimensionality samplers use when proposing candidate directions
+- changes the baseline and incumbent vector length in replay, traces, and session state
+
+Notes:
+
+- this is a per-session YAML setting
+- the current implementation still uses `low_dimensional` steering mode, but the dimension inside that mode is now configurable
 
 ### `candidate_count`
 

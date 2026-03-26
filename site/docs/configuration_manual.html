@@ -112,6 +112,7 @@ updater: winner_average
 feedback_mode: scalar_rating
 seed_policy: fixed-per-round
 steering_mode: low_dimensional
+steering_dimension: 3
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.35
@@ -225,6 +226,25 @@ model_name: runwayml/stable-diffusion-v1-5
 <ul>
 <li>selects the steering representation contract used by generation</li>
 <li>the current implementation supports only <code>low_dimensional</code>, so this field is validated but not yet a multi-mode switch</li>
+</ul>
+<h3 id="steering_dimension"><code>steering_dimension</code></h3>
+<p>Controls the size of the low-dimensional steering vector for the session.</p>
+<p>Typical values:</p>
+<ul>
+<li><code>3</code></li>
+<li><code>5</code></li>
+<li><code>8</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes the length of the session steering vector <code>current_z</code></li>
+<li>changes the dimensionality samplers use when proposing candidate directions</li>
+<li>changes the baseline and incumbent vector length in replay, traces, and session state</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>this is a per-session YAML setting</li>
+<li>the current implementation still uses <code>low_dimensional</code> steering mode, but the dimension inside that mode is now configurable</li>
 </ul>
 <h3 id="candidate_count"><code>candidate_count</code></h3>
 <p>Controls how many candidates are shown per round.</p>

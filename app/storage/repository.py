@@ -176,6 +176,19 @@ class SQLiteRepository:
             return None
         return Session.model_validate(self._load_payload(row["payload_json"]))
 
+    def list_sessions(self) -> list[Session]:
+        """Return all stored sessions with newest activity first."""
+
+        with self._lock, self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT payload_json
+                FROM sessions
+                ORDER BY updated_at DESC, created_at DESC, id DESC
+                """
+            ).fetchall()
+        return [Session.model_validate(self._load_payload(row["payload_json"])) for row in rows]
+
     def save_round(self, round_obj: Round) -> Round:
         """Persist one generated round."""
 

@@ -37,7 +37,7 @@ test.describe("StableSteering browser flow", () => {
 
     await page.getByRole("button", { name: /Generate .* round/ }).click();
 
-    await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
+    await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
     await expect(page.locator(".image-card")).toHaveCount(5);
     await expect(page.locator(".image-card img").first()).toBeVisible();
 
@@ -49,13 +49,20 @@ test.describe("StableSteering browser flow", () => {
 
     await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
+    await page.getByRole("button", { name: /Generate .* round/ }).click();
+    await expect(page.locator("details.round-block")).toHaveCount(2);
+    await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
+    await expect(page.locator("#round-container").getByText("Round 2")).toBeVisible();
+    await expect(page.locator("details.round-block[open]")).toHaveCount(1);
+    await expect(page.locator("details.round-block[open]").getByText("Round 2")).toBeVisible();
 
     await page.getByRole("link", { name: "Open replay" }).click();
 
     await expect(page).toHaveURL(/\/sessions\/.+\/replay-view$/);
     await expect(page.getByText("Replay", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
-    await expect(page.locator(".compact-card")).toHaveCount(5);
+    await expect(page.getByRole("heading", { name: /Round 2/ })).toBeVisible();
+    await expect(page.locator(".compact-card")).toHaveCount(10);
   });
 
   test("replay export API returns the round and feedback history for a browser-created session", async ({ page, request }) => {
@@ -66,7 +73,7 @@ test.describe("StableSteering browser flow", () => {
     });
 
     await page.getByRole("button", { name: /Generate .* round/ }).click();
-    await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
+    await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
 
     await page.locator('.star-button[data-candidate-id]').nth(1 * 5 + 3).click();
     await page.locator('.star-button[data-candidate-id]').nth(2 * 5 + 4).click();
@@ -95,7 +102,7 @@ test.describe("StableSteering browser flow", () => {
     });
 
     await page.getByRole("button", { name: /Generate .* round/ }).click();
-    await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
+    await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
     await expect(page.locator(".winner-only-input")).toHaveCount(5);
     await page.locator(".winner-only-input").nth(2).check();
     await page.getByRole("button", { name: "Submit feedback" }).click();
@@ -118,6 +125,20 @@ test.describe("StableSteering browser flow", () => {
     await page.getByRole("link", { name: "Start a session" }).click();
     await expect(page).toHaveURL("/setup");
     await expect(page.getByRole("button", { name: "Create and open session" })).toBeVisible();
+  });
+
+  test("home page lets the user resume a recent session", async ({ page }) => {
+    const sessionId = await createSessionViaBrowser(page, {
+      experimentName: "Resume session flow",
+      description: "Resume session test",
+      prompt: "A minimal ceramic lamp on a pedestal",
+    });
+
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Resume sessions" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Resume session" }).first()).toBeVisible();
+    await page.getByRole("link", { name: "Resume session" }).first().click();
+    await expect(page).toHaveURL(new RegExp(`/sessions/${sessionId}/view$`));
   });
 
   test("diagnostics page shows resolved backend and CUDA status", async ({ page }) => {

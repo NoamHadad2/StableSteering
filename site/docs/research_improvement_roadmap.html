@@ -367,7 +367,27 @@
 <li>the research program can say where iterative steering helps most across diffusion workflow families</li>
 </ul>
 <h2 id="9-r2-strategy-research-expansions">9. R2: Strategy Research Expansions</h2>
-<h3 id="91-add-richer-steering-representations">9.1 Add richer steering representations</h3>
+<h3 id="91-study-steering-dimension-selection-methods">9.1 Study steering-dimension selection methods</h3>
+<p>Why it matters:</p>
+<ul>
+<li>steering dimension controls the size and geometry of the search space the user is trying to navigate</li>
+<li>too few dimensions may cap attainable quality or controllability, while too many may increase noise, redundancy, and cognitive burden</li>
+<li>strong results on one fixed dimension do not automatically transfer to other tasks, prompts, or diffusion workflows</li>
+</ul>
+<p>Implementation notes:</p>
+<ul>
+<li>compare fixed low dimensions such as 2, 3, 5, 8, and 16 across matched prompts, seeds, and feedback budgets</li>
+<li>test adaptive dimension schedules, for example start low for stability and expand capacity only after early convergence</li>
+<li>compare basis-construction methods such as random orthogonal axes, PCA-style data-driven axes, learned steering dictionaries, and semantically aligned attribute axes</li>
+<li>measure not only final preference outcome but also rounds-to-satisfaction, duplicate rate, diversity, preference consistency, and subjective user burden</li>
+<li>analyze whether optimal dimension depends on task family, prompt complexity, feedback mode, sampler family, or diffusion workflow</li>
+<li>study whether dimension interacts strongly with incumbent carry-forward and trust-radius policies</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>the project can recommend steering-dimension choices for specific task classes with empirical justification</li>
+</ul>
+<h3 id="92-add-richer-steering-representations">9.2 Add richer steering representations</h3>
 <p>Why it matters:</p>
 <ul>
 <li>low-dimensional steering is interpretable and simple, but it may be too limited for some tasks</li>
@@ -382,7 +402,7 @@
 <ul>
 <li>representation changes are justified by measurable gains rather than novelty alone</li>
 </ul>
-<h3 id="92-add-stronger-samplers">9.2 Add stronger samplers</h3>
+<h3 id="93-add-stronger-samplers">9.3 Add stronger samplers</h3>
 <p>Why it matters:</p>
 <ul>
 <li>sampler quality strongly shapes the candidate set a user can choose from</li>
@@ -400,7 +420,7 @@
 <ul>
 <li>sampler comparisons reveal clear tradeoffs in exploration, stability, and user burden</li>
 </ul>
-<h3 id="93-add-stronger-preference-and-reward-models">9.3 Add stronger preference and reward models</h3>
+<h3 id="94-add-stronger-preference-and-reward-models">9.4 Add stronger preference and reward models</h3>
 <p>Why it matters:</p>
 <ul>
 <li>simple winner heuristics are easy to inspect, but they may waste information from rankings, approvals, uncertainty, and critiques</li>
@@ -418,7 +438,7 @@
 <ul>
 <li>the project has evidence about which preference-model family best converts user judgments into useful steering signals</li>
 </ul>
-<h3 id="94-add-stronger-updaters">9.4 Add stronger updaters</h3>
+<h3 id="95-add-stronger-updaters">9.5 Add stronger updaters</h3>
 <p>Why it matters:</p>
 <ul>
 <li>the update rule determines how user judgments become steering-state movement</li>
@@ -453,6 +473,7 @@
 </ul>
 <h3 id="milestone-r-c-comparative-research">Milestone R-C: Comparative Research</h3>
 <ul>
+<li>compare steering-dimension selection methods</li>
 <li>compare samplers</li>
 <li>compare preference and reward models</li>
 <li>compare updaters</li>
@@ -479,6 +500,7 @@
 <li>build synthetic stress-test corpora</li>
 <li>evaluate synthetic-user realism</li>
 <li>extend studies to image-prompt, inpainting, and ControlNet workflows</li>
+<li>compare steering-dimension selection methods</li>
 <li>compare richer representations, samplers, preference models, and updaters</li>
 </ol>
 <h2 id="12-summary">12. Summary</h2>

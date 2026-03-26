@@ -354,6 +354,27 @@ Success signal:
 
 - the system can switch between heuristic update rules and explicit learned preference models through one stable contract
 
+### 6.8 Add steering-dimension selection methods
+
+Why it matters:
+
+- steering dimension is now configurable, but choosing it well still depends too much on operator intuition
+- dimensions that are too small can block controllability, while dimensions that are too large can create noisy search and harder user judgments
+- a practical system should help users pick a dimension that matches the task, model, and feedback budget
+
+Implementation notes:
+
+- add preset dimension profiles such as fast-explore, balanced, and high-capacity, with clear documentation of their tradeoffs
+- log steering dimension together with prompt family, sampler, feedback mode, round count, and outcome quality so dimension choices can be audited later
+- add diagnostics and analysis summaries that compare session behavior across dimensions, including convergence speed, diversity, and preference consistency
+- support dimension sweep runs in scripts and sample-generation utilities so several dimensions can be compared under one prompt/config preset
+- add optional basis-construction helpers so larger dimensions can be initialized from PCA, random orthogonal bases, learned dictionaries, or attribute-aligned axes instead of arbitrary coordinates
+- expose dimension-selection guidance in the setup YAML template and configuration manual
+
+Success signal:
+
+- the system can compare and recommend steering dimensions with evidence rather than ad hoc guesses
+
 ## 7. P1: Synthetic Data Infrastructure and Tooling
 
 ### 7.1 Support anchor-seeking synthetic-user simulation
@@ -499,6 +520,7 @@ Success signal:
 - richer elicitation modes and critique-aware UI
 - better async progress states
 - improved replay and trace navigation
+- first steering-dimension selection and sweep tooling
 - first synthetic-data pipeline for anchor-seeking and diversity-seeking corpora
 - first multi-pipeline steering support for image prompt, inpainting, and ControlNet workflows
 - first advanced sampler family
@@ -520,21 +542,22 @@ Success signal:
 5. add richer elicitation modes and critique-aware UI
 6. refine async progress states
 7. improve replay and trace navigation
-8. add stronger sampler families
-9. add stronger preference-model implementations
-10. reduce pipeline warm-up cost
-11. normalize high-value SQLite query paths
-12. add artifact retention and cleanup tooling
-13. add anchor-seeking synthetic-data pipeline
-14. add diversity-seeking synthetic-data pipeline
-15. build synthetic corpus management and quality checks
-16. expand generation contracts for multiple diffusion pipeline types
-17. add image-prompt steering support
-18. add inpainting steering support
-19. add ControlNet steering support
-20. harden release automation
-21. prepare shared-storage evolution
-22. add API schema snapshots
+8. add steering-dimension selection and sweep tooling
+9. add stronger sampler families
+10. add stronger preference-model implementations
+11. reduce pipeline warm-up cost
+12. normalize high-value SQLite query paths
+13. add artifact retention and cleanup tooling
+14. add anchor-seeking synthetic-data pipeline
+15. add diversity-seeking synthetic-data pipeline
+16. build synthetic corpus management and quality checks
+17. expand generation contracts for multiple diffusion pipeline types
+18. add image-prompt steering support
+19. add inpainting steering support
+20. add ControlNet steering support
+21. harden release automation
+22. prepare shared-storage evolution
+23. add API schema snapshots
 
 ## 11. Summary
 

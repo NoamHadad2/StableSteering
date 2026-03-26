@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import hashlib
 import math
+from typing import Callable
 
 from app.core.config import settings
 from app.core.schema import (
@@ -62,6 +63,13 @@ class Orchestrator:
             "linear_preference": LinearPreferenceUpdater(),
         }
 
+    @staticmethod
+    def _report_progress(progress_callback: Callable[[int, str], None] | None, progress: int, message: str) -> None:
+        """Emit a phase-level progress update when a callback is available."""
+
+        if progress_callback is not None:
+            progress_callback(progress, message)
+
     def create_experiment(self, request: ExperimentCreate) -> Experiment:
         """Create and persist a reusable experiment definition."""
 
@@ -102,6 +110,7 @@ class Orchestrator:
             negative_prompt=request.negative_prompt,
             model_name=config.model_name,
             config=config,
+            current_z=[0.0 for _ in range(config.steering_dimension)],
             status=SessionStatus.ready,
         )
         logger.info("Created session %s for experiment %s", session.id, session.experiment_id)
@@ -118,17 +127,28 @@ class Orchestrator:
 
         return self.repository.get_session(session_id)
 
+    def list_sessions(self) -> list[Session]:
+        """Return all stored sessions ordered by recent activity."""
+
+        return self.repository.list_sessions()
+
     def get_session_rounds(self, session_id: str) -> list[Round]:
         """Return ordered rounds for a given session."""
 
         return self.repository.list_rounds_for_session(session_id)
 
-    def generate_round(self, session_id: str) -> RoundResponse:
+    def generate_round(
+        self,
+        session_id: str,
+        progress_callback: Callable[[int, str], None] | None = None,
+    ) -> RoundResponse:
         """Propose, render, persist, and return the next round of candidates."""
 
+        self._report_progress(progress_callback, 14, "Checking session readiness")
         session = self._assert_round_generation_allowed(session_id)
         sampler = self.samplers[session.config.sampler]
         round_index = session.current_round + 1
+        self._report_progress(progress_callback, 24, "Preparing round state")
         round_obj = Round(
             session_id=session.id,
             round_index=round_index,
@@ -144,6 +164,7 @@ class Orchestrator:
         carried_forward = self._build_carried_forward_candidate(session)
         baseline_candidate = self._build_baseline_prompt_candidate(session)
         sampler_seed = self._seed_token(session.id, round_index, "sampler")
+        self._report_progress(progress_callback, 36, f"Sampling {session.config.candidate_count} candidate directions")
         proposed_candidates = sampler.propose(session, sampler_seed)
         proposed_candidates = self._widen_first_round_candidates(session, proposed_candidates)
         candidates = self._compose_round_candidates(
@@ -152,6 +173,7 @@ class Orchestrator:
             candidate_count=session.config.candidate_count,
         )
         self._assign_candidate_seeds(session, round_index, candidates)
+        self._report_progress(progress_callback, 52, "Rendering candidate images on the model backend")
         # Render each candidate independently so future versions can tolerate
         # partial round failures without changing the orchestration contract.
         for candidate in candidates:
@@ -164,6 +186,7 @@ class Orchestrator:
         round_obj.candidates = candidates
         round_obj.render_status = RenderStatus.succeeded
         round_obj.latency_ms = 15 * len(candidates)
+        self._report_progress(progress_callback, 76, "Saving rendered candidates and round state")
         session.current_round = round_index
         session.status = SessionStatus.awaiting_feedback
         session.updated_at = utc_now()
@@ -179,7 +202,9 @@ class Orchestrator:
                 "candidates": [self._candidate_trace_payload(candidate) for candidate in round_obj.candidates],
             },
         )
+        self._report_progress(progress_callback, 90, "Refreshing trace report and replay data")
         self.generate_trace_report(session.id)
+        self._report_progress(progress_callback, 98, "Round ready for review")
         return RoundResponse(
             round_id=round_obj.id,
             candidate_metadata=round_obj.candidates,
@@ -191,13 +216,21 @@ class Orchestrator:
             },
         )
 
-    def submit_feedback(self, round_id: str, request: FeedbackRequest) -> FeedbackResponse:
+    def submit_feedback(
+        self,
+        round_id: str,
+        request: FeedbackRequest,
+        progress_callback: Callable[[int, str], None] | None = None,
+    ) -> FeedbackResponse:
         """Normalize feedback, update state, and persist the new incumbent."""
 
+        self._report_progress(progress_callback, 14, "Checking round readiness for feedback")
         round_obj, session = self._assert_feedback_submission_allowed(round_id, request)
+        self._report_progress(progress_callback, 30, "Normalizing and validating user preferences")
         feedback = normalize_feedback(round_id, request)
         self._validate_feedback_against_round(round_obj, feedback)
         updater = self.updaters[session.config.updater]
+        self._report_progress(progress_callback, 52, "Updating the steering model from your feedback")
         next_z, update_summary = updater.update(session, round_obj.candidates, feedback)
         round_obj.feedback_events.append(feedback)
         round_obj.update_summary = update_summary
@@ -205,6 +238,7 @@ class Orchestrator:
         session.incumbent_candidate_id = update_summary["winner_candidate_id"]
         session.status = SessionStatus.ready
         session.updated_at = utc_now()
+        self._report_progress(progress_callback, 72, "Saving updated session state")
         self.repository.save_round(round_obj)
         self.repository.save_session(session)
         logger.info("Applied feedback to round %s for session %s", round_obj.id, session.id)
@@ -221,7 +255,9 @@ class Orchestrator:
                 "next_incumbent_state": next_z,
             },
         )
+        self._report_progress(progress_callback, 90, "Refreshing trace report with the new preference outcome")
         self.generate_trace_report(session.id)
+        self._report_progress(progress_callback, 98, "Feedback applied and next round unlocked")
         return FeedbackResponse(update_summary=update_summary, next_incumbent_state=next_z)
 
     def export_replay(self, session_id: str) -> dict:

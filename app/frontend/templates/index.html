@@ -19,6 +19,41 @@
       </section>
       <section class="card">
         <div class="section-head">
+          <h2>Resume sessions</h2>
+          <span>{{ sessions|length }} recent</span>
+        </div>
+        {% if sessions %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Prompt</th>
+                <th>Status</th>
+                <th>Round</th>
+                <th>Continue</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for session in sessions %}
+              <tr>
+                <td>{{ session.prompt }}</td>
+                <td>{{ session.status }}</td>
+                <td>{{ session.current_round }}</td>
+                <td>
+                  <div class="actions inline-actions">
+                    <a class="button secondary" href="/sessions/{{ session.id }}/view">Resume session</a>
+                    <a class="button secondary" href="/sessions/{{ session.id }}/replay-view">Replay</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No sessions yet. Create your first session to make it resumable from this dashboard.</p>
+        {% endif %}
+      </section>
+      <section class="card">
+        <div class="section-head">
           <h2>Experiments</h2>
           <span>{{ experiments|length }} total</span>
         </div>
