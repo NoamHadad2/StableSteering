@@ -59,9 +59,24 @@
                 <p>z: {{ candidate.z }}</p>
                 <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode }}">
                   {% if session.config.feedback_mode == "scalar_rating" %}
-                    <label>Rating
-                      <input type="number" min="1" max="5" class="rating-input" data-candidate-id="{{ candidate.id }}" inputmode="numeric" {% if current_round.feedback_events %}disabled{% endif %}>
-                    </label>
+                    <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
+                      <span class="rating-label">Rating</span>
+                      <div class="star-rating" role="radiogroup" aria-label="Rate candidate {{ candidate.id }}">
+                        {% for star in [1, 2, 3, 4, 5] %}
+                          <button
+                            type="button"
+                            class="star-button"
+                            data-candidate-id="{{ candidate.id }}"
+                            data-rating-value="{{ star }}"
+                            aria-label="{{ star }} star{% if star > 1 %}s{% endif %}"
+                            aria-pressed="false"
+                            {% if current_round.feedback_events %}disabled{% endif %}
+                          >★</button>
+                        {% endfor %}
+                      </div>
+                      <input type="hidden" class="rating-input" data-candidate-id="{{ candidate.id }}" value="0">
+                      <p class="star-rating-caption" data-candidate-id="{{ candidate.id }}">No rating selected yet</p>
+                    </div>
                   {% elif session.config.feedback_mode == "pairwise" %}
                     <label class="choice-row">
                       <input type="radio" name="pairwise_winner" class="pairwise-winner-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
@@ -97,7 +112,7 @@
           {% if not current_round.feedback_events %}
             <p class="hint">
               {% if session.config.feedback_mode == "scalar_rating" %}
-                Rate one or more candidates from 1 to 5. The highest-rated candidate becomes the winner.
+                Click one to five stars on any candidates you want to rate. Higher stars mean stronger preference.
               {% elif session.config.feedback_mode == "pairwise" %}
                 Choose one winner and one loser.
               {% elif session.config.feedback_mode == "winner_only" %}

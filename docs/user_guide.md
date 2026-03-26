@@ -89,6 +89,15 @@ When you generate a round or submit feedback, the session page shows:
 - a status label such as queueing, running, completed, or failed
 - inline error text if something goes wrong
 
+The status text is phase-aware. You may see messages such as:
+
+- `Checking session readiness`
+- `Sampling 5 candidate directions`
+- `Rendering candidate images on the model backend`
+- `Normalizing and validating user preferences`
+- `Updating the steering model from your feedback`
+- `Refreshing trace report and replay data`
+
 While work is running:
 
 - the relevant button is disabled
@@ -110,7 +119,7 @@ Each card shows:
 
 The visible controls change with the selected feedback mode:
 
-- `scalar_rating` shows rating inputs
+- `scalar_rating` shows clickable one-to-five star controls
 - `pairwise` shows explicit winner and loser choices
 - `winner_only` shows a single winner choice
 - `approve_reject` shows approval choices plus a preferred approved winner

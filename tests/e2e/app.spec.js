@@ -41,12 +41,10 @@ test.describe("StableSteering browser flow", () => {
     await expect(page.locator(".image-card")).toHaveCount(5);
     await expect(page.locator(".image-card img").first()).toBeVisible();
 
-    const ratings = page.locator(".rating-input");
-    await ratings.nth(0).fill("2");
-    await ratings.nth(1).fill("5");
-    await ratings.nth(2).fill("4");
-    await ratings.nth(3).fill("3");
-    await ratings.nth(4).fill("1");
+    await page.locator('.star-button[data-candidate-id]').nth(1 * 5 + 4).click();
+    await page.locator('.star-button[data-candidate-id]').nth(2 * 5 + 3).click();
+    await page.locator('.star-button[data-candidate-id]').nth(3 * 5 + 2).click();
+    await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 0).click();
     await page.getByRole("button", { name: "Submit feedback" }).click();
 
     await expect(page.getByText("Status:")).toBeVisible();
@@ -70,12 +68,10 @@ test.describe("StableSteering browser flow", () => {
     await page.getByRole("button", { name: "Generate next round" }).click();
     await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
 
-    const ratings = page.locator(".rating-input");
-    await ratings.nth(0).fill("1");
-    await ratings.nth(1).fill("4");
-    await ratings.nth(2).fill("5");
-    await ratings.nth(3).fill("3");
-    await ratings.nth(4).fill("2");
+    await page.locator('.star-button[data-candidate-id]').nth(1 * 5 + 3).click();
+    await page.locator('.star-button[data-candidate-id]').nth(2 * 5 + 4).click();
+    await page.locator('.star-button[data-candidate-id]').nth(3 * 5 + 2).click();
+    await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 1).click();
     await page.getByRole("button", { name: "Submit feedback" }).click();
     await expect(page.getByText("Status:")).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();

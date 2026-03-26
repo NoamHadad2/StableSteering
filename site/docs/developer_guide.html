@@ -221,6 +221,11 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li>impossible async requests are rejected before queueing when the session or round is already in a conflicting state</li>
 </ul>
 <p>This keeps the UI responsive while the real GPU-backed backend works in the background.</p>
+<p>Current progress phrases are intentionally operation-specific. For example:</p>
+<ul>
+<li>round generation reports phases such as <code>Checking session readiness</code>, <code>Sampling 5 candidate directions</code>, <code>Rendering candidate images on the model backend</code>, and <code>Refreshing trace report and replay data</code></li>
+<li>feedback submission reports phases such as <code>Normalizing and validating user preferences</code>, <code>Updating the steering model from your feedback</code>, and <code>Feedback applied and next round unlocked</code></li>
+</ul>
 <p><img alt="Session lifecycle diagram" src="assets/illustrations/session_lifecycle.svg"></p>
 <h2 id="6-core-extension-points">6. Core Extension Points</h2>
 <h3 id="61-add-a-sampler">6.1 Add a sampler</h3>
@@ -274,7 +279,7 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 </ul>
 <p>The current feedback-mode contract is:</p>
 <ul>
-<li><code>scalar_rating</code> uses explicit rating inputs</li>
+<li><code>scalar_rating</code> uses explicit clickable star ratings</li>
 <li><code>pairwise</code> uses explicit winner and loser selection controls</li>
 <li><code>winner_only</code> uses an explicit winner selection control</li>
 <li><code>approve_reject</code> uses explicit approval checkboxes plus winner selection</li>

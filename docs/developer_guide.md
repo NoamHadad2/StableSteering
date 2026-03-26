@@ -239,6 +239,11 @@ During round generation and feedback submission:
 
 This keeps the UI responsive while the real GPU-backed backend works in the background.
 
+Current progress phrases are intentionally operation-specific. For example:
+
+- round generation reports phases such as `Checking session readiness`, `Sampling 5 candidate directions`, `Rendering candidate images on the model backend`, and `Refreshing trace report and replay data`
+- feedback submission reports phases such as `Normalizing and validating user preferences`, `Updating the steering model from your feedback`, and `Feedback applied and next round unlocked`
+
 ![Session lifecycle diagram](./assets/illustrations/session_lifecycle.svg)
 
 ## 6. Core Extension Points
@@ -301,7 +306,7 @@ The current API quality contract is:
 
 The current feedback-mode contract is:
 
-- `scalar_rating` uses explicit rating inputs
+- `scalar_rating` uses explicit clickable star ratings
 - `pairwise` uses explicit winner and loser selection controls
 - `winner_only` uses an explicit winner selection control
 - `approve_reject` uses explicit approval checkboxes plus winner selection

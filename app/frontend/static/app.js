@@ -125,6 +125,33 @@ function collectRatings() {
   })).filter((entry) => entry.rating > 0);
 }
 
+function ratingCaption(value) {
+  if (!value) {
+    return "No rating selected yet";
+  }
+  if (value === 1) return "1 star selected";
+  return `${value} stars selected`;
+}
+
+function applyStarRating(candidateId, value) {
+  const numericValue = Number(value || 0);
+  const hiddenInput = document.querySelector(`.rating-input[data-candidate-id="${candidateId}"]`);
+  if (hiddenInput) {
+    hiddenInput.value = String(numericValue);
+  }
+  const buttons = Array.from(document.querySelectorAll(`.star-button[data-candidate-id="${candidateId}"]`));
+  buttons.forEach((button) => {
+    const buttonValue = Number(button.dataset.ratingValue || 0);
+    const active = numericValue > 0 && buttonValue <= numericValue;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  const caption = document.querySelector(`.star-rating-caption[data-candidate-id="${candidateId}"]`);
+  if (caption) {
+    caption.textContent = ratingCaption(numericValue);
+  }
+}
+
 function buildFeedbackPayload(feedbackMode) {
   if (feedbackMode === "pairwise") {
     const winner = document.querySelector(".pairwise-winner-input:checked")?.dataset.candidateId;
@@ -285,7 +312,7 @@ if (nextRoundButton) {
       await pollJob(job.status_url, {
         onProgress: (snapshot) => {
           setStatus(snapshot.status_message);
-          setProgress(snapshot.progress, "Generating next round");
+      setProgress(snapshot.progress, snapshot.status_message || "Generating next round");
         },
       });
       setStatus("Round generated. Refreshing session view...");
@@ -298,6 +325,16 @@ if (nextRoundButton) {
     }
   });
 }
+
+Array.from(document.querySelectorAll(".star-button")).forEach((button) => {
+  button.addEventListener("click", () => {
+    if (button.disabled) return;
+    const candidateId = button.dataset.candidateId;
+    const value = Number(button.dataset.ratingValue || 0);
+    applyStarRating(candidateId, value);
+    traceFrontend("feedback.rating.selected", { candidate_id: candidateId, rating: value });
+  });
+});
 
 const submitFeedbackButton = document.getElementById("submit-feedback-button");
 if (submitFeedbackButton) {
@@ -321,7 +358,7 @@ if (submitFeedbackButton) {
       await pollJob(job.status_url, {
         onProgress: (snapshot) => {
           setStatus(snapshot.status_message);
-          setProgress(snapshot.progress, "Applying feedback");
+      setProgress(snapshot.progress, snapshot.status_message || "Applying feedback");
         },
       });
       setStatus("Feedback submitted. Refreshing session view...");
