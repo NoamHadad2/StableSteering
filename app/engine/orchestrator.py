@@ -465,6 +465,16 @@ class Orchestrator:
         boost_radius = min(max(session.config.trust_radius * 1.55, 0.34), 0.72)
         min_radius = min(max(session.config.trust_radius * 0.95, 0.24), boost_radius)
         for index, candidate in enumerate(proposed_candidates):
+            if candidate.sampler_role == "exploit":
+                exploit_radius = min(max(session.config.trust_radius * 0.35, 0.12), 0.24)
+                boosted_z = clamp_vector(list(candidate.z), exploit_radius)
+                candidate.z = boosted_z
+                candidate.generation_params["first_round_diversity_boost"] = True
+                candidate.generation_params["first_round_diversity_scale"] = 0.6
+                candidate.generation_params["first_round_role_behavior"] = "keep_exploit_close"
+                boosted_candidates.append(candidate)
+                continue
+
             spread_direction = Orchestrator._first_round_spread_direction(index, dimensions)
             scale = 1.15 + (0.1 * index)
             blended = [

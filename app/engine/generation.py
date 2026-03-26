@@ -6,7 +6,7 @@ from typing import Protocol
 
 from app.bootstrap.huggingface import model_slug
 from app.core.config import settings
-from app.core.schema import Candidate, Session
+from app.core.schema import Candidate, Session, SteeringMode
 
 
 def _color_from_candidate(candidate: Candidate) -> tuple[str, str]:
@@ -28,6 +28,15 @@ def parse_image_size(value: str) -> tuple[int, int]:
         return int(width_str), int(height_str)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"Invalid image size: {value!r}. Expected format WIDTHxHEIGHT.") from exc
+
+
+def resolve_steering_mode(session: Session) -> SteeringMode:
+    """Resolve and validate the session steering mode used at generation time."""
+
+    mode = session.config.steering_mode
+    if mode == SteeringMode.low_dimensional:
+        return mode
+    raise ValueError(f"Unsupported steering mode: {mode}")
 
 
 class GenerationEngine(Protocol):
@@ -55,6 +64,7 @@ class MockGenerationEngine:
     def render_candidate(self, session: Session, candidate: Candidate) -> Candidate:
         """Render one candidate to an SVG artifact and attach its public path."""
 
+        steering_mode = resolve_steering_mode(session)
         primary, secondary = _color_from_candidate(candidate)
         width, height = parse_image_size(session.config.image_size)
         path = self.artifacts_dir / f"{candidate.id}.svg"
@@ -77,6 +87,7 @@ class MockGenerationEngine:
 <text x="40" y="330" fill="white" font-size="18" font-family="Arial">CFG: {session.config.guidance_scale:.2f}</text>
 <text x="40" y="365" fill="white" font-size="18" font-family="Arial">Steps: {session.config.num_inference_steps}</text>
 <text x="40" y="400" fill="white" font-size="18" font-family="Arial">Anchor strength: {session.config.anchor_strength:.2f}</text>
+<text x="40" y="435" fill="white" font-size="18" font-family="Arial">Steering mode: {escape(steering_mode.value)}</text>
 </svg>"""
         path.write_text(svg, encoding="utf-8")
         candidate.image_path = f"/artifacts/{path.name}"
@@ -88,6 +99,7 @@ class MockGenerationEngine:
                 "num_inference_steps": session.config.num_inference_steps,
                 "model_source": session.config.model_name,
                 "anchor_strength": session.config.anchor_strength,
+                "steering_mode": steering_mode.value,
             }
         )
         return candidate
@@ -265,6 +277,7 @@ class DiffusersGenerationEngine:
     def _encode_steered_embeddings(self, session: Session, candidate: Candidate):
         """Encode prompt text, then apply a deterministic steering offset."""
 
+        steering_mode = resolve_steering_mode(session)
         pipe = self._load_pipeline(self._resolve_model_source(session))
         prompt_embeds, negative_prompt_embeds = pipe.encode_prompt(
             prompt=session.prompt,
@@ -273,7 +286,14 @@ class DiffusersGenerationEngine:
             do_classifier_free_guidance=True,
             negative_prompt=session.negative_prompt or "",
         )
-        steered_prompt_embeds = prompt_embeds + self._steering_offset(prompt_embeds, candidate.z, session.config.anchor_strength)
+        if steering_mode == SteeringMode.low_dimensional:
+            steered_prompt_embeds = prompt_embeds + self._steering_offset(
+                prompt_embeds,
+                candidate.z,
+                session.config.anchor_strength,
+            )
+        else:
+            raise ValueError(f"Unsupported steering mode: {steering_mode}")
         return steered_prompt_embeds, negative_prompt_embeds
 
     def render_candidate(self, session: Session, candidate: Candidate) -> Candidate:
@@ -309,7 +329,7 @@ class DiffusersGenerationEngine:
                 "num_inference_steps": num_inference_steps,
                 "model_source": model_source,
                 "anchor_strength": session.config.anchor_strength,
-                "steering_mode": session.config.steering_mode,
+                "steering_mode": resolve_steering_mode(session).value,
             }
         )
         return candidate

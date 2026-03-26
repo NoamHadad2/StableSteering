@@ -100,16 +100,16 @@ This means the YAML document is the source of truth for per-session strategy con
 The setup page starts from a backend-generated YAML document similar to this:
 
 ```yaml
-sampler: random_local
+sampler: exploit_orthogonal
 updater: winner_average
 feedback_mode: scalar_rating
-seed_policy: fixed-per-round
+seed_policy: fixed-per-candidate
 steering_mode: low_dimensional
-steering_dimension: 3
+steering_dimension: 5
 candidate_count: 5
 image_size: 512x512
-trust_radius: 0.35
-anchor_strength: 0.35
+trust_radius: 0.55
+anchor_strength: 0.7
 guidance_scale: 7.5
 num_inference_steps: 15
 model_name: runwayml/stable-diffusion-v1-5
@@ -227,7 +227,7 @@ Current value used by the MVP:
 Effect:
 
 - selects the steering representation contract used by generation
-- the current implementation supports only `low_dimensional`, so this field is validated but not yet a multi-mode switch
+- generation now explicitly routes through the `low_dimensional` steering path and rejects unsupported modes during rendering
 
 ### `steering_dimension`
 

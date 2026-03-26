@@ -7,15 +7,19 @@ from app.core.config_yaml import parse_strategy_config_yaml, render_strategy_con
 
 def test_render_strategy_config_yaml_uses_current_defaults() -> None:
     rendered = render_strategy_config_yaml()
+    assert "updater: winner_average" in rendered
+    assert "feedback_mode: scalar_rating" in rendered
+    assert "seed_policy: fixed-per-candidate" in rendered
+    assert "steering_mode: low_dimensional" in rendered
     assert "candidate_count: 5" in rendered
     assert "steering_dimension: 5" in rendered
     assert "sampler: exploit_orthogonal" in rendered
-    assert "seed_policy: fixed-per-candidate" in rendered
     assert "trust_radius: 0.55" in rendered
     assert "anchor_strength: 0.7" in rendered
-    assert "feedback_mode: scalar_rating" in rendered
+    assert "image_size: 512x512" in rendered
     assert "guidance_scale: 7.5" in rendered
     assert "num_inference_steps: 15" in rendered
+    assert "model_name: runwayml/stable-diffusion-v1-5" in rendered
 
 
 def test_parse_strategy_config_yaml_accepts_valid_yaml() -> None:

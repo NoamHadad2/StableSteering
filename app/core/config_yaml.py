@@ -18,10 +18,15 @@ CONFIG_COMMENT_BLOCK = dedent(
     # updater: winner_average | winner_copy | linear_preference
     # feedback_mode: scalar_rating | pairwise | top_k | winner_only | approve_reject
     # seed_policy: fixed-per-round | fixed-per-candidate | fixed-per-candidate-role
+    # steering_mode: currently low_dimensional
     # steering_dimension: low-dimensional steering vector size, for example 3 or 5
+    # candidate_count: visible candidates per round
     # image_size: WIDTHxHEIGHT, for example 512x512
+    # trust_radius: steering search radius around the current state
+    # anchor_strength: strength of the steering offset applied to prompt embeddings
     # guidance_scale: classifier-free guidance strength, for example 7.5
     # num_inference_steps: diffusion denoising steps, for example 15 or 30
+    # model_name: prepared local model id or Hugging Face model id
     """
 )
 

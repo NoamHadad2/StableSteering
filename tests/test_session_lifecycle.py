@@ -109,10 +109,13 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     exploratory_candidates = round_payload["candidate_metadata"][1:]
     assert exploratory_candidates
     assert all(candidate["generation_params"]["first_round_diversity_boost"] is True for candidate in exploratory_candidates)
+    exploit_candidate = next(candidate for candidate in exploratory_candidates if candidate["sampler_role"] == "exploit")
+    explore_candidates = [candidate for candidate in exploratory_candidates if candidate["sampler_role"] == "explore"]
+    assert math.sqrt(sum(value * value for value in exploit_candidate["z"])) < 0.2
     assert all(
-        math.sqrt(sum(value * value for value in candidate["z"])) > 0.18 for candidate in exploratory_candidates
+        math.sqrt(sum(value * value for value in candidate["z"])) > 0.18 for candidate in explore_candidates
     )
-    for left, right in itertools.combinations(exploratory_candidates, 2):
+    for left, right in itertools.combinations(explore_candidates, 2):
         pair_distance = math.sqrt(sum((a - b) ** 2 for a, b in zip(left["z"], right["z"], strict=False)))
         assert pair_distance > 0.22
 
@@ -156,6 +159,43 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     assert duplicate_feedback.status_code == 409
 
 
+def test_random_local_sampler_makes_exploit_and_explore_meaningfully_different(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Random local role separation",
+            "description": "Exploit vs explore behavior test",
+            "config": {
+                "sampler": "random_local",
+                "candidate_count": 5,
+                "seed_policy": "fixed-per-candidate",
+                "steering_dimension": 5,
+                "trust_radius": 0.55,
+            },
+        },
+    ).json()
+
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A role-separated sampler prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+
+    candidates = round_payload["candidate_metadata"]
+    exploit_candidate = next(candidate for candidate in candidates if candidate["sampler_role"] == "exploit")
+    explore_candidates = [candidate for candidate in candidates if candidate["sampler_role"] == "explore"]
+
+    exploit_distance = math.sqrt(sum(value * value for value in exploit_candidate["z"]))
+    explore_distances = [math.sqrt(sum(value * value for value in candidate["z"])) for candidate in explore_candidates]
+
+    assert explore_candidates
+    assert exploit_distance < 0.2
+    assert all(distance > exploit_distance + 0.08 for distance in explore_distances)
+    for left, right in itertools.combinations(explore_candidates, 2):
+        pair_distance = math.sqrt(sum((a - b) ** 2 for a, b in zip(left["z"], right["z"], strict=False)))
+        assert pair_distance > 0.18
+
+
 def test_session_steering_dimension_comes_from_config(client) -> None:
     experiment = client.post(
         "/experiments",
@@ -180,6 +220,57 @@ def test_session_steering_dimension_comes_from_config(client) -> None:
     baseline = round_payload["candidate_metadata"][0]
     assert baseline["z"] == [0.0, 0.0, 0.0, 0.0, 0.0]
     assert all(len(candidate["z"]) == 5 for candidate in round_payload["candidate_metadata"])
+
+
+def test_generation_metadata_reflects_operational_yaml_fields(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Operational config surface",
+            "description": "Ensure YAML-backed config is reflected in runtime metadata",
+            "config": {
+                "sampler": "axis_sweep",
+                "updater": "winner_copy",
+                "feedback_mode": "winner_only",
+                "seed_policy": "fixed-per-candidate",
+                "steering_mode": "low_dimensional",
+                "steering_dimension": 5,
+                "candidate_count": 4,
+                "image_size": "512x512",
+                "trust_radius": 0.42,
+                "anchor_strength": 0.6,
+                "guidance_scale": 8.5,
+                "num_inference_steps": 21,
+                "model_name": "runwayml/stable-diffusion-v1-5",
+            },
+        },
+    ).json()
+
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A config surface prompt", "negative_prompt": "blurry"},
+    ).json()
+    assert session["config"]["sampler"] == "axis_sweep"
+    assert session["config"]["updater"] == "winner_copy"
+    assert session["config"]["feedback_mode"] == "winner_only"
+    assert session["config"]["seed_policy"] == "fixed-per-candidate"
+    assert session["config"]["steering_mode"] == "low_dimensional"
+    assert session["config"]["steering_dimension"] == 5
+    assert session["config"]["candidate_count"] == 4
+    assert session["config"]["trust_radius"] == 0.42
+    assert session["config"]["anchor_strength"] == 0.6
+    assert session["config"]["guidance_scale"] == 8.5
+    assert session["config"]["num_inference_steps"] == 21
+    assert session["config"]["model_name"] == "runwayml/stable-diffusion-v1-5"
+
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    assert len(round_payload["candidate_metadata"]) == 4
+    assert round_payload["state_summary"]["round_index"] == 1
+    candidate = round_payload["candidate_metadata"][1]
+    assert candidate["generation_params"]["image_size"] == "512x512"
+    assert candidate["generation_params"]["seed_policy"] == "fixed-per-candidate"
+    assert candidate["generation_params"]["seed_group"].startswith("candidate:")
+    assert round_payload["candidate_metadata"][0]["z"] == [0.0, 0.0, 0.0, 0.0, 0.0]
 
 
 def test_replay_export_contains_rounds(client) -> None:
