@@ -108,3 +108,8 @@ class AsyncJobManager:
         ]
         for job_id in completed_ids[:overflow]:
             self._jobs.pop(job_id, None)
+
+    def close(self) -> None:
+        """Shut down worker threads when the app exits."""
+
+        self._executor.shutdown(wait=False, cancel_futures=False)

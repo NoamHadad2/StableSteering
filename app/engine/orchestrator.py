@@ -126,9 +126,7 @@ class Orchestrator:
     def generate_round(self, session_id: str) -> RoundResponse:
         """Propose, render, persist, and return the next round of candidates."""
 
-        session = self._require_session(session_id)
-        if session.status == SessionStatus.awaiting_feedback:
-            raise RuntimeError("Cannot generate a new round while feedback for the current round is still pending")
+        session = self._assert_round_generation_allowed(session_id)
         sampler = self.samplers[session.config.sampler]
         round_index = session.current_round + 1
         round_obj = Round(
@@ -196,14 +194,7 @@ class Orchestrator:
     def submit_feedback(self, round_id: str, request: FeedbackRequest) -> FeedbackResponse:
         """Normalize feedback, update state, and persist the new incumbent."""
 
-        round_obj = self.repository.get_round(round_id)
-        if round_obj is None:
-            raise KeyError(f"Round not found: {round_id}")
-        session = self._require_session(round_obj.session_id)
-        if session.status != SessionStatus.awaiting_feedback:
-            raise RuntimeError("Session is not currently awaiting feedback for this round")
-        if round_obj.feedback_events:
-            raise RuntimeError("Feedback has already been submitted for this round")
+        round_obj, session = self._assert_feedback_submission_allowed(round_id, request)
         feedback = normalize_feedback(round_id, request)
         self._validate_feedback_against_round(round_obj, feedback)
         updater = self.updaters[session.config.updater]
@@ -269,6 +260,37 @@ class Orchestrator:
         if session is None:
             raise KeyError(f"Session not found: {session_id}")
         return session
+
+    def _require_round(self, round_id: str) -> Round:
+        """Load a round or raise a lookup error."""
+
+        round_obj = self.repository.get_round(round_id)
+        if round_obj is None:
+            raise KeyError(f"Round not found: {round_id}")
+        return round_obj
+
+    def _assert_round_generation_allowed(self, session_id: str) -> Session:
+        """Validate that a session is in a state that allows generating a round."""
+
+        session = self._require_session(session_id)
+        if session.status == SessionStatus.awaiting_feedback:
+            raise RuntimeError("Cannot generate a new round while feedback for the current round is still pending")
+        return session
+
+    def _assert_feedback_submission_allowed(self, round_id: str, request: FeedbackRequest | None = None) -> tuple[Round, Session]:
+        """Validate that a round can currently accept feedback."""
+
+        round_obj = self._require_round(round_id)
+        session = self._require_session(round_obj.session_id)
+        if request is not None and request.feedback_type != session.config.feedback_mode:
+            raise ValueError(
+                f"Feedback type {request.feedback_type.value} does not match session mode {session.config.feedback_mode.value}"
+            )
+        if session.status != SessionStatus.awaiting_feedback:
+            raise RuntimeError("Session is not currently awaiting feedback for this round")
+        if round_obj.feedback_events:
+            raise RuntimeError("Feedback has already been submitted for this round")
+        return round_obj, session
 
     def _validate_feedback_against_round(self, round_obj: Round, feedback) -> None:
         """Ensure feedback references candidates that exist in the target round."""

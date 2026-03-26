@@ -58,7 +58,12 @@ async def lifespan(application: FastAPI):
     """Initialize services once the ASGI app starts."""
 
     initialize_app_state(application)
-    yield
+    try:
+        yield
+    finally:
+        job_manager = getattr(application.state, "job_manager", None)
+        if job_manager is not None:
+            job_manager.close()
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
@@ -329,12 +334,15 @@ async def next_round_async(session_id: str):
     """Start generating the next round asynchronously and return a job handle."""
 
     try:
+        app.state.orchestrator._assert_round_generation_allowed(session_id)
         job = await app.state.job_manager.submit(
             operation=f"generate_round:{session_id}",
             fn=lambda: app.state.orchestrator.generate_round(session_id),
         )
     except KeyError as exc:
         return api_error_response(404, "not_found", str(exc))
+    except RuntimeError as exc:
+        return api_error_response(409, "conflict", str(exc))
     return {"job_id": job.id, "status_url": f"/jobs/{job.id}", "state": job.state}
 
 
@@ -357,12 +365,17 @@ async def submit_feedback_async(round_id: str, request: FeedbackRequest):
     """Start feedback application asynchronously and return a job handle."""
 
     try:
+        app.state.orchestrator._assert_feedback_submission_allowed(round_id, request)
         job = await app.state.job_manager.submit(
             operation=f"submit_feedback:{round_id}",
             fn=lambda: app.state.orchestrator.submit_feedback(round_id, request),
         )
     except KeyError as exc:
         return api_error_response(404, "not_found", str(exc))
+    except ValueError as exc:
+        return api_error_response(400, "invalid_input", str(exc))
+    except RuntimeError as exc:
+        return api_error_response(409, "conflict", str(exc))
     return {"job_id": job.id, "status_url": f"/jobs/{job.id}", "state": job.state}
 
 

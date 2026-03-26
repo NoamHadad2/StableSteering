@@ -235,6 +235,7 @@ During round generation and feedback submission:
 - `progress` updates the progress bar
 - the page refreshes automatically after success
 - errors are shown inline if the job fails
+- impossible async requests are rejected before queueing when the session or round is already in a conflicting state
 
 This keeps the UI responsive while the real GPU-backed backend works in the background.
 
@@ -305,6 +306,7 @@ The current feedback-mode contract is:
 - `winner_only` uses an explicit winner selection control
 - `approve_reject` uses explicit approval checkboxes plus winner selection
 - `top_k` uses explicit rank inputs with uniqueness validation
+- the backend rejects submissions whose `feedback_type` does not match the session's configured `feedback_mode`
 
 The current seed policy contract is:
 

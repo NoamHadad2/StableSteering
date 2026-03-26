@@ -315,7 +315,11 @@ def test_approve_reject_feedback_mode_submits_successfully(client) -> None:
 def test_feedback_rejects_unknown_candidate_id(client) -> None:
     experiment = client.post(
         "/experiments",
-        json={"name": "Invalid feedback", "description": "Invalid candidate", "config": {"candidate_count": 2}},
+        json={
+            "name": "Invalid feedback",
+            "description": "Invalid candidate",
+            "config": {"candidate_count": 2, "feedback_mode": "pairwise"},
+        },
     ).json()
     session = client.post(
         "/sessions",
@@ -331,6 +335,31 @@ def test_feedback_rejects_unknown_candidate_id(client) -> None:
     payload = feedback.json()
     assert payload["error_code"] == "invalid_input"
     assert "unknown winner candidate" in payload["message"]
+
+
+def test_feedback_rejects_mismatched_feedback_mode(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={"name": "Mode mismatch", "description": "Wrong feedback type", "config": {"feedback_mode": "winner_only"}},
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A clean product render", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    candidates = round_payload["candidate_metadata"]
+
+    feedback = client.post(
+        f"/rounds/{round_payload['round_id']}/feedback",
+        json={
+            "feedback_type": "pairwise",
+            "payload": {"winner_candidate_id": candidates[0]["id"], "loser_candidate_id": candidates[1]["id"]},
+        },
+    )
+    assert feedback.status_code == 400
+    payload = feedback.json()
+    assert payload["error_code"] == "invalid_input"
+    assert "does not match session mode" in payload["message"]
 
 
 def test_fixed_per_round_seed_policy_shares_one_seed_across_new_candidates(client) -> None:
@@ -443,6 +472,20 @@ def test_async_round_job_completes_and_returns_result(client) -> None:
     assert len(status["result"]["candidate_metadata"]) == 2
 
 
+def test_async_round_job_preflights_conflict_before_queueing(client) -> None:
+    experiment = client.post("/experiments", json={"name": "Async round conflict", "config": {"candidate_count": 2}}).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "An async round prompt", "negative_prompt": ""},
+    ).json()
+    client.post(f"/sessions/{session['id']}/rounds/next")
+
+    job = client.post(f"/sessions/{session['id']}/rounds/next/async")
+    assert job.status_code == 409
+    payload = job.json()
+    assert payload["error_code"] == "conflict"
+
+
 def test_async_feedback_job_completes_and_returns_result(client) -> None:
     experiment = client.post("/experiments", json={"name": "Async feedback", "config": {"candidate_count": 2}}).json()
     session = client.post(
@@ -465,3 +508,27 @@ def test_async_feedback_job_completes_and_returns_result(client) -> None:
         time.sleep(0.01)
     assert status["state"] == "succeeded"
     assert status["result"]["update_summary"]["winner_candidate_id"] in ratings
+
+
+def test_async_feedback_job_preflights_mode_mismatch(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={"name": "Async feedback mismatch", "config": {"candidate_count": 2, "feedback_mode": "winner_only"}},
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "An async feedback prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    candidates = round_payload["candidate_metadata"]
+
+    job = client.post(
+        f"/rounds/{round_payload['round_id']}/feedback/async",
+        json={
+            "feedback_type": "pairwise",
+            "payload": {"winner_candidate_id": candidates[0]["id"], "loser_candidate_id": candidates[1]["id"]},
+        },
+    )
+    assert job.status_code == 400
+    payload = job.json()
+    assert payload["error_code"] == "invalid_input"

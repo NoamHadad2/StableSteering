@@ -94,6 +94,7 @@ While work is running:
 - the relevant button is disabled
 - the current page remains usable
 - the page refreshes automatically after success so you see the next state
+- if the requested action is no longer valid, the app reports that conflict immediately instead of queueing a doomed background job
 
 This is especially helpful with the real Diffusers backend, where image generation can take a noticeable amount of time.
 

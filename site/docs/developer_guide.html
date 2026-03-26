@@ -218,6 +218,7 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li><code>progress</code> updates the progress bar</li>
 <li>the page refreshes automatically after success</li>
 <li>errors are shown inline if the job fails</li>
+<li>impossible async requests are rejected before queueing when the session or round is already in a conflicting state</li>
 </ul>
 <p>This keeps the UI responsive while the real GPU-backed backend works in the background.</p>
 <p><img alt="Session lifecycle diagram" src="assets/illustrations/session_lifecycle.svg"></p>
@@ -278,6 +279,7 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li><code>winner_only</code> uses an explicit winner selection control</li>
 <li><code>approve_reject</code> uses explicit approval checkboxes plus winner selection</li>
 <li><code>top_k</code> uses explicit rank inputs with uniqueness validation</li>
+<li>the backend rejects submissions whose <code>feedback_type</code> does not match the session's configured <code>feedback_mode</code></li>
 </ul>
 <p>The current seed policy contract is:</p>
 <ul>

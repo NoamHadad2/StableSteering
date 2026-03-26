@@ -15,6 +15,17 @@ def test_scalar_rating_normalization_chooses_highest_score() -> None:
     assert event.normalized_payload["winner_candidate_id"] == "b"
 
 
+def test_scalar_rating_tie_breaks_deterministically_by_candidate_id() -> None:
+    event = normalize_feedback(
+        "round_tie",
+        FeedbackRequest(
+            feedback_type=FeedbackType.scalar_rating,
+            payload={"ratings": {"c": 4, "a": 4, "b": 4}},
+        ),
+    )
+    assert event.normalized_payload["winner_candidate_id"] == "a"
+
+
 def test_top_k_requires_ranking() -> None:
     request = FeedbackRequest(feedback_type=FeedbackType.top_k, payload={"ranking": ["c1", "c2"]})
     event = normalize_feedback("round_2", request)
@@ -95,6 +106,16 @@ def test_scalar_rating_requires_non_empty_ratings() -> None:
         raise AssertionError("Expected scalar rating validation to fail")
 
 
+def test_scalar_rating_requires_numeric_values() -> None:
+    request = FeedbackRequest(feedback_type=FeedbackType.scalar_rating, payload={"ratings": {"c1": "5"}})
+    try:
+        normalize_feedback("round_3b", request)
+    except ValueError as exc:
+        assert "numeric ratings" in str(exc)
+    else:
+        raise AssertionError("Expected scalar rating numeric validation to fail")
+
+
 def test_approve_reject_requires_one_approved_candidate() -> None:
     request = FeedbackRequest(
         feedback_type=FeedbackType.approve_reject,
@@ -106,6 +127,19 @@ def test_approve_reject_requires_one_approved_candidate() -> None:
         assert "at least one approved candidate" in str(exc)
     else:
         raise AssertionError("Expected approve/reject validation to fail")
+
+
+def test_approve_reject_requires_boolean_approval_values() -> None:
+    request = FeedbackRequest(
+        feedback_type=FeedbackType.approve_reject,
+        payload={"approvals": {"c1": "yes", "c2": False}},
+    )
+    try:
+        normalize_feedback("round_4b", request)
+    except ValueError as exc:
+        assert "boolean approval values" in str(exc)
+    else:
+        raise AssertionError("Expected approve/reject approval type validation to fail")
 
 
 def test_top_k_requires_unique_ranking() -> None:
@@ -130,3 +164,15 @@ def test_top_k_requires_at_least_two_candidates() -> None:
         assert "at least two ranked candidates" in str(exc)
     else:
         raise AssertionError("Expected top-k minimum length validation to fail")
+
+
+def test_top_k_requires_list_payload() -> None:
+    try:
+        normalize_feedback(
+            "round_top_k_shape",
+            FeedbackRequest(feedback_type=FeedbackType.top_k, payload={"ranking": "c1,c2"}),
+        )
+    except ValueError as exc:
+        assert "ranking to be a list" in str(exc)
+    else:
+        raise AssertionError("Expected top-k list-shape validation to fail")
