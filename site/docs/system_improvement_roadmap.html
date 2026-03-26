@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>system_improvement_roadmap | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/system_improvement_roadmap.md">View source Markdown</a></p>
+        <h1 id="system-improvement-roadmap">System Improvement Roadmap</h1>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This document tracks the highest-value engineering and product improvements for the StableSteering system itself.</p>
+<p>It focuses on:</p>
+<ul>
+<li>runtime reliability</li>
+<li>user experience</li>
+<li>observability</li>
+<li>performance</li>
+<li>maintainability</li>
+<li>release and deployment quality</li>
+</ul>
+<p>It does not focus on research questions or study design. Those belong in:</p>
+<ul>
+<li><a href="research_improvement_roadmap.html">research_improvement_roadmap.md</a></li>
+</ul>
+<h2 id="2-current-baseline">2. Current Baseline</h2>
+<p>The current MVP already includes:</p>
+<ul>
+<li>a FastAPI backend</li>
+<li>a real GPU-backed Diffusers runtime by default</li>
+<li>SQLite-backed local persistence</li>
+<li>async round generation and feedback jobs</li>
+<li>replay export</li>
+<li>runtime diagnostics</li>
+<li>backend and frontend tracing</li>
+<li>per-session HTML trace reports</li>
+<li>browser and backend test coverage</li>
+<li>GitHub Pages documentation publishing</li>
+</ul>
+<h2 id="3-priority-levels">3. Priority Levels</h2>
+<ul>
+<li>
+<p><code>P0</code>
+  Important to system trust, correctness, or operator safety.</p>
+</li>
+<li>
+<p><code>P1</code>
+  Important to day-to-day usability and research throughput.</p>
+</li>
+<li>
+<p><code>P2</code>
+  Valuable polish, scale, or long-term maintainability work.</p>
+</li>
+</ul>
+<h2 id="4-p0-near-term-system-priorities">4. P0: Near-Term System Priorities</h2>
+<h3 id="41-strengthen-real-backend-end-to-end-coverage">4.1 Strengthen real-backend end-to-end coverage</h3>
+<p>Goals:</p>
+<ul>
+<li>add more browser coverage against the real Diffusers backend</li>
+<li>verify at least one full generate-feedback-generate cycle on real GPU hardware</li>
+<li>catch UI or orchestration bugs that only appear with real latency</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>extend the opt-in real Playwright suite beyond diagnostics</li>
+<li>add a release checklist item for the real browser path</li>
+<li>persist real test artifacts for debugging</li>
+</ul>
+<h3 id="42-add-export-packaging-for-session-trace-bundles">4.2 Add export packaging for session trace bundles</h3>
+<p>Goals:</p>
+<ul>
+<li>make one session easy to archive, share, or attach to a report</li>
+<li>keep images, replay payloads, trace logs, and <code>report.html</code> together</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>add a session export endpoint or script</li>
+<li>produce a zip bundle with stable manifest metadata</li>
+<li>include checksum and schema version info</li>
+</ul>
+<h3 id="43-improve-runtime-diagnostics-depth">4.3 Improve runtime diagnostics depth</h3>
+<p>Goals:</p>
+<ul>
+<li>make it obvious that the app is truly using GPU</li>
+<li>reduce time spent debugging environment mismatches</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>show GPU adapter name</li>
+<li>show VRAM totals and current usage if available</li>
+<li>show torch, diffusers, and transformers versions</li>
+<li>show prepared model path and pipeline warm state</li>
+</ul>
+<h3 id="44-harden-trace-and-export-path-hygiene">4.4 Harden trace and export path hygiene</h3>
+<p>Goals:</p>
+<ul>
+<li>keep local paths readable without leaking unnecessary machine-specific details into exports</li>
+<li>make trace bundles easier to move between machines</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>reduce machine-local absolute paths in user-facing reports</li>
+<li>normalize export manifests around relative paths</li>
+<li>document which files are portable and which are local-runtime only</li>
+</ul>
+<h2 id="5-p1-workflow-and-ux-improvements">5. P1: Workflow and UX Improvements</h2>
+<h3 id="51-build-true-mode-specific-feedback-controls">5.1 Build true mode-specific feedback controls</h3>
+<p>Current gap:</p>
+<ul>
+<li>the UI uses rating inputs for all feedback modes and derives pairwise and top-k indirectly</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>add dedicated pairwise widgets</li>
+<li>add explicit ranking controls for top-k</li>
+<li>preserve a rating-only fast path for quick testing</li>
+</ul>
+<h3 id="52-improve-replay-and-trace-navigation">5.2 Improve replay and trace navigation</h3>
+<p>Goals:</p>
+<ul>
+<li>reduce friction when reviewing a completed session</li>
+<li>connect replay, diagnostics, and trace reports more clearly</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>add navigation between replay and trace sections</li>
+<li>add per-round anchors</li>
+<li>add summary badges for winning candidates and user critique</li>
+</ul>
+<h3 id="53-add-richer-async-job-visibility">5.3 Add richer async job visibility</h3>
+<p>Goals:</p>
+<ul>
+<li>make long-running work easier to interpret</li>
+<li>distinguish queueing, model warm-up, image generation, and feedback application phases</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>refine <code>status_message</code></li>
+<li>add operation-specific milestones</li>
+<li>surface estimated duration when possible</li>
+</ul>
+<h3 id="54-improve-frontend-resilience">5.4 Improve frontend resilience</h3>
+<p>Goals:</p>
+<ul>
+<li>preserve user work during recoverable failures</li>
+<li>reduce unnecessary page reloads</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>preserve unsent ratings locally until success</li>
+<li>replace full refreshes with selective in-page updates</li>
+<li>add clearer retry affordances</li>
+</ul>
+<h2 id="6-p1-performance-improvements">6. P1: Performance Improvements</h2>
+<h3 id="61-reduce-repeated-pipeline-warm-up-cost">6.1 Reduce repeated pipeline warm-up cost</h3>
+<p>Goals:</p>
+<ul>
+<li>improve first-round latency</li>
+<li>reduce perceived slowness during interactive use</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>preload pipeline on startup when appropriate</li>
+<li>add explicit warm-up action or startup hook</li>
+<li>report cold-start vs warm-run timing</li>
+</ul>
+<h3 id="62-improve-database-structure-for-future-growth">6.2 Improve database structure for future growth</h3>
+<p>Current state:</p>
+<ul>
+<li>structured state is already in SQLite, but some values remain stored as JSON payloads</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>normalize the highest-value query fields further</li>
+<li>add indexes based on observed query patterns</li>
+<li>prepare migration notes for a future shared store</li>
+</ul>
+<h3 id="63-optimize-artifact-lifecycle">6.3 Optimize artifact lifecycle</h3>
+<p>Goals:</p>
+<ul>
+<li>avoid clutter from old runs</li>
+<li>keep storage growth understandable</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>add retention and cleanup scripts</li>
+<li>document safe deletion more clearly</li>
+<li>add optional artifact compression for exported bundles</li>
+</ul>
+<h2 id="7-p2-architecture-and-scale-improvements">7. P2: Architecture and Scale Improvements</h2>
+<h3 id="71-add-a-pluggable-storage-layer-for-shared-deployments">7.1 Add a pluggable storage layer for shared deployments</h3>
+<p>Goals:</p>
+<ul>
+<li>support multi-user or hosted research workflows later</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>define a storage adapter contract explicitly</li>
+<li>prepare PostgreSQL-backed implementation</li>
+<li>preserve replay export compatibility</li>
+</ul>
+<h3 id="72-improve-release-automation">7.2 Improve release automation</h3>
+<p>Goals:</p>
+<ul>
+<li>make releases more repeatable</li>
+<li>reduce manual mistakes</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>automate release zip creation in CI</li>
+<li>validate docs-site generation in CI</li>
+<li>update workflow actions for upcoming Node 24 runtime changes</li>
+</ul>
+<h3 id="73-add-api-schema-snapshots">7.3 Add API schema snapshots</h3>
+<p>Goals:</p>
+<ul>
+<li>make contract drift more visible</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>snapshot structured API responses</li>
+<li>snapshot replay export schema</li>
+<li>snapshot trace-report structure where stable</li>
+</ul>
+<h2 id="8-milestone-view">8. Milestone View</h2>
+<h3 id="milestone-a-operator-trust">Milestone A: Operator Trust</h3>
+<ul>
+<li>richer diagnostics</li>
+<li>session trace bundle export</li>
+<li>real-backend browser smoke expansion</li>
+</ul>
+<h3 id="milestone-b-better-interactive-use">Milestone B: Better Interactive Use</h3>
+<ul>
+<li>mode-specific feedback UI</li>
+<li>better async progress states</li>
+<li>improved replay and trace navigation</li>
+</ul>
+<h3 id="milestone-c-hardening-and-release-maturity">Milestone C: Hardening and Release Maturity</h3>
+<ul>
+<li>stronger CI release automation</li>
+<li>better export portability</li>
+<li>shared-store preparation</li>
+</ul>
+<h2 id="9-suggested-execution-order">9. Suggested Execution Order</h2>
+<ol>
+<li>expand real-backend end-to-end validation</li>
+<li>package session trace bundles for export</li>
+<li>improve diagnostics depth</li>
+<li>build mode-specific feedback UI</li>
+<li>refine async progress states</li>
+<li>improve replay and trace navigation</li>
+<li>harden release automation</li>
+<li>prepare shared-storage evolution</li>
+</ol>
+<h2 id="10-summary">10. Summary</h2>
+<p>The main system goal is no longer “make the MVP exist.” That is done.</p>
+<p>The next engineering phase should make the system:</p>
+<ul>
+<li>easier to trust</li>
+<li>easier to inspect</li>
+<li>easier to operate</li>
+<li>easier to extend</li>
+<li>easier to publish and reproduce</li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

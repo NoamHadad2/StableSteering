@@ -2,12 +2,18 @@
 
 This folder contains the specification set for the StableSteering research platform.
 
+Published HTML version:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
 The current repository also includes a runnable prototype. The most implementation-specific documents are:
 
 - [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
 - [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
 - [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
 - [faq.md](/E:/Projects/StableSteering/docs/faq.md)
+- [system_improvement_roadmap.md](/E:/Projects/StableSteering/docs/system_improvement_roadmap.md)
+- [research_improvement_roadmap.md](/E:/Projects/StableSteering/docs/research_improvement_roadmap.md)
 
 Current implementation highlights reflected in these guides:
 
@@ -46,6 +52,12 @@ Current implementation highlights reflected in these guides:
 - [faq.md](/E:/Projects/StableSteering/docs/faq.md)
   Answers common questions about the prototype and its current limitations.
 
+- [system_improvement_roadmap.md](/E:/Projects/StableSteering/docs/system_improvement_roadmap.md)
+  Tracks engineering, UX, observability, performance, and release priorities for the system itself.
+
+- [research_improvement_roadmap.md](/E:/Projects/StableSteering/docs/research_improvement_roadmap.md)
+  Tracks study design, baselines, measurement, and analysis priorities for the research program.
+
 ## Supporting Documents
 
 - [document_audit.md](/E:/Projects/StableSteering/docs/document_audit.md)
@@ -62,3 +74,5 @@ Current implementation highlights reflected in these guides:
 4. [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
 5. [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
 6. [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
+7. [system_improvement_roadmap.md](/E:/Projects/StableSteering/docs/system_improvement_roadmap.md)
+8. [research_improvement_roadmap.md](/E:/Projects/StableSteering/docs/research_improvement_roadmap.md)

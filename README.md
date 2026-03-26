@@ -4,6 +4,10 @@ StableSteering is a research documentation repository for an interactive system 
 
 The runtime app is now GPU-only by default and expects CUDA-backed Diffusers inference.
 
+Published HTML documentation:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
 The current repository contains the specification set used to define the project before implementation:
 
 - [Motivation](./docs/motivation.md)
@@ -19,6 +23,8 @@ The current repository contains the specification set used to define the project
 - [Install Guide](./INSTALL.md)
 - [Release Guide](./RELEASE.md)
 - [Release Notes v0.1.0](./RELEASE_NOTES_v0.1.0.md)
+- [System Improvement Roadmap](./docs/system_improvement_roadmap.md)
+- [Research Improvement Roadmap](./docs/research_improvement_roadmap.md)
 
 ## Folder Guides
 
@@ -61,6 +67,8 @@ This repository now contains:
 4. [System Test Specification](./docs/system_test_specification.md)
 5. [Pre-Implementation Blueprint](./docs/pre_implementation_blueprint.md)
 6. [Quick Start](./docs/quick_start.md)
+7. [System Improvement Roadmap](./docs/system_improvement_roadmap.md)
+8. [Research Improvement Roadmap](./docs/research_improvement_roadmap.md)
 
 ## Run Locally
 

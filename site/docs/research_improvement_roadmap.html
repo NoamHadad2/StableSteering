@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>research_improvement_roadmap | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/research_improvement_roadmap.md">View source Markdown</a></p>
+        <h1 id="research-improvement-roadmap">Research Improvement Roadmap</h1>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This document tracks the highest-value research improvements for StableSteering as a study platform.</p>
+<p>It focuses on:</p>
+<ul>
+<li>research design</li>
+<li>experimental validity</li>
+<li>evaluation quality</li>
+<li>interpretability</li>
+<li>study operations</li>
+<li>comparative baselines</li>
+</ul>
+<p>It does not focus on core engineering execution. That belongs in:</p>
+<ul>
+<li><a href="system_improvement_roadmap.html">system_improvement_roadmap.md</a></li>
+</ul>
+<h2 id="2-current-research-baseline">2. Current Research Baseline</h2>
+<p>The current system already supports:</p>
+<ul>
+<li>iterative steering sessions</li>
+<li>multiple samplers and updaters</li>
+<li>multiple feedback modes at the schema level</li>
+<li>deterministic test paths</li>
+<li>replay and trace capture</li>
+<li>real GPU-backed image generation</li>
+</ul>
+<p>This is enough for exploratory pilot work, but not yet enough for a strong research program.</p>
+<h2 id="3-main-research-gaps">3. Main Research Gaps</h2>
+<p>The largest current gaps are:</p>
+<ul>
+<li>limited comparative baselines</li>
+<li>limited human-study instrumentation</li>
+<li>no formal study protocols in the repo</li>
+<li>limited analysis automation</li>
+<li>weak coverage of confounds like seed sensitivity and user inconsistency</li>
+</ul>
+<h2 id="4-priority-levels">4. Priority Levels</h2>
+<ul>
+<li>
+<p><code>R0</code>
+  Needed before making strong research claims.</p>
+</li>
+<li>
+<p><code>R1</code>
+  Strongly improves study quality and interpretability.</p>
+</li>
+<li>
+<p><code>R2</code>
+  Valuable expansions once the core research loop is stable.</p>
+</li>
+</ul>
+<h2 id="5-r0-research-validity-priorities">5. R0: Research Validity Priorities</h2>
+<h3 id="51-establish-a-baseline-comparison-matrix">5.1 Establish a baseline comparison matrix</h3>
+<p>Goals:</p>
+<ul>
+<li>compare steering against simpler alternatives</li>
+<li>avoid overclaiming based on one workflow</li>
+</ul>
+<p>Minimum baselines:</p>
+<ul>
+<li>prompt-only rewriting</li>
+<li>prompt-only manual iteration without steering state</li>
+<li>no-update random sampling baseline</li>
+<li>winner-copy vs winner-average vs linear-preference updater comparison</li>
+</ul>
+<h3 id="52-add-explicit-study-protocols">5.2 Add explicit study protocols</h3>
+<p>Goals:</p>
+<ul>
+<li>make experiments repeatable across operators</li>
+<li>reduce ad hoc evaluation drift</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>define pilot study templates</li>
+<li>define prompt set selection rules</li>
+<li>define stopping criteria</li>
+<li>define annotation instructions for operators</li>
+</ul>
+<h3 id="53-improve-confound-logging">5.3 Improve confound logging</h3>
+<p>Goals:</p>
+<ul>
+<li>understand when session outcomes are caused by seed, fatigue, or interface effects rather than the steering method itself</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>log repeated hidden comparisons</li>
+<li>log user confidence</li>
+<li>log time-to-decision</li>
+<li>log interruptions, retries, and session abandonment</li>
+</ul>
+<h3 id="54-define-research-success-criteria">5.4 Define research success criteria</h3>
+<p>Goals:</p>
+<ul>
+<li>make it clear when a strategy is actually better</li>
+<li>prevent endless qualitative-only iteration</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>define minimum effect expectations</li>
+<li>define acceptable operator burden</li>
+<li>define replay-based success checks</li>
+<li>define robustness thresholds across seeds</li>
+</ul>
+<h2 id="6-r1-better-measurement-and-analysis">6. R1: Better Measurement and Analysis</h2>
+<h3 id="61-add-stronger-outcome-metrics">6.1 Add stronger outcome metrics</h3>
+<p>Suggested metrics:</p>
+<ul>
+<li>incumbent win rate against previous incumbents</li>
+<li>average rounds to satisfaction</li>
+<li>preference consistency over repeated judgments</li>
+<li>robustness under alternate seeds</li>
+<li>user-reported controllability</li>
+<li>user-reported fatigue</li>
+</ul>
+<h3 id="62-build-analysis-ready-exports">6.2 Build analysis-ready exports</h3>
+<p>Goals:</p>
+<ul>
+<li>reduce manual cleanup before analysis</li>
+<li>make traces easier to use in notebooks and reports</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>export tidy CSV or parquet summaries</li>
+<li>create one row per candidate</li>
+<li>create one row per feedback event</li>
+<li>create one row per round</li>
+<li>include experiment/session metadata joins</li>
+</ul>
+<h3 id="63-add-notebook-based-analysis-templates">6.3 Add notebook-based analysis templates</h3>
+<p>Goals:</p>
+<ul>
+<li>make it easy to analyze sessions without rebuilding analysis logic each time</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>session trajectory notebook</li>
+<li>seed robustness notebook</li>
+<li>sampler comparison notebook</li>
+<li>updater comparison notebook</li>
+</ul>
+<h3 id="64-strengthen-replay-as-a-research-asset">6.4 Strengthen replay as a research asset</h3>
+<p>Goals:</p>
+<ul>
+<li>use replay not just for debugging, but for comparative analysis and auditing</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>derive session summaries automatically</li>
+<li>compute change-over-round plots</li>
+<li>highlight candidate lineage and incumbent transitions</li>
+<li>compare replay trajectories across strategies</li>
+</ul>
+<h2 id="7-r1-better-human-interaction-research">7. R1: Better Human Interaction Research</h2>
+<h3 id="71-move-beyond-rating-only-interaction">7.1 Move beyond rating-only interaction</h3>
+<p>Current gap:</p>
+<ul>
+<li>although the system supports multiple feedback schemas, the current UI still centers ratings</li>
+</ul>
+<p>Research opportunity:</p>
+<ul>
+<li>compare rating-based interaction with true pairwise and ranking interactions</li>
+<li>measure cognitive load and speed differences</li>
+<li>measure whether richer critique improves update quality</li>
+</ul>
+<h3 id="72-evaluate-user-consistency-and-fatigue">7.2 Evaluate user consistency and fatigue</h3>
+<p>Goals:</p>
+<ul>
+<li>understand how stable user judgment is across rounds</li>
+<li>understand when the session length starts harming data quality</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>hidden repeat judgments</li>
+<li>forced calibration rounds</li>
+<li>round-count versus confidence tracking</li>
+<li>fatigue self-report prompts</li>
+</ul>
+<h3 id="73-study-interface-bias">7.3 Study interface bias</h3>
+<p>Goals:</p>
+<ul>
+<li>ensure the UI is not shaping results more than the underlying algorithm</li>
+</ul>
+<p>Suggested work:</p>
+<ul>
+<li>randomize candidate order in controlled experiments</li>
+<li>compare metadata-hidden vs metadata-visible views</li>
+<li>compare grid sizes and density</li>
+<li>compare replay-rich vs replay-light workflows</li>
+</ul>
+<h2 id="8-r2-strategy-research-expansions">8. R2: Strategy Research Expansions</h2>
+<h3 id="81-add-richer-steering-representations">8.1 Add richer steering representations</h3>
+<p>Suggested expansions:</p>
+<ul>
+<li>token-level steering</li>
+<li>pooled-embedding steering</li>
+<li>hybrid low-dimensional plus token mask approaches</li>
+</ul>
+<h3 id="82-add-stronger-samplers">8.2 Add stronger samplers</h3>
+<p>Suggested expansions:</p>
+<ul>
+<li>Thompson-style sampling</li>
+<li>quality-diversity or archive-based exploration</li>
+<li>critique-conditioned candidate proposals</li>
+<li>adaptive trust-region sampling</li>
+</ul>
+<h3 id="83-add-stronger-updaters">8.3 Add stronger updaters</h3>
+<p>Suggested expansions:</p>
+<ul>
+<li>Bradley-Terry style preference updating</li>
+<li>Bayesian preference models</li>
+<li>contextual bandit approaches</li>
+<li>critique-aware updates</li>
+</ul>
+<h2 id="9-study-program-milestones">9. Study Program Milestones</h2>
+<h3 id="milestone-r-a-pilot-validity">Milestone R-A: Pilot Validity</h3>
+<ul>
+<li>establish baseline comparison tasks</li>
+<li>define prompt set</li>
+<li>define study protocol</li>
+<li>log confounds more explicitly</li>
+</ul>
+<h3 id="milestone-r-b-reliable-measurement">Milestone R-B: Reliable Measurement</h3>
+<ul>
+<li>add stronger metrics</li>
+<li>add analysis exports</li>
+<li>add notebooks and replay summaries</li>
+</ul>
+<h3 id="milestone-r-c-comparative-research">Milestone R-C: Comparative Research</h3>
+<ul>
+<li>compare samplers</li>
+<li>compare updaters</li>
+<li>compare feedback modalities</li>
+<li>compare representation strategies</li>
+</ul>
+<h2 id="10-suggested-execution-order">10. Suggested Execution Order</h2>
+<ol>
+<li>define baseline comparison matrix</li>
+<li>define pilot protocol and prompt/task sets</li>
+<li>add stronger confound logging</li>
+<li>add analysis-ready exports</li>
+<li>add replay-based comparative summaries</li>
+<li>compare feedback modalities</li>
+<li>compare samplers and updaters</li>
+<li>expand representation strategies</li>
+</ol>
+<h2 id="11-summary">11. Summary</h2>
+<p>The next research phase should shift from “can the system run?” to “can the system support credible conclusions?”</p>
+<p>That means focusing on:</p>
+<ul>
+<li>better baselines</li>
+<li>better measurement</li>
+<li>better confound control</li>
+<li>better analysis workflows</li>
+<li>better human-study structure</li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

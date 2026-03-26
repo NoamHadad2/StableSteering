@@ -2,6 +2,10 @@
 
 ## 1. Install
 
+Published HTML documentation:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
 From the repository root:
 
 ```bash

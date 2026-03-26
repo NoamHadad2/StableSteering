@@ -2,6 +2,10 @@
 
 This document explains how to install and prepare StableSteering on Windows for local development or evaluation.
 
+Published HTML documentation:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
 ## Requirements
 
 - Windows with PowerShell

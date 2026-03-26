@@ -2,6 +2,10 @@
 
 Initial runnable MVP release of StableSteering.
 
+Published HTML documentation:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
 ## Highlights
 
 - FastAPI backend for experiments, sessions, rounds, feedback, replay, diagnostics, and async job status
