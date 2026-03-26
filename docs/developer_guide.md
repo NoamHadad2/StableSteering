@@ -18,10 +18,11 @@ The current implementation is a minimal research MVP with:
 
 - a FastAPI backend
 - a simple HTML/CSS/JS frontend
-- JSON-backed local persistence
+- SQLite-backed local persistence
 - a GPU-only real Diffusers runtime by default
 - deterministic mock SVG generation for tests only
 - basic replay export
+- asynchronous round-generation and feedback jobs with visible progress status
 - rich backend logging and persisted trace events
 - frontend trace capture and visible trace panels
 - automated tests for feedback, lifecycle, tracing, and replay export
@@ -30,7 +31,6 @@ It does not yet include:
 
 - database-backed persistence
 - authentication
-- asynchronous job execution
 - multi-user coordination
 
 ## 3. Project Structure
@@ -47,7 +47,7 @@ Key directories:
   Generation and orchestration logic.
 
 - [app/storage](E:\Projects\StableSteering\app\storage)
-  JSON repository implementation.
+  SQLite repository implementation.
 
 - [app/samplers](E:\Projects\StableSteering\app\samplers)
   Candidate proposal strategies.
@@ -151,10 +151,12 @@ The current runtime flow is:
 4. sampler proposes candidates
 5. Diffusers renders candidate images on GPU
 6. frontend displays the candidate images
-7. frontend and backend trace the active flow
-8. feedback is normalized and validated against the round
-9. updater computes the next incumbent state
-10. replay export exposes the persisted trajectory
+7. frontend starts async jobs for round generation and feedback submission
+8. users see progress and status while the job runs
+9. frontend and backend trace the active flow
+10. feedback is normalized and validated against the round
+11. updater computes the next incumbent state
+12. replay export exposes the persisted trajectory
 
 When a prepared local model is available and the backend is set to `diffusers`,
 the generation step uses a real Stable Diffusion pipeline, pins inference to
@@ -209,10 +211,17 @@ The current browser test contract is:
 
 - `npm run test:e2e:chrome` covers the UI flow and replay export API smoke path
 - `npm run test:e2e:debug` runs the same suite headed for interactive debugging
+- `npm run test:e2e:real` provides an opt-in real-backend browser smoke path for CUDA-capable environments with prepared model assets
 
-### 6.4 Replace JSON persistence
+The current API quality contract is:
 
-To move from JSON files to SQLite or PostgreSQL:
+- JSON API errors use the structured `ApiError` payload shape
+- replay exports include explicit schema and app versions
+- long-running session actions are exposed as async jobs with pollable status
+
+### 6.4 Evolve persistence
+
+To move from SQLite to PostgreSQL or another shared store:
 
 1. keep repository method names stable
 2. preserve session and round ordering
@@ -235,6 +244,7 @@ Before merging meaningful behavior changes:
 - run `python -m pytest`
 - run `npm run test:e2e:chrome` for UI-impacting changes
 - use `npm run test:e2e:debug` when you need to watch the browser flow interactively
+- use `npm run test:e2e:real` when you need browser validation against the real Diffusers backend
 - add or update at least one relevant test when changing lifecycle behavior
 - preserve replay export compatibility where possible
 - keep the explicitly injected mock test path working even if the runtime stays GPU-only
@@ -255,10 +265,9 @@ data/
 Look in:
 
 ```text
-data/experiments/
-data/sessions/
-data/rounds/
+data/stablesteering.db
 data/artifacts/
+data/traces/
 ```
 
 ### Validate the browser flow
@@ -275,6 +284,4 @@ Minimal manual smoke test:
 ## 10. Recommended Next Engineering Steps
 
 - introduce a database-backed repository
-- add schema versioning to replay exports
-- add more robust API error payloads
 - add richer end-to-end browser tests

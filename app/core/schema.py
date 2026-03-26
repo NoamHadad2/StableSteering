@@ -194,7 +194,9 @@ class FeedbackResponse(BaseModel):
 class ReplayExport(BaseModel):
     """Serializable replay bundle for one completed or in-progress session."""
 
-    experiment: Experiment
+    schema_version: str = "1.0"
+    app_version: str = "0.1.0"
+    experiment: Experiment | None
     session: Session
     rounds: list[Round]
     exported_at: datetime = Field(default_factory=utc_now)

@@ -29,7 +29,7 @@ This folder contains the running StableSteering application.
   Candidate proposal strategies.
 
 - `storage/`
-  Local JSON persistence.
+  Local SQLite persistence plus artifact/trace directories.
 
 - `updaters/`
   Steering-state update strategies.

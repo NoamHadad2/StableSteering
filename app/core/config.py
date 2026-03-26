@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     """Application settings shared by runtime code and tests."""
 
     app_name: str = "StableSteering"
+    app_version: str = "0.1.0"
     environment: str = "development"
     data_dir: Path = Path("data")
     artifacts_dir_name: str = "artifacts"

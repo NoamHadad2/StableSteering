@@ -12,8 +12,13 @@
         <p class="eyebrow">Session</p>
         <h1>{{ session.prompt }}</h1>
         <p class="lede">Sampler: {{ session.config.sampler }} | Updater: {{ session.config.updater }} | Feedback: {{ session.config.feedback_mode }}</p>
+        <div class="badge-row">
+          <span class="status-badge">Backend: {{ runtime_diagnostics.backend }}</span>
+          <span class="status-badge">Device: {{ runtime_diagnostics.active_device or runtime_diagnostics.configured_device or "n/a" }}</span>
+          <span class="status-badge">CUDA: {{ runtime_diagnostics.cuda_available }}</span>
+        </div>
         <div class="actions">
-          <button class="button" data-session-id="{{ session.id }}" id="next-round-button">Generate next round</button>
+          <button class="button" data-session-id="{{ session.id }}" id="next-round-button" {% if session.status == "awaiting_feedback" %}disabled{% endif %}>Generate next round</button>
           <a class="button secondary" href="/sessions/{{ session.id }}/replay-view">Open replay</a>
         </div>
       </section>
@@ -22,6 +27,16 @@
         <div class="section-head">
           <h2>Current state</h2>
           <span>Round {{ session.current_round }}</span>
+        </div>
+        <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
+        <div id="progress-panel" class="progress-panel" hidden>
+          <div class="progress-head">
+            <strong id="progress-label">Working...</strong>
+            <span id="progress-value">0%</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
         </div>
         <p>Current steering vector: <code>{{ session.current_z }}</code></p>
         <p>Status: <strong>{{ session.status }}</strong></p>
@@ -42,7 +57,7 @@
                 <p>Role: {{ candidate.sampler_role }}</p>
                 <p>z: {{ candidate.z }}</p>
                 <label>Rating
-                  <input type="number" min="1" max="5" value="3" class="rating-input" data-candidate-id="{{ candidate.id }}">
+                  <input type="number" min="1" max="5" value="3" class="rating-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
                 </label>
               </article>
             {% endfor %}

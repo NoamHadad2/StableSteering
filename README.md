@@ -16,6 +16,9 @@ The current repository contains the specification set used to define the project
 - [User Guide](./docs/user_guide.md)
 - [Developer Guide](./docs/developer_guide.md)
 - [FAQ](./docs/faq.md)
+- [Install Guide](./INSTALL.md)
+- [Release Guide](./RELEASE.md)
+- [Release Notes v0.1.0](./RELEASE_NOTES_v0.1.0.md)
 
 ## Folder Guides
 
@@ -102,6 +105,12 @@ Prepare Hugging Face assets for the real generator:
 python scripts/setup_huggingface.py
 ```
 
+Bootstrap a fresh local machine:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
+```
+
 Select the real Diffusers backend:
 
 ```bash
@@ -123,6 +132,12 @@ Run a one-off real-model smoke test:
 python scripts/smoke_real_diffusers.py
 ```
 
+Build an optional release zip:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0
+```
+
 ## Legacy Source
 
 The original combined specification is preserved as:
@@ -133,5 +148,5 @@ The original combined specification is preserved as:
 
 - add a diagnostics endpoint for backend, CUDA, and model readiness
 - introduce a database-backed repository
-- add schema versioning to replay exports
 - expand browser coverage for pairwise and top-k feedback flows
+- add release packaging and bootstrap/install scripts

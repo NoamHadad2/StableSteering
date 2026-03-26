@@ -1,4 +1,9 @@
 const traceLog = document.getElementById("trace-log");
+const pageStatus = document.getElementById("page-status");
+const progressPanel = document.getElementById("progress-panel");
+const progressBar = document.getElementById("progress-bar");
+const progressValue = document.getElementById("progress-value");
+const progressLabel = document.getElementById("progress-label");
 
 function appendTrace(message) {
   if (!traceLog) return;
@@ -7,7 +12,31 @@ function appendTrace(message) {
   traceLog.prepend(item);
 }
 
-async function traceFrontend(event, details = {}) {
+function setStatus(message, isError = false) {
+  if (!pageStatus) return;
+  pageStatus.hidden = !message;
+  pageStatus.textContent = message || "";
+  pageStatus.classList.toggle("error", Boolean(isError));
+}
+
+function setProgress(progress, label = "Working...") {
+  if (!progressPanel || !progressBar || !progressValue || !progressLabel) return;
+  const clamped = Math.max(0, Math.min(100, Number(progress || 0)));
+  progressPanel.hidden = false;
+  progressBar.style.width = `${clamped}%`;
+  progressValue.textContent = `${clamped}%`;
+  progressLabel.textContent = label;
+}
+
+function clearProgress() {
+  if (!progressPanel || !progressBar || !progressValue || !progressLabel) return;
+  progressPanel.hidden = true;
+  progressBar.style.width = "0%";
+  progressValue.textContent = "0%";
+  progressLabel.textContent = "Working...";
+}
+
+function traceFrontend(event, details = {}) {
   const payload = {
     event,
     page: window.location.pathname,
@@ -18,18 +47,25 @@ async function traceFrontend(event, details = {}) {
   appendTrace(`${event} ${JSON.stringify(details)}`);
   console.info("[StableSteering trace]", payload);
   try {
-    await fetch("/frontend-events", {
+    const body = JSON.stringify(payload);
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: "application/json" });
+      navigator.sendBeacon("/frontend-events", blob);
+      return;
+    }
+    fetch("/frontend-events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      body,
+      keepalive: true,
+    }).catch((error) => console.warn("Failed to persist frontend trace event", error));
   } catch (error) {
     console.warn("Failed to persist frontend trace event", error);
   }
 }
 
 async function postJson(url, body) {
-  await traceFrontend("http.request.started", { url, body_keys: Object.keys(body || {}) });
+  traceFrontend("http.request.started", { url, body_keys: Object.keys(body || {}) });
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -37,12 +73,39 @@ async function postJson(url, body) {
   });
   if (!response.ok) {
     const text = await response.text();
-    await traceFrontend("http.request.failed", { url, status: response.status, detail: text });
-    throw new Error(text || `Request failed: ${response.status}`);
+    let message = text || `Request failed: ${response.status}`;
+    try {
+      const parsed = JSON.parse(text);
+      message = parsed.message || parsed.detail || message;
+    } catch {
+      message = text || message;
+    }
+    traceFrontend("http.request.failed", { url, status: response.status, detail: message });
+    throw new Error(message);
   }
   const data = await response.json();
-  await traceFrontend("http.request.completed", { url, status: response.status });
+  traceFrontend("http.request.completed", { url, status: response.status });
   return data;
+}
+
+async function pollJob(statusUrl, { onProgress } = {}) {
+  for (;;) {
+    const response = await fetch(statusUrl, { method: "GET" });
+    if (!response.ok) {
+      throw new Error(`Failed to poll job status: ${response.status}`);
+    }
+    const job = await response.json();
+    if (onProgress) {
+      onProgress(job);
+    }
+    if (job.state === "succeeded") {
+      return job.result;
+    }
+    if (job.state === "failed") {
+      throw new Error(job.error || "Asynchronous job failed.");
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
+  }
 }
 
 function collectRatings() {
@@ -89,30 +152,40 @@ function buildFeedbackPayload(feedbackMode, ratingEntries) {
 }
 
 const setupForm = document.getElementById("setup-form");
+const setupSubmitButton = document.getElementById("setup-submit-button");
 if (setupForm) {
   traceFrontend("page.loaded", { view: "setup" });
   setupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    await traceFrontend("setup.submit.clicked");
-    const form = new FormData(setupForm);
-    const experiment = await postJson("/experiments", {
-      name: form.get("experiment_name"),
-      description: form.get("description"),
-      config: {
-        sampler: form.get("sampler"),
-        updater: form.get("updater"),
-        feedback_mode: form.get("feedback_mode"),
-        candidate_count: Number(form.get("candidate_count")),
-      },
-    });
-    await traceFrontend("experiment.created", { experiment_id: experiment.id });
-    const session = await postJson("/sessions", {
-      experiment_id: experiment.id,
-      prompt: form.get("prompt"),
-      negative_prompt: form.get("negative_prompt"),
-    });
-    await traceFrontend("session.created", { session_id: session.id });
-    window.location.href = `/sessions/${session.id}/view`;
+    traceFrontend("setup.submit.clicked");
+    if (setupSubmitButton) setupSubmitButton.disabled = true;
+    setStatus("Creating experiment and session...");
+    try {
+      const form = new FormData(setupForm);
+      const experiment = await postJson("/experiments", {
+        name: form.get("experiment_name"),
+        description: form.get("description"),
+        config: {
+          sampler: form.get("sampler"),
+          updater: form.get("updater"),
+          feedback_mode: form.get("feedback_mode"),
+          candidate_count: Number(form.get("candidate_count")),
+        },
+      });
+      traceFrontend("experiment.created", { experiment_id: experiment.id });
+      const session = await postJson("/sessions", {
+        experiment_id: experiment.id,
+        prompt: form.get("prompt"),
+        negative_prompt: form.get("negative_prompt"),
+      });
+      traceFrontend("session.created", { session_id: session.id });
+      setStatus("Session created. Opening the interactive view...");
+      window.location.href = `/sessions/${session.id}/view`;
+    } catch (error) {
+      setStatus(error.message, true);
+    } finally {
+      if (setupSubmitButton) setupSubmitButton.disabled = false;
+    }
   });
 }
 
@@ -120,10 +193,28 @@ const nextRoundButton = document.getElementById("next-round-button");
 if (nextRoundButton) {
   traceFrontend("page.loaded", { view: "session", session_id: nextRoundButton.dataset.sessionId });
   nextRoundButton.addEventListener("click", async () => {
+    if (nextRoundButton.disabled) return;
     const sessionId = nextRoundButton.dataset.sessionId;
-    await traceFrontend("round.generate.clicked", { session_id: sessionId });
-    await postJson(`/sessions/${sessionId}/rounds/next`, {});
-    window.location.reload();
+    traceFrontend("round.generate.clicked", { session_id: sessionId });
+    nextRoundButton.disabled = true;
+    setStatus("Queueing round generation...");
+    setProgress(5, "Queueing next round");
+    try {
+      const job = await postJson(`/sessions/${sessionId}/rounds/next/async`, {});
+      await pollJob(job.status_url, {
+        onProgress: (snapshot) => {
+          setStatus(snapshot.status_message);
+          setProgress(snapshot.progress, "Generating next round");
+        },
+      });
+      setStatus("Round generated. Refreshing session view...");
+      setProgress(100, "Round completed");
+      window.location.reload();
+    } catch (error) {
+      setStatus(error.message, true);
+      clearProgress();
+      nextRoundButton.disabled = false;
+    }
   });
 }
 
@@ -131,17 +222,35 @@ const submitFeedbackButton = document.getElementById("submit-feedback-button");
 if (submitFeedbackButton) {
   traceFrontend("round.visible", { round_id: submitFeedbackButton.dataset.roundId });
   submitFeedbackButton.addEventListener("click", async () => {
+    if (submitFeedbackButton.disabled) return;
     const feedbackMode = submitFeedbackButton.dataset.feedbackMode || "scalar_rating";
-    const ratingEntries = collectRatings();
-    const request = buildFeedbackPayload(feedbackMode, ratingEntries);
-    await traceFrontend("feedback.submit.clicked", {
-      round_id: submitFeedbackButton.dataset.roundId,
-      feedback_mode: feedbackMode,
-      rated_candidates: ratingEntries.length,
-    });
-    await postJson(`/rounds/${submitFeedbackButton.dataset.roundId}/feedback`, {
-      ...request,
-    });
-    window.location.reload();
+    try {
+      const ratingEntries = collectRatings();
+      const request = buildFeedbackPayload(feedbackMode, ratingEntries);
+      traceFrontend("feedback.submit.clicked", {
+        round_id: submitFeedbackButton.dataset.roundId,
+        feedback_mode: feedbackMode,
+        rated_candidates: ratingEntries.length,
+      });
+      submitFeedbackButton.disabled = true;
+      setStatus("Queueing feedback submission...");
+      setProgress(5, "Queueing feedback");
+      const job = await postJson(`/rounds/${submitFeedbackButton.dataset.roundId}/feedback/async`, {
+        ...request,
+      });
+      await pollJob(job.status_url, {
+        onProgress: (snapshot) => {
+          setStatus(snapshot.status_message);
+          setProgress(snapshot.progress, "Applying feedback");
+        },
+      });
+      setStatus("Feedback submitted. Refreshing session view...");
+      setProgress(100, "Feedback applied");
+      window.location.reload();
+    } catch (error) {
+      setStatus(error.message, true);
+      clearProgress();
+      submitFeedbackButton.disabled = false;
+    }
   });
 }

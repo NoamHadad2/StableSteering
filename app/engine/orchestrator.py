@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from app.core.config import settings
 from app.core.schema import (
     Experiment,
     ExperimentCreate,
     FeedbackRequest,
     FeedbackResponse,
+    ReplayExport,
     RenderStatus,
     Round,
     RoundResponse,
@@ -206,11 +208,13 @@ class Orchestrator:
         session = self._require_session(session_id)
         experiment = self.repository.get_experiment(session.experiment_id)
         rounds = self.repository.list_rounds_for_session(session.id)
-        return {
-            "experiment": experiment.model_dump(mode="json") if experiment else None,
-            "session": session.model_dump(mode="json"),
-            "rounds": [item.model_dump(mode="json") for item in rounds],
-        }
+        replay = ReplayExport(
+            app_version=settings.app_version,
+            experiment=experiment,
+            session=session,
+            rounds=rounds,
+        )
+        return replay.model_dump(mode="json")
 
     def _require_session(self, session_id: str) -> Session:
         """Load a session or raise a lookup error."""

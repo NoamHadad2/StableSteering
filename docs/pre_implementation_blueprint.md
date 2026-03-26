@@ -64,7 +64,7 @@ The project should proceed with these default assumptions unless deliberately ch
 
 - single-machine execution
 - one active interactive session at a time in v1
-- JSON-backed local persistence for the current MVP, with SQLite or PostgreSQL still a plausible next step
+- SQLite-backed local persistence for the current MVP, with PostgreSQL still a plausible next step
 - filesystem storage for images and exports
 - replay correctness is higher priority than generation speed
 - prompts and critique text are stored as research data

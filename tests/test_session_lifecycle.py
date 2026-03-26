@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 
 def test_session_lifecycle_round_feedback_round(client) -> None:
     experiment = client.post(
@@ -76,6 +78,9 @@ def test_replay_export_contains_rounds(client) -> None:
     replay = client.get(f"/sessions/{session['id']}/replay")
     assert replay.status_code == 200
     replay_payload = replay.json()
+    assert replay_payload["schema_version"] == "1.0"
+    assert replay_payload["app_version"] == "0.1.0"
+    assert replay_payload["exported_at"]
     assert replay_payload["session"]["id"] == session["id"]
     assert len(replay_payload["rounds"]) == 1
     assert replay_payload["rounds"][0]["feedback_events"][0]["normalized_payload"]["winner_candidate_id"] in ratings
@@ -126,6 +131,9 @@ def test_feedback_rejects_unknown_candidate_id(client) -> None:
         json={"feedback_type": "pairwise", "payload": {"winner_candidate_id": "cand_missing", "loser_candidate_id": "cand_other"}},
     )
     assert feedback.status_code == 400
+    payload = feedback.json()
+    assert payload["error_code"] == "invalid_input"
+    assert "unknown winner candidate" in payload["message"]
 
 
 def test_diagnostics_endpoint_reports_backend_and_device(client) -> None:
@@ -136,3 +144,49 @@ def test_diagnostics_endpoint_reports_backend_and_device(client) -> None:
     assert payload["test_only_backend"] is True
     assert "cuda_available" in payload
     assert "active_device" in payload
+
+
+def test_async_round_job_completes_and_returns_result(client) -> None:
+    experiment = client.post("/experiments", json={"name": "Async round", "config": {"candidate_count": 2}}).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "An async round prompt", "negative_prompt": ""},
+    ).json()
+
+    job = client.post(f"/sessions/{session['id']}/rounds/next/async")
+    assert job.status_code == 202
+    status = client.get(job.json()["status_url"]).json()
+    assert status["state"] in {"queued", "running", "succeeded"}
+
+    for _ in range(20):
+        status = client.get(job.json()["status_url"]).json()
+        if status["state"] == "succeeded":
+            break
+        time.sleep(0.01)
+    assert status["state"] == "succeeded"
+    assert status["result"]["round_id"]
+    assert len(status["result"]["candidate_metadata"]) == 2
+
+
+def test_async_feedback_job_completes_and_returns_result(client) -> None:
+    experiment = client.post("/experiments", json={"name": "Async feedback", "config": {"candidate_count": 2}}).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "An async feedback prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    ratings = {candidate["id"]: 5 - index for index, candidate in enumerate(round_payload["candidate_metadata"])}
+
+    job = client.post(
+        f"/rounds/{round_payload['round_id']}/feedback/async",
+        json={"feedback_type": "scalar_rating", "payload": {"ratings": ratings}},
+    )
+    assert job.status_code == 202
+
+    for _ in range(20):
+        status = client.get(job.json()["status_url"]).json()
+        if status["state"] == "succeeded":
+            break
+        time.sleep(0.01)
+    assert status["state"] == "succeeded"
+    assert status["result"]["update_summary"]["winner_candidate_id"] in ratings

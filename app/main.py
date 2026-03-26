@@ -6,13 +6,15 @@ from time import perf_counter
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.config import settings
+from app.core.jobs import AsyncJobManager
 from app.core.logging import configure_logging, logger, set_request_id
-from app.core.schema import ExperimentCreate, FeedbackRequest, SessionCreate
+from app.core.schema import ApiError, ExperimentCreate, FeedbackRequest, SessionCreate
 from app.core.tracing import TraceRecorder
 from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
@@ -28,6 +30,9 @@ def initialize_app_state(application: FastAPI) -> None:
     The default app runtime is GPU-only. Tests can inject their own orchestrator
     and trace recorder before startup to bypass heavyweight initialization.
     """
+
+    if getattr(application.state, "job_manager", None) is None:
+        application.state.job_manager = AsyncJobManager()
 
     if getattr(application.state, "orchestrator", None) is not None and getattr(application.state, "trace_recorder", None) is not None:
         return
@@ -58,6 +63,13 @@ async def lifespan(application: FastAPI):
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="app/frontend/static"), name="static")
 app.mount("/artifacts", StaticFiles(directory=str(settings.artifacts_dir)), name="artifacts")
+
+
+def api_error_response(status_code: int, error_code: str, message: str) -> JSONResponse:
+    """Return a stable structured error payload for JSON API routes."""
+
+    payload = ApiError(error_code=error_code, message=message).model_dump(mode="json")
+    return JSONResponse(status_code=status_code, content=payload)
 
 
 @app.middleware("http")
@@ -164,9 +176,16 @@ def session_page(request: Request, session_id: str) -> HTMLResponse:
         raise HTTPException(status_code=404, detail="Session not found")
     rounds = request.app.state.orchestrator.get_session_rounds(session_id)
     current_round = rounds[-1] if rounds else None
+    runtime_diagnostics = request.app.state.orchestrator.generator.diagnostics()
     return templates.TemplateResponse(
         "session.html",
-        {"request": request, "session": session, "rounds": rounds, "current_round": current_round},
+        {
+            "request": request,
+            "session": session,
+            "rounds": rounds,
+            "current_round": current_round,
+            "runtime_diagnostics": runtime_diagnostics,
+        },
     )
 
 
@@ -201,7 +220,7 @@ def get_experiment(experiment_id: str):
 
     experiment = app.state.orchestrator.get_experiment(experiment_id)
     if experiment is None:
-        raise HTTPException(status_code=404, detail="Experiment not found")
+        return api_error_response(404, "not_found", "Experiment not found")
     return experiment
 
 
@@ -212,9 +231,9 @@ def create_session(request: SessionCreate):
     try:
         return app.state.orchestrator.create_session(request)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        return api_error_response(404, "not_found", str(exc))
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return api_error_response(400, "invalid_input", str(exc))
 
 
 @app.get("/sessions/{session_id}")
@@ -223,8 +242,18 @@ def get_session(session_id: str):
 
     session = app.state.orchestrator.get_session(session_id)
     if session is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+        return api_error_response(404, "not_found", "Session not found")
     return session
+
+
+@app.get("/jobs/{job_id}")
+async def get_job(job_id: str):
+    """Return the current status for one asynchronous job."""
+
+    job = await app.state.job_manager.get(job_id)
+    if job is None:
+        return api_error_response(404, "not_found", "Job not found")
+    return job
 
 
 @app.post("/sessions/{session_id}/rounds/next")
@@ -234,9 +263,23 @@ def next_round(session_id: str):
     try:
         return app.state.orchestrator.generate_round(session_id)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        return api_error_response(404, "not_found", str(exc))
     except RuntimeError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        return api_error_response(409, "conflict", str(exc))
+
+
+@app.post("/sessions/{session_id}/rounds/next/async", status_code=202)
+async def next_round_async(session_id: str):
+    """Start generating the next round asynchronously and return a job handle."""
+
+    try:
+        job = await app.state.job_manager.submit(
+            operation=f"generate_round:{session_id}",
+            fn=lambda: app.state.orchestrator.generate_round(session_id),
+        )
+    except KeyError as exc:
+        return api_error_response(404, "not_found", str(exc))
+    return {"job_id": job.id, "status_url": f"/jobs/{job.id}", "state": job.state}
 
 
 @app.post("/rounds/{round_id}/feedback")
@@ -246,11 +289,25 @@ def submit_feedback(round_id: str, request: FeedbackRequest):
     try:
         return app.state.orchestrator.submit_feedback(round_id, request)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        return api_error_response(404, "not_found", str(exc))
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return api_error_response(400, "invalid_input", str(exc))
     except RuntimeError as exc:
-        raise HTTPException(status_code=409, detail=str(exc)) from exc
+        return api_error_response(409, "conflict", str(exc))
+
+
+@app.post("/rounds/{round_id}/feedback/async", status_code=202)
+async def submit_feedback_async(round_id: str, request: FeedbackRequest):
+    """Start feedback application asynchronously and return a job handle."""
+
+    try:
+        job = await app.state.job_manager.submit(
+            operation=f"submit_feedback:{round_id}",
+            fn=lambda: app.state.orchestrator.submit_feedback(round_id, request),
+        )
+    except KeyError as exc:
+        return api_error_response(404, "not_found", str(exc))
+    return {"job_id": job.id, "status_url": f"/jobs/{job.id}", "state": job.state}
 
 
 @app.get("/sessions/{session_id}/replay")
@@ -260,7 +317,7 @@ def replay(session_id: str):
     try:
         return app.state.orchestrator.export_replay(session_id)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
+        return api_error_response(404, "not_found", str(exc))
 
 
 @app.post("/frontend-events")
