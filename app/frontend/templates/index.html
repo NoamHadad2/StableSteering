@@ -36,8 +36,8 @@
             {% for session in sessions %}
               <tr>
                 <td>{{ session.prompt }}</td>
-                <td>{{ session.status }}</td>
-                <td>{{ session.current_round }}</td>
+                <td>{{ humanize_session_status(session.status) }}</td>
+                <td>{% if session.current_round == 0 %}Not started yet{% else %}Round {{ session.current_round }}{% endif %}</td>
                 <td>
                   <div class="actions inline-actions">
                     <a class="button secondary" href="/sessions/{{ session.id }}/view">Resume session</a>
@@ -55,7 +55,7 @@
       <section class="card">
         <div class="section-head">
           <h2>Experiments</h2>
-          <span>{{ experiments|length }} total</span>
+          <span>{{ experiments|length }} shown · {{ experiment_count }} total</span>
         </div>
         {% if experiments %}
           <table class="table">
@@ -71,9 +71,9 @@
             {% for experiment in experiments %}
               <tr>
                 <td>{{ experiment.name }}</td>
-                <td>{{ experiment.config.sampler }}</td>
-                <td>{{ experiment.config.updater }}</td>
-                <td>{{ experiment.config.feedback_mode }}</td>
+                <td>{{ humanize_token(experiment.config.sampler) }}</td>
+                <td>{{ humanize_token(experiment.config.updater) }}</td>
+                <td>{{ humanize_feedback_mode(experiment.config.feedback_mode) }}</td>
               </tr>
             {% endfor %}
             </tbody>

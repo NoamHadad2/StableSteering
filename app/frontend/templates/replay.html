@@ -21,7 +21,7 @@
         <section class="card">
           <div class="section-head">
             <h2>Round {{ round.round_index }}</h2>
-            <span>{{ round.render_status }} · {{ round.candidates|length }} candidates</span>
+            <span>{{ humanize_token(round.render_status) }} · {{ round.candidates|length }} candidates</span>
           </div>
           <div class="summary-grid">
             <div class="summary-item">
@@ -34,7 +34,7 @@
             </div>
             <div class="summary-item">
               <span class="summary-label">Seed policy</span>
-              <strong>{{ round.seed_policy }}</strong>
+              <strong>{{ humanize_token(round.seed_policy) }}</strong>
             </div>
           </div>
           <div class="image-grid">
@@ -43,7 +43,7 @@
                 <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
                 <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
                 <p class="candidate-subtitle">{{ candidate.id }}</p>
-                <p><strong>{{ candidate.sampler_role }}</strong></p>
+                <p><strong>{{ humanize_token(candidate.sampler_role) }}</strong></p>
               </article>
             {% endfor %}
           </div>

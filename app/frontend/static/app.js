@@ -68,11 +68,18 @@ function traceFrontend(event, details = {}) {
 
 async function postJson(url, body) {
   traceFrontend("http.request.started", { url, body_keys: Object.keys(body || {}) });
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (error) {
+    const message = "Could not reach the server. Make sure the app is still running, then try again.";
+    traceFrontend("http.request.failed", { url, detail: message, error_name: error?.name || "network_error" });
+    throw new Error(message);
+  }
   if (!response.ok) {
     const text = await response.text();
     let message = text || `Request failed: ${response.status}`;
@@ -116,6 +123,18 @@ async function pollJob(statusUrl, { onProgress } = {}) {
     }
     await new Promise((resolve) => window.setTimeout(resolve, 250));
   }
+}
+
+async function runNextRoundJob(sessionId, { queuedLabel, runningFallbackLabel } = {}) {
+  const job = await postJson(`/sessions/${sessionId}/rounds/next/async`, {});
+  setStatus(queuedLabel || "Queueing round generation...");
+  setProgress(55, queuedLabel || "Queueing next round");
+  await pollJob(job.status_url, {
+    onProgress: (snapshot) => {
+      setStatus(snapshot.status_message);
+      setProgress(snapshot.progress, snapshot.status_message || runningFallbackLabel || "Generating next round");
+    },
+  });
 }
 
 function collectRatings() {
@@ -308,12 +327,9 @@ if (nextRoundButton) {
     setStatus("Queueing round generation...");
     setProgress(5, "Queueing next round");
     try {
-      const job = await postJson(`/sessions/${sessionId}/rounds/next/async`, {});
-      await pollJob(job.status_url, {
-        onProgress: (snapshot) => {
-          setStatus(snapshot.status_message);
-          setProgress(snapshot.progress, snapshot.status_message || "Generating next round");
-        },
+      await runNextRoundJob(sessionId, {
+        queuedLabel: "Queueing round generation...",
+        runningFallbackLabel: "Generating next round",
       });
       setStatus("Round generated. Refreshing session view...");
       setProgress(100, "Round completed");
@@ -342,6 +358,7 @@ if (submitFeedbackButton) {
   submitFeedbackButton.addEventListener("click", async () => {
     if (submitFeedbackButton.disabled) return;
     const feedbackMode = submitFeedbackButton.dataset.feedbackMode || "scalar_rating";
+    const sessionId = submitFeedbackButton.dataset.sessionId;
     try {
       const request = buildFeedbackPayload(feedbackMode);
       traceFrontend("feedback.submit.clicked", {
@@ -361,8 +378,18 @@ if (submitFeedbackButton) {
           setProgress(snapshot.progress, snapshot.status_message || "Applying feedback");
         },
       });
-      setStatus("Feedback submitted. Refreshing session view...");
-      setProgress(100, "Feedback applied");
+      traceFrontend("feedback.submit.completed", {
+        round_id: submitFeedbackButton.dataset.roundId,
+        session_id: sessionId,
+      });
+      setStatus("Feedback applied. Starting the next round...");
+      setProgress(50, "Preparing next round");
+      await runNextRoundJob(sessionId, {
+        queuedLabel: "Queueing next round after feedback...",
+        runningFallbackLabel: "Generating the next round",
+      });
+      setStatus("Next round ready. Refreshing session view...");
+      setProgress(100, "Next round completed");
       window.location.reload();
     } catch (error) {
       setStatus(error.message, true);

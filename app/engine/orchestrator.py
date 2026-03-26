@@ -176,11 +176,25 @@ class Orchestrator:
         self._report_progress(progress_callback, 52, "Rendering candidate images on the model backend")
         # Render each candidate independently so future versions can tolerate
         # partial round failures without changing the orchestration contract.
-        for candidate in candidates:
+        render_progress_start = 52
+        render_progress_end = 74
+        total_candidates = max(1, len(candidates))
+        for index, candidate in enumerate(candidates, start=1):
+            progress = render_progress_start + int((render_progress_end - render_progress_start) * ((index - 1) / total_candidates))
             candidate.round_id = round_obj.id
             if candidate.generation_params.get("carried_forward") and candidate.image_path:
+                self._report_progress(
+                    progress_callback,
+                    progress,
+                    f"Using saved image {index} of {total_candidates} from the previous winning round",
+                )
                 candidate.render_status = RenderStatus.succeeded
                 continue
+            self._report_progress(
+                progress_callback,
+                progress,
+                f"Generating image {index} of {total_candidates} on the model backend",
+            )
             candidate = self.generator.render_candidate(session, candidate)
             candidate.render_status = RenderStatus.succeeded
         round_obj.candidates = candidates
@@ -447,26 +461,60 @@ class Orchestrator:
             return proposed_candidates
 
         boosted_candidates: list[Candidate] = []
-        boost_radius = min(session.config.trust_radius * 1.35, 0.6)
-        min_radius = min(max(session.config.trust_radius * 0.85, 0.18), boost_radius)
+        dimensions = max(1, len(session.current_z))
+        boost_radius = min(max(session.config.trust_radius * 1.55, 0.34), 0.72)
+        min_radius = min(max(session.config.trust_radius * 0.95, 0.24), boost_radius)
         for index, candidate in enumerate(proposed_candidates):
-            scale = 1.2 + (0.12 * index)
-            boosted_z = clamp_vector([value * scale for value in candidate.z], boost_radius)
+            spread_direction = Orchestrator._first_round_spread_direction(index, dimensions)
+            scale = 1.15 + (0.1 * index)
+            blended = [
+                (original * 0.35) + (spread * boost_radius)
+                for original, spread in zip(candidate.z, spread_direction, strict=False)
+            ]
+            boosted_z = clamp_vector(blended, boost_radius)
             length = math.sqrt(sum(value * value for value in boosted_z))
             if 0.0 < length < min_radius:
                 normalization = min_radius / length
                 boosted_z = clamp_vector([value * normalization for value in boosted_z], boost_radius)
                 length = math.sqrt(sum(value * value for value in boosted_z))
             if length == 0.0:
-                axis = index % max(1, len(session.current_z))
+                axis = index % dimensions
                 boosted_z = [0.0 for _ in session.current_z]
                 boosted_z[axis] = min_radius
             candidate.z = boosted_z
             candidate.generation_params["first_round_diversity_boost"] = True
             candidate.generation_params["first_round_diversity_scale"] = round(scale, 3)
             candidate.generation_params["first_round_min_radius"] = round(min_radius, 3)
+            candidate.generation_params["first_round_spread_direction"] = [round(value, 4) for value in spread_direction]
             boosted_candidates.append(candidate)
         return boosted_candidates
+
+    @staticmethod
+    def _first_round_spread_direction(index: int, dimensions: int) -> list[float]:
+        """Build a deliberately separated first-round direction for visible diversity."""
+
+        vector = [0.0 for _ in range(dimensions)]
+        primary_axis = index % dimensions
+        secondary_axis = (index + 1) % dimensions
+        tertiary_axis = (index + 2) % dimensions
+        primary_sign = 1.0 if index % 2 == 0 else -1.0
+        secondary_sign = -1.0 if index % 3 == 1 else 1.0
+        tertiary_sign = -1.0 if index % 4 >= 2 else 1.0
+
+        vector[primary_axis] = 1.0 * primary_sign
+        if dimensions > 1:
+            vector[secondary_axis] += 0.55 * secondary_sign
+        if dimensions > 2:
+            vector[tertiary_axis] += 0.3 * tertiary_sign
+        if dimensions > 3:
+            extra_axis = (index + 3) % dimensions
+            vector[extra_axis] += 0.22 if index % 2 == 0 else -0.22
+
+        length = math.sqrt(sum(value * value for value in vector))
+        if length == 0.0:
+            vector[0] = 1.0
+            return vector
+        return [value / length for value in vector]
 
     @staticmethod
     def _compose_round_candidates(

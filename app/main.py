@@ -25,6 +25,46 @@ configure_logging()
 templates = Jinja2Templates(directory=str(Path("app/frontend/templates")))
 
 
+def humanize_token(value: object) -> str:
+    """Turn enum values and slugs into readable UI labels."""
+
+    if value is None:
+        return ""
+    raw = getattr(value, "value", str(value))
+    return raw.replace("_", " ").replace("-", " ").strip().title()
+
+
+def humanize_feedback_mode(value: object) -> str:
+    mapping = {
+        "scalar_rating": "Star ratings",
+        "pairwise": "Pairwise winner vs loser",
+        "top_k": "Top-k ranking",
+        "winner_only": "Single winner",
+        "approve_reject": "Approve / reject",
+    }
+    raw = getattr(value, "value", str(value))
+    return mapping.get(raw, humanize_token(raw))
+
+
+def humanize_session_status(value: object) -> str:
+    mapping = {
+        "created": "Created",
+        "ready": "Ready for the next round",
+        "awaiting_feedback": "Waiting for feedback",
+        "updating": "Applying feedback",
+        "completed": "Completed",
+        "failed": "Needs attention",
+        "paused": "Paused",
+    }
+    raw = getattr(value, "value", str(value))
+    return mapping.get(raw, humanize_token(raw))
+
+
+templates.env.globals["humanize_token"] = humanize_token
+templates.env.globals["humanize_feedback_mode"] = humanize_feedback_mode
+templates.env.globals["humanize_session_status"] = humanize_session_status
+
+
 def initialize_app_state(application: FastAPI) -> None:
     """Build the runtime services for the web app.
 
@@ -129,7 +169,15 @@ def index(request: Request) -> HTMLResponse:
 
     experiments = request.app.state.orchestrator.list_experiments()
     sessions = request.app.state.orchestrator.list_sessions()
-    return templates.TemplateResponse("index.html", {"request": request, "experiments": experiments, "sessions": sessions[:10]})
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "experiments": experiments[:20],
+            "experiment_count": len(experiments),
+            "sessions": sessions[:10],
+        },
+    )
 
 
 @app.get("/diagnostics")
@@ -292,6 +340,13 @@ def create_session_from_setup(request: SetupSessionRequest):
         return api_error_response(400, "invalid_input", str(exc))
     except KeyError as exc:
         return api_error_response(404, "not_found", str(exc))
+    except Exception:
+        logger.exception("Unexpected failure while creating a session from setup YAML")
+        return api_error_response(
+            500,
+            "internal_error",
+            "The session could not be created from this YAML configuration due to an unexpected server error.",
+        )
     return {
         "experiment": experiment.model_dump(mode="json"),
         "session": session.model_dump(mode="json"),

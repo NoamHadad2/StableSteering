@@ -33,7 +33,7 @@ test.describe("StableSteering browser flow", () => {
   test("user can create a session, click through a round, and see replay content", async ({ page }) => {
     await createSessionViaBrowser(page);
     await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
-    await expect(page.getByText(/Steering vector/)).toBeVisible();
+    await expect(page.getByText(/Feedback mode/)).toBeVisible();
 
     await page.getByRole("button", { name: /Generate .* round/ }).click();
 
@@ -45,12 +45,10 @@ test.describe("StableSteering browser flow", () => {
     await page.locator('.star-button[data-candidate-id]').nth(2 * 5 + 3).click();
     await page.locator('.star-button[data-candidate-id]').nth(3 * 5 + 2).click();
     await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 0).click();
-    await page.getByRole("button", { name: "Submit feedback" }).click();
+    await page.getByRole("button", { name: "Submit feedback and generate next round" }).click();
 
-    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
-    await page.getByRole("button", { name: /Generate .* round/ }).click();
     await expect(page.locator("details.round-block")).toHaveCount(2);
+    await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
     await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
     await expect(page.locator("#round-container").getByText("Round 2")).toBeVisible();
     await expect(page.locator("details.round-block[open]")).toHaveCount(1);
@@ -79,8 +77,8 @@ test.describe("StableSteering browser flow", () => {
     await page.locator('.star-button[data-candidate-id]').nth(2 * 5 + 4).click();
     await page.locator('.star-button[data-candidate-id]').nth(3 * 5 + 2).click();
     await page.locator('.star-button[data-candidate-id]').nth(4 * 5 + 1).click();
-    await page.getByRole("button", { name: "Submit feedback" }).click();
-    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
+    await page.getByRole("button", { name: "Submit feedback and generate next round" }).click();
+    await expect(page.locator("#round-container").getByText("Round 2")).toBeVisible();
     await expect(page.getByRole("link", { name: "Open replay" })).toBeVisible();
 
     const replayResponse = await request.get(`/sessions/${sessionId}/replay`);
@@ -88,10 +86,11 @@ test.describe("StableSteering browser flow", () => {
 
     const replay = await replayResponse.json();
     expect(replay.session.id).toBe(sessionId);
-    expect(replay.rounds).toHaveLength(1);
+    expect(replay.rounds).toHaveLength(2);
     expect(replay.rounds[0].candidates).toHaveLength(5);
     expect(replay.rounds[0].feedback_events).toHaveLength(1);
     expect(replay.rounds[0].update_summary.winner_candidate_id).toBeTruthy();
+    expect(replay.rounds[1].candidates).toHaveLength(5);
   });
 
   test("winner-only mode uses explicit winner selection controls", async ({ page }) => {
@@ -105,8 +104,8 @@ test.describe("StableSteering browser flow", () => {
     await expect(page.locator("#round-container").getByText("Round 1")).toBeVisible();
     await expect(page.locator(".winner-only-input")).toHaveCount(5);
     await page.locator(".winner-only-input").nth(2).check();
-    await page.getByRole("button", { name: "Submit feedback" }).click();
-    await expect(page.getByRole("button", { name: /Generate .* round/ })).toBeVisible();
+    await page.getByRole("button", { name: "Submit feedback and generate next round" }).click();
+    await expect(page.locator("#round-container").getByText("Round 2")).toBeVisible();
   });
 
   test("setup page can reload the default YAML template", async ({ page }) => {
@@ -116,6 +115,14 @@ test.describe("StableSteering browser flow", () => {
     await page.getByRole("button", { name: "Reload default YAML" }).click();
     await expect(editor).toContainText("candidate_count: 5");
     await expect(editor).toContainText("sampler: random_local");
+  });
+
+  test("setup page shows a clear validation error after a broken YAML edit", async ({ page }) => {
+    await page.goto("/setup");
+    await page.locator('[name="config_yaml"]').fill("sampler: [oops");
+    await page.getByRole("button", { name: "Create and open session" }).click();
+    await expect(page).toHaveURL("/setup");
+    await expect(page.getByRole("status")).toContainText("Invalid YAML configuration");
   });
 
   test("home page shows experiments after a browser-created flow", async ({ page }) => {

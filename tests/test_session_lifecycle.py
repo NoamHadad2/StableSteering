@@ -112,6 +112,9 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     assert all(
         math.sqrt(sum(value * value for value in candidate["z"])) > 0.18 for candidate in exploratory_candidates
     )
+    for left, right in itertools.combinations(exploratory_candidates, 2):
+        pair_distance = math.sqrt(sum((a - b) ** 2 for a, b in zip(left["z"], right["z"], strict=False)))
+        assert pair_distance > 0.22
 
     blocked_round = client.post(f"/sessions/{session_id}/rounds/next")
     assert blocked_round.status_code == 409
@@ -498,6 +501,29 @@ def test_async_round_job_completes_and_returns_result(client) -> None:
     assert status["state"] == "succeeded"
     assert status["result"]["round_id"]
     assert len(status["result"]["candidate_metadata"]) == 2
+
+
+def test_generate_round_reports_image_level_progress(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={"name": "Image progress", "config": {"candidate_count": 3}},
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A progress reporting prompt", "negative_prompt": ""},
+    ).json()
+
+    seen_updates: list[tuple[int, str]] = []
+
+    def capture(progress: int, message: str) -> None:
+        seen_updates.append((progress, message))
+
+    response = client.app.state.orchestrator.generate_round(session["id"], progress_callback=capture)
+
+    assert response.round_id
+    assert any("Generating image 1 of 3" in message for _, message in seen_updates)
+    assert any("Generating image 2 of 3" in message for _, message in seen_updates)
+    assert any("Generating image 3 of 3" in message for _, message in seen_updates)
 
 
 def test_async_round_job_preflights_conflict_before_queueing(client) -> None:

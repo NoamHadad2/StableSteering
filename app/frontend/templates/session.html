@@ -11,7 +11,7 @@
       <section class="hero compact">
         <p class="eyebrow">Session</p>
         <h1>{{ session.prompt }}</h1>
-        <p class="lede">Sampler: {{ session.config.sampler.value }} | Updater: {{ session.config.updater.value }} | Feedback: {{ session.config.feedback_mode.value }}</p>
+        <p class="lede">Sampler: {{ humanize_token(session.config.sampler) }} | Updater: {{ humanize_token(session.config.updater) }} | Feedback: {{ humanize_feedback_mode(session.config.feedback_mode) }}</p>
         <div class="badge-row">
           <span class="status-badge" title="The resolved generation backend for this session.">Backend: {{ runtime_diagnostics.backend }}</span>
           <span class="status-badge" title="The device currently used for inference.">Device: {{ runtime_diagnostics.active_device or runtime_diagnostics.configured_device or "n/a" }}</span>
@@ -27,7 +27,7 @@
       <section class="card">
         <div class="section-head">
           <h2>Current state</h2>
-          <span>Round {{ session.current_round }}</span>
+          <span>{% if session.current_round == 0 %}Not started yet{% else %}Round {{ session.current_round }}{% endif %}</span>
         </div>
         <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
         <div id="progress-panel" class="progress-panel" hidden>
@@ -46,11 +46,7 @@
           </div>
           <div class="summary-item">
             <span class="summary-label">Feedback mode <span class="help-tip inline" tabindex="0" role="note" aria-label="Feedback mode help" data-tooltip="This controls which feedback widget appears on each candidate card and how your selection is interpreted.">?</span></span>
-            <strong>{{ session.config.feedback_mode.value }}</strong>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Steering vector <span class="help-tip inline" tabindex="0" role="note" aria-label="Steering vector help" data-tooltip="This is the current low-dimensional steering state that the updater moves after each round of feedback.">?</span></span>
-            <code>{{ session.current_z }}</code>
+            <strong>{{ humanize_feedback_mode(session.config.feedback_mode) }}</strong>
           </div>
         </div>
         <p class="hint">{% if session.current_round == 0 %}Start by generating the first round. You will see one raw prompt baseline plus additional sampled variants.{% elif session.status == "awaiting_feedback" %}Review this round and submit feedback to unlock the next one.{% else %}Feedback is complete for the current round. You can continue exploring or open replay to review the history.{% endif %}</p>
@@ -78,7 +74,6 @@
                       <p class="candidate-subtitle">{{ candidate.id }}</p>
                       <div class="candidate-meta">
                         <p>Role <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate role help" data-tooltip="Baseline is the raw prompt, incumbent is the previous winner, and sampler roles describe how other candidates were proposed.">?</span>: <strong>{{ candidate.sampler_role }}</strong></p>
-                        <p>Steering <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate steering vector help" data-tooltip="This candidate's proposed steering coordinates for the current round.">?</span>: <code>{{ candidate.z }}</code></p>
                       </div>
                       {% if is_current_round and not round.feedback_events %}
                         <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode.value }}">
@@ -148,7 +143,7 @@
                     {% endif %}
                   </p>
                   <div class="actions">
-                    <button class="button" id="submit-feedback-button" data-round-id="{{ round.id }}" data-feedback-mode="{{ session.config.feedback_mode.value }}" title="Submit your current preference selections and update the session model.">Submit feedback</button>
+                    <button class="button" id="submit-feedback-button" data-round-id="{{ round.id }}" data-feedback-mode="{{ session.config.feedback_mode.value }}" data-session-id="{{ session.id }}" title="Apply your current preference selections and immediately generate the next round.">Submit feedback and generate next round</button>
                   </div>
                 {% elif round.feedback_events %}
                   <div class="soft-callout">
