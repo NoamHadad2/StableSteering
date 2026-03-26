@@ -201,6 +201,7 @@ class TraceRecorder:
             '  <details class="card section" open>',
             "    <summary>Run Summary</summary>",
             '    <div class="card-body">',
+            f"    <p><strong>Initial prompt:</strong> {self._escape(session.get('prompt') or '(none)')}</p>",
             f"    <p><strong>Negative prompt:</strong> {self._escape(session.get('negative_prompt') or '(none)')}</p>",
             f"    <p><strong>Model:</strong> <code>{self._escape(session.get('model_name', 'unknown'))}</code></p>",
             f"    <p><strong>Feedback mode:</strong> <code>{self._escape(str(session.get('config', {}).get('feedback_mode', 'unknown')))}</code></p>",

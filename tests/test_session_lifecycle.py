@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import time
 import math
 
@@ -224,6 +225,74 @@ def test_pairwise_feedback_mode_submits_successfully(client) -> None:
     assert feedback.status_code == 200
 
 
+def test_winner_only_feedback_mode_submits_successfully(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Winner only",
+            "description": "Winner only test",
+            "config": {
+                "sampler": "axis_sweep",
+                "updater": "winner_copy",
+                "feedback_mode": "winner_only",
+                "candidate_count": 4,
+            },
+        },
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A sharp studio headphone render", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    winner = round_payload["candidate_metadata"][1]["id"]
+
+    feedback = client.post(
+        f"/rounds/{round_payload['round_id']}/feedback",
+        json={"feedback_type": "winner_only", "payload": {"winner_candidate_id": winner}},
+    )
+    assert feedback.status_code == 200
+
+
+def test_approve_reject_feedback_mode_submits_successfully(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Approve reject",
+            "description": "Approve reject test",
+            "config": {
+                "sampler": "incumbent_mix",
+                "updater": "linear_preference",
+                "feedback_mode": "approve_reject",
+                "candidate_count": 5,
+            },
+        },
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A boutique perfume bottle on marble", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    candidates = round_payload["candidate_metadata"]
+
+    feedback = client.post(
+        f"/rounds/{round_payload['round_id']}/feedback",
+        json={
+            "feedback_type": "approve_reject",
+            "payload": {
+                "winner_candidate_id": candidates[2]["id"],
+                "approvals": {
+                    candidates[0]["id"]: False,
+                    candidates[1]["id"]: True,
+                    candidates[2]["id"]: True,
+                    candidates[3]["id"]: False,
+                    candidates[4]["id"]: False,
+                },
+            },
+        },
+    )
+    assert feedback.status_code == 200
+
+
 def test_feedback_rejects_unknown_candidate_id(client) -> None:
     experiment = client.post(
         "/experiments",
@@ -243,6 +312,84 @@ def test_feedback_rejects_unknown_candidate_id(client) -> None:
     payload = feedback.json()
     assert payload["error_code"] == "invalid_input"
     assert "unknown winner candidate" in payload["message"]
+
+
+def test_fixed_per_round_seed_policy_shares_one_seed_across_new_candidates(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Round seed policy",
+            "description": "Fixed per round seed test",
+            "config": {"candidate_count": 5, "seed_policy": "fixed-per-round"},
+        },
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A seed policy prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+
+    non_baseline = round_payload["candidate_metadata"][1:]
+    seeds = {candidate["seed"] for candidate in non_baseline}
+    assert len(seeds) == 1
+    assert all(candidate["generation_params"]["seed_policy"] == "fixed-per-round" for candidate in non_baseline)
+    assert all(candidate["generation_params"]["seed_group"] == "round_shared" for candidate in non_baseline)
+
+
+def test_fixed_per_candidate_seed_policy_assigns_distinct_seeds(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Candidate seed policy",
+            "description": "Fixed per candidate seed test",
+            "config": {"candidate_count": 5, "seed_policy": "fixed-per-candidate"},
+        },
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A seed policy prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+
+    candidates = round_payload["candidate_metadata"]
+    seeds = [candidate["seed"] for candidate in candidates]
+    assert len(set(seeds)) == len(seeds)
+    assert candidates[0]["generation_params"]["seed_group"] == "candidate:0"
+    assert candidates[1]["generation_params"]["seed_group"] == "candidate:1"
+    assert all(candidate["generation_params"]["seed_policy"] == "fixed-per-candidate" for candidate in candidates)
+
+
+def test_fixed_per_candidate_role_seed_policy_shares_seeds_by_role(client) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={
+            "name": "Role seed policy",
+            "description": "Fixed per candidate role seed test",
+            "config": {
+                "sampler": "random_local",
+                "candidate_count": 5,
+                "seed_policy": "fixed-per-candidate-role",
+            },
+        },
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A seed policy prompt", "negative_prompt": ""},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+
+    candidates = round_payload["candidate_metadata"]
+    assert candidates[0]["sampler_role"] == "baseline_prompt"
+    explore_candidates = [candidate for candidate in candidates if candidate["sampler_role"] == "explore"]
+    assert len(explore_candidates) >= 2
+    assert len({candidate["seed"] for candidate in explore_candidates}) == 1
+    assert all(candidate["generation_params"]["seed_group"] == "role:explore" for candidate in explore_candidates)
+
+    for left, right in itertools.combinations(candidates, 2):
+        if left["sampler_role"] != right["sampler_role"]:
+            if left["sampler_role"] == "explore" and right["sampler_role"] == "explore":
+                continue
+            assert left["seed"] != right["seed"]
 
 
 def test_diagnostics_endpoint_reports_backend_and_device(client) -> None:

@@ -15,7 +15,7 @@ A release should include:
 
 Current release notes:
 
-- [RELEASE_NOTES_v0.1.0.md](E:\Projects\StableSteering\RELEASE_NOTES_v0.1.0.md)
+- [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md)
 
 ## Release Checklist
 
@@ -31,10 +31,10 @@ Current release notes:
 6. Rebuild the documentation site:
    `python scripts/build_pages_site.py`
 7. Review:
-   - [INSTALL.md](E:\Projects\StableSteering\INSTALL.md)
-   - [README.md](E:\Projects\StableSteering\README.md)
-   - [docs/student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md)
-   - [RELEASE_NOTES_v0.1.0.md](E:\Projects\StableSteering\RELEASE_NOTES_v0.1.0.md)
+   - [INSTALL.md](INSTALL.md)
+   - [README.md](README.md)
+   - [docs/student_tutorial.md](docs/student_tutorial.md)
+   - [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md)
 8. Build a source zip if needed:
    `powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0`
 9. Create the Git tag.

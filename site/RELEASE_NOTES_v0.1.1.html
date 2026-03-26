@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RELEASE_NOTES_v0.1.0 | StableSteering</title>
+    <title>RELEASE_NOTES_v0.1.1 | StableSteering</title>
     <link rel="stylesheet" href="assets/site.css">
   </head>
   <body>
@@ -18,48 +18,63 @@
         </nav>
       </aside>
       <main class="content">
-        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/RELEASE_NOTES_v0.1.0.md">View source Markdown</a></p>
-        <h1 id="release-notes-v010">Release Notes v0.1.0</h1>
-<p>Initial runnable MVP release of StableSteering.</p>
-<p>Published HTML documentation:</p>
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/RELEASE_NOTES_v0.1.1.md">View source Markdown</a></p>
+        <h1 id="release-notes-v011">Release Notes v0.1.1</h1>
+<h2 id="summary">Summary</h2>
+<p>This release expands the research MVP into a more configurable and inspectable system.</p>
+<p>Major themes in this release:</p>
 <ul>
-<li><a href="https://apartsinprojects.github.io/StableSteering/">GitHub Pages Docs</a></li>
+<li>richer sampling and preference-mode support</li>
+<li>stronger per-session YAML configuration</li>
+<li>better runtime trace reporting and portable HTML artifacts</li>
+<li>improved docs-site linking and roadmap detail</li>
+<li>real seed-policy behavior in the orchestration layer</li>
 </ul>
 <h2 id="highlights">Highlights</h2>
+<h3 id="sampling-and-preference-updates">Sampling and preference updates</h3>
 <ul>
-<li>FastAPI backend for experiments, sessions, rounds, feedback, replay, diagnostics, and async job status</li>
-<li>real Diffusers-backed GPU runtime by default</li>
-<li>explicit test-only mock backend</li>
-<li>browser UI for setup, interactive sessions, replay, diagnostics, and trace visibility</li>
-<li>rich backend logging and persisted frontend/backend trace events</li>
-<li>async round generation and feedback submission with visible progress indicators</li>
-<li>per-session HTML trace reports saved by the backend</li>
-<li>replay exports with schema and app version metadata</li>
-<li>Playwright browser coverage, including replay export smoke and diagnostics checks</li>
-<li>opt-in real-backend browser smoke path for CUDA-capable environments</li>
-<li>reusable real GPU-backed end-to-end example bundle generation</li>
+<li>added <code>axis_sweep</code> and <code>incumbent_mix</code> samplers</li>
+<li>added <code>winner_only</code> and <code>approve_reject</code> feedback modes</li>
+<li>documented the current sampler and preference-model behavior more clearly</li>
 </ul>
-<h2 id="included-documentation">Included Documentation</h2>
+<h3 id="session-and-orchestration-updates">Session and orchestration updates</h3>
 <ul>
-<li><a href="index.html">README.md</a></li>
-<li><a href="INSTALL.html">INSTALL.md</a></li>
-<li><a href="RELEASE.html">RELEASE.md</a></li>
-<li><a href="docs/student_tutorial.html">student_tutorial.md</a></li>
-<li><a href="docs/quick_start.html">quick_start.md</a></li>
-<li><a href="docs/developer_guide.html">developer_guide.md</a></li>
-<li><a href="docs/user_guide.html">user_guide.md</a></li>
+<li>first round always includes the unmodified prompt baseline</li>
+<li>later rounds carry forward the previous winner as the incumbent</li>
+<li>default candidate count is now <code>5</code></li>
+<li>implemented seed policies:</li>
+<li><code>fixed-per-round</code></li>
+<li><code>fixed-per-candidate</code></li>
+<li><code>fixed-per-candidate-role</code></li>
 </ul>
-<h2 id="validation-snapshot">Validation Snapshot</h2>
+<h3 id="reporting-and-examples">Reporting and examples</h3>
 <ul>
-<li><code>python -m pytest</code></li>
+<li>improved HTML session trace reporting</li>
+<li>ensured initial prompt visibility in generated HTML reports</li>
+<li>regenerated the real end-to-end sample bundle</li>
+<li>added a configuration-matrix sample generator</li>
+</ul>
+<h3 id="documentation-and-publishing">Documentation and publishing</h3>
+<ul>
+<li>fixed broken Markdown links that pointed at machine-local paths</li>
+<li>regenerated the GitHub Pages site with corrected document and code links</li>
+<li>expanded the roadmap docs with:</li>
+<li>why each item matters</li>
+<li>implementation notes</li>
+<li>success signals</li>
+</ul>
+<h2 id="verification">Verification</h2>
+<p>Validated before release with:</p>
+<ul>
+<li><code>python -m pytest -q</code></li>
 <li><code>npm run test:e2e:chrome</code></li>
 <li><code>python scripts/build_pages_site.py</code></li>
 </ul>
-<h2 id="notes">Notes</h2>
+<h2 id="known-limitations">Known limitations</h2>
 <ul>
-<li>The normal runtime requires a CUDA-capable GPU.</li>
-<li>The mock generator is available only for tests and explicit test harnesses.</li>
-<li>This is a research MVP, not a production release.</li>
+<li><code>multi-seed averaging</code> is still specified in docs but not yet implemented</li>
+<li>mode-specific frontend controls are still incomplete for some preference modes</li>
+<li>the real-backend Playwright smoke remains opt-in</li>
 </ul>
       </main>
     </div>

@@ -122,10 +122,10 @@ It lets the user:
 
 Relevant files:
 
-- [index.html](/E:/Projects/StableSteering/app/frontend/templates/index.html)
-- [setup.html](/E:/Projects/StableSteering/app/frontend/templates/setup.html)
-- [session.html](/E:/Projects/StableSteering/app/frontend/templates/session.html)
-- [app.js](/E:/Projects/StableSteering/app/frontend/static/app.js)
+- [index.html](../app/frontend/templates/index.html)
+- [setup.html](../app/frontend/templates/setup.html)
+- [session.html](../app/frontend/templates/session.html)
+- [app.js](../app/frontend/static/app.js)
 
 ### API Layer
 
@@ -142,7 +142,7 @@ It handles:
 
 Relevant file:
 
-- [main.py](/E:/Projects/StableSteering/app/main.py)
+- [main.py](../app/main.py)
 
 ### Orchestration Layer
 
@@ -160,7 +160,7 @@ It decides how to:
 
 Relevant file:
 
-- [orchestrator.py](/E:/Projects/StableSteering/app/engine/orchestrator.py)
+- [orchestrator.py](../app/engine/orchestrator.py)
 
 ### Generation Layer
 
@@ -171,7 +171,7 @@ The project also contains a mock backend, but that is reserved strictly for test
 
 Relevant file:
 
-- [generation.py](/E:/Projects/StableSteering/app/engine/generation.py)
+- [generation.py](../app/engine/generation.py)
 
 ### Storage Layer
 
@@ -180,7 +180,7 @@ The current implementation uses SQLite for structured records, while artifacts a
 
 Relevant file:
 
-- [repository.py](/E:/Projects/StableSteering/app/storage/repository.py)
+- [repository.py](../app/storage/repository.py)
 
 ## 5. A Typical User Session
 
@@ -271,10 +271,10 @@ If you are learning the system for the first time, this is a good reading order:
 4. Read [quick_start.md](./quick_start.md).
 5. Read [user_guide.md](./user_guide.md).
 6. Read [developer_guide.md](./developer_guide.md).
-7. Open [main.py](/E:/Projects/StableSteering/app/main.py).
-8. Open [orchestrator.py](/E:/Projects/StableSteering/app/engine/orchestrator.py).
-9. Open [generation.py](/E:/Projects/StableSteering/app/engine/generation.py).
-10. Open [repository.py](/E:/Projects/StableSteering/app/storage/repository.py).
+7. Open [main.py](../app/main.py).
+8. Open [orchestrator.py](../app/engine/orchestrator.py).
+9. Open [generation.py](../app/engine/generation.py).
+10. Open [repository.py](../app/storage/repository.py).
 
 ## 9. Suggested Exercises
 

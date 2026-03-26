@@ -6,8 +6,8 @@ This document defines the verification contract for the research platform. Its p
 
 Related documents:
 
-- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
-- [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
+- [system_specification.md](system_specification.md)
+- [pre_implementation_blueprint.md](pre_implementation_blueprint.md)
 
 ## 2. Test Objectives
 

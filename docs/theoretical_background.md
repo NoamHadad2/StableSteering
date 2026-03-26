@@ -13,8 +13,8 @@ It explains:
 
 Related documents:
 
-- [motivation.md](/E:/Projects/StableSteering/docs/motivation.md)
-- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
+- [motivation.md](motivation.md)
+- [system_specification.md](system_specification.md)
 
 ## 2. Diffusion at a High Level
 

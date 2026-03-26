@@ -18,9 +18,9 @@ It focuses on:
 
 Related documents:
 
-- [motivation.md](/E:/Projects/StableSteering/docs/motivation.md)
-- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
-- [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
+- [motivation.md](motivation.md)
+- [system_specification.md](system_specification.md)
+- [system_test_specification.md](system_test_specification.md)
 
 ## 2. Implementation Principles
 

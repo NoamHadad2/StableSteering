@@ -4,7 +4,7 @@
 
 StableSteering is a research prototype for studying interactive prompt-embedding steering in text-to-image systems.
 
-If you want the easiest conceptual introduction, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+If you want the easiest conceptual introduction, start with [student_tutorial.md](student_tutorial.md).
 
 ## Does it generate real AI images yet?
 

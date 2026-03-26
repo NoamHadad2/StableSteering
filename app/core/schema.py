@@ -49,6 +49,14 @@ class FeedbackType(str, Enum):
     scalar_rating = "scalar_rating"
     pairwise = "pairwise"
     top_k = "top_k"
+    winner_only = "winner_only"
+    approve_reject = "approve_reject"
+
+
+class SeedPolicy(str, Enum):
+    fixed_per_round = "fixed-per-round"
+    fixed_per_candidate = "fixed-per-candidate"
+    fixed_per_candidate_role = "fixed-per-candidate-role"
 
 
 class StrategyConfig(BaseModel):
@@ -57,7 +65,7 @@ class StrategyConfig(BaseModel):
     sampler: str = "random_local"
     updater: str = "winner_average"
     feedback_mode: FeedbackType = FeedbackType.scalar_rating
-    seed_policy: str = "fixed-per-round"
+    seed_policy: SeedPolicy = SeedPolicy.fixed_per_round
     steering_mode: str = "low_dimensional"
     candidate_count: int = 5
     image_size: str = "512x512"

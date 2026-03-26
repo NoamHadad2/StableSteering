@@ -12,7 +12,7 @@ It is intended for developers who want to:
 - change storage or generation behavior
 - maintain test coverage while evolving the system
 
-For a student-oriented conceptual walkthrough, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+For a student-oriented conceptual walkthrough, start with [student_tutorial.md](student_tutorial.md).
 
 ## 2. Current Implementation Scope
 
@@ -41,34 +41,34 @@ It does not yet include:
 
 Key directories:
 
-- [app](E:\Projects\StableSteering\app)
+- [app](../app)
   Main application code.
 
-- [app/core](E:\Projects\StableSteering\app\core)
+- [app/core](../app/core)
   Shared settings and Pydantic schemas.
 
-- [app/engine](E:\Projects\StableSteering\app\engine)
+- [app/engine](../app/engine)
   Generation and orchestration logic.
 
-- [app/storage](E:\Projects\StableSteering\app\storage)
+- [app/storage](../app/storage)
   SQLite repository implementation.
 
-- [app/samplers](E:\Projects\StableSteering\app\samplers)
+- [app/samplers](../app/samplers)
   Candidate proposal strategies.
 
-- [app/updaters](E:\Projects\StableSteering\app\updaters)
+- [app/updaters](../app/updaters)
   Steering-state update strategies.
 
-- [app/feedback](E:\Projects\StableSteering\app\feedback)
+- [app/feedback](../app/feedback)
   Feedback normalization logic.
 
-- [app/frontend](E:\Projects\StableSteering\app\frontend)
+- [app/frontend](../app/frontend)
   Jinja templates and static frontend assets.
 
-- [tests](E:\Projects\StableSteering\tests)
+- [tests](../tests)
   Automated tests.
 
-- [scripts](E:\Projects\StableSteering\scripts)
+- [scripts](../scripts)
   Convenience scripts such as the local dev launcher.
 
 ## 4. Local Development Setup
@@ -242,25 +242,25 @@ This keeps the UI responsive while the real GPU-backed backend works in the back
 
 To add a sampler:
 
-1. create a new module under [app/samplers](E:\Projects\StableSteering\app\samplers)
+1. create a new module under [app/samplers](../app/samplers)
 2. implement `propose(session, seed) -> list[Candidate]`
-3. register the sampler in [orchestrator.py](E:\Projects\StableSteering\app\engine\orchestrator.py)
+3. register the sampler in [orchestrator.py](../app/engine/orchestrator.py)
 4. add tests for deterministic behavior and output shape
 
 ### 6.2 Add an updater
 
 To add an updater:
 
-1. create a new module under [app/updaters](E:\Projects\StableSteering\app\updaters)
+1. create a new module under [app/updaters](../app/updaters)
 2. implement `update(session, candidates, feedback) -> (next_z, summary)`
-3. register the updater in [orchestrator.py](E:\Projects\StableSteering\app\engine\orchestrator.py)
+3. register the updater in [orchestrator.py](../app/engine/orchestrator.py)
 4. add tests for update behavior and edge cases
 
 ### 6.3 Evolve generation
 
 To evolve the generation backend further:
 
-1. keep the same high-level contract as [MockGenerationEngine](E:\Projects\StableSteering\app\engine\generation.py)
+1. keep the same high-level contract as [MockGenerationEngine](../app/engine/generation.py)
 2. preserve deterministic testability by keeping the mock path available only in tests
 3. avoid letting generation concerns leak into API routes
 4. keep artifact paths stable enough for replay
@@ -292,6 +292,13 @@ The current API quality contract is:
 - replay exports include explicit schema and app versions
 - long-running session actions are exposed as async jobs with pollable status
 - session trace reports are backend-owned artifacts, not frontend-only console output
+
+The current seed policy contract is:
+
+- `fixed-per-round` shares one seed across newly rendered candidates in the round
+- `fixed-per-candidate` assigns a deterministic seed per visible candidate slot
+- `fixed-per-candidate-role` shares seeds across candidates with the same sampler role
+- carried-forward incumbents keep the original winning image and seed instead of being re-rendered
 
 The current roadmap also includes expanding steering support beyond prompt-only generation into:
 

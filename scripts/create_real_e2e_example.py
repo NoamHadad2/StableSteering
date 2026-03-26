@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from html import escape
 from pathlib import Path
@@ -22,6 +23,14 @@ def _copy_artifact(image_url: str, artifacts_dir: Path, images_dir: Path) -> str
     target = images_dir / filename
     shutil.copy2(source, target)
     return f"images/{filename}"
+
+
+def _rewrite_trace_report_image_paths(report_path: Path, destination_path: Path) -> None:
+    """Make a copied trace report portable by rewriting runtime artifact URLs."""
+
+    html = report_path.read_text(encoding="utf-8")
+    rewritten = re.sub(r'(["\'])/artifacts/([^"\']+)(["\'])', r"\1images/\2\3", html)
+    destination_path.write_text(rewritten, encoding="utf-8")
 
 
 def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int], str]:
@@ -296,7 +305,7 @@ def _render_html(
         '    <div class="card-body stack">',
         "      <div>",
         "      <h2>Run Setup</h2>",
-        f"      <p><strong>Prompt:</strong> {escape(session['prompt'])}</p>",
+        f"      <p><strong>Initial prompt:</strong> {escape(session['prompt'])}</p>",
         f"      <p><strong>Negative prompt:</strong> {escape(session.get('negative_prompt') or '(none)')}</p>",
         f"      <p><strong>Sampler:</strong> <code>{escape(session['config']['sampler'])}</code> | <strong>Updater:</strong> <code>{escape(session['config']['updater'])}</code> | <strong>Feedback mode:</strong> <code>{escape(session['config']['feedback_mode'])}</code></p>",
         f"      <p><strong>Output file:</strong> <code>{escape(str(output_path))}</code></p>",
@@ -561,7 +570,7 @@ def main() -> int:
 
     trace_report_path = orchestrator.generate_trace_report(session.id)
     portable_trace_report = bundle_root / "session_trace_report.html"
-    shutil.copy2(trace_report_path, portable_trace_report)
+    _rewrite_trace_report_image_paths(trace_report_path, portable_trace_report)
 
     manifest = {
         "session_id": session.id,

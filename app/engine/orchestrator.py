@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 import math
 
 from app.core.config import settings
@@ -14,6 +15,7 @@ from app.core.schema import (
     RenderStatus,
     Round,
     RoundResponse,
+    SeedPolicy,
     Session,
     SessionCreate,
     SessionStatus,
@@ -22,8 +24,10 @@ from app.core.schema import (
 from app.core.logging import logger
 from app.core.tracing import TraceRecorder
 from app.feedback.normalization import normalize_feedback
+from app.samplers.axis_sweep import AxisSweepSampler
 from app.samplers.base import clamp_vector
 from app.samplers.exploit_orthogonal import ExploitOrthogonalSampler
+from app.samplers.incumbent_mix import IncumbentMixSampler
 from app.samplers.random_local import RandomLocalSampler
 from app.samplers.uncertainty import UncertaintyGuidedSampler
 from app.storage.repository import JsonRepository
@@ -49,6 +53,8 @@ class Orchestrator:
             "random_local": RandomLocalSampler(),
             "exploit_orthogonal": ExploitOrthogonalSampler(),
             "uncertainty_guided": UncertaintyGuidedSampler(),
+            "axis_sweep": AxisSweepSampler(),
+            "incumbent_mix": IncumbentMixSampler(),
         }
         self.updaters = {
             "winner_copy": WinnerCopyUpdater(),
@@ -123,7 +129,6 @@ class Orchestrator:
         session = self._require_session(session_id)
         if session.status == SessionStatus.awaiting_feedback:
             raise RuntimeError("Cannot generate a new round while feedback for the current round is still pending")
-        seed = 1000 + session.current_round
         sampler = self.samplers[session.config.sampler]
         round_index = session.current_round + 1
         round_obj = Round(
@@ -140,13 +145,15 @@ class Orchestrator:
         )
         carried_forward = self._build_carried_forward_candidate(session)
         baseline_candidate = self._build_baseline_prompt_candidate(session)
-        proposed_candidates = sampler.propose(session, seed)
+        sampler_seed = self._seed_token(session.id, round_index, "sampler")
+        proposed_candidates = sampler.propose(session, sampler_seed)
         proposed_candidates = self._widen_first_round_candidates(session, proposed_candidates)
         candidates = self._compose_round_candidates(
             pinned_candidate=carried_forward or baseline_candidate,
             proposed_candidates=proposed_candidates,
             candidate_count=session.config.candidate_count,
         )
+        self._assign_candidate_seeds(session, round_index, candidates)
         # Render each candidate independently so future versions can tolerate
         # partial round failures without changing the orchestration contract.
         for candidate in candidates:
@@ -154,7 +161,6 @@ class Orchestrator:
             if candidate.generation_params.get("carried_forward") and candidate.image_path:
                 candidate.render_status = RenderStatus.succeeded
                 continue
-            candidate.seed = seed
             candidate = self.generator.render_candidate(session, candidate)
             candidate.render_status = RenderStatus.succeeded
         round_obj.candidates = candidates
@@ -281,6 +287,16 @@ class Orchestrator:
         if unknown_ranked:
             raise ValueError(f"Feedback ranking references unknown candidates: {', '.join(unknown_ranked)}")
 
+        approved = feedback.normalized_payload.get("approved_candidate_ids", [])
+        unknown_approved = [candidate_id for candidate_id in approved if candidate_id not in candidate_ids]
+        if unknown_approved:
+            raise ValueError(f"Feedback approvals reference unknown candidates: {', '.join(unknown_approved)}")
+
+        rejected = feedback.normalized_payload.get("rejected_candidate_ids", [])
+        unknown_rejected = [candidate_id for candidate_id in rejected if candidate_id not in candidate_ids]
+        if unknown_rejected:
+            raise ValueError(f"Feedback rejections reference unknown candidates: {', '.join(unknown_rejected)}")
+
     @staticmethod
     def _candidate_trace_payload(candidate) -> dict:
         """Return a compact trace payload for one proposed image candidate."""
@@ -294,6 +310,8 @@ class Orchestrator:
             "z": candidate.z,
             "predicted_score": candidate.predicted_score,
             "predicted_uncertainty": candidate.predicted_uncertainty,
+            "seed_policy": candidate.generation_params.get("seed_policy"),
+            "seed_group": candidate.generation_params.get("seed_group"),
         }
 
     def _build_carried_forward_candidate(self, session: Session) -> Candidate | None:
@@ -409,3 +427,40 @@ class Orchestrator:
         for index, candidate in enumerate(selected):
             candidate.candidate_index = index
         return selected
+
+    def _assign_candidate_seeds(self, session: Session, round_index: int, candidates: list[Candidate]) -> None:
+        """Assign deterministic candidate seeds according to the configured policy."""
+
+        policy = session.config.seed_policy
+        round_seed = self._seed_token(session.id, round_index, "round")
+        for candidate in candidates:
+            if candidate.generation_params.get("carried_forward"):
+                candidate.generation_params["seed_policy"] = policy.value
+                candidate.generation_params["seed_group"] = "carried_forward"
+                candidate.generation_params["seed_preserved"] = True
+                continue
+
+            if policy == SeedPolicy.fixed_per_round:
+                candidate.seed = round_seed
+                seed_group = "round_shared"
+            elif policy == SeedPolicy.fixed_per_candidate:
+                candidate.seed = self._seed_token(session.id, round_index, "candidate", str(candidate.candidate_index))
+                seed_group = f"candidate:{candidate.candidate_index}"
+            elif policy == SeedPolicy.fixed_per_candidate_role:
+                role = candidate.sampler_role or "candidate"
+                candidate.seed = self._seed_token(session.id, round_index, "role", role)
+                seed_group = f"role:{role}"
+            else:
+                raise ValueError(f"Unsupported seed policy: {policy}")
+
+            candidate.generation_params["seed_policy"] = policy.value
+            candidate.generation_params["seed_group"] = seed_group
+            candidate.generation_params["round_seed"] = round_seed
+
+    @staticmethod
+    def _seed_token(*parts: object) -> int:
+        """Create one stable positive seed from arbitrary deterministic inputs."""
+
+        joined = "|".join(str(part) for part in parts)
+        digest = hashlib.blake2b(joined.encode("utf-8"), digest_size=4).digest()
+        return int.from_bytes(digest, byteorder="big", signed=False)

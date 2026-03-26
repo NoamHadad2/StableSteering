@@ -6,7 +6,7 @@ Published HTML documentation:
 
 - [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
 
-If you want the conceptual walkthrough first, read [Student Tutorial](E:\Projects\StableSteering\docs\student_tutorial.md).
+If you want the conceptual walkthrough first, read [Student Tutorial](student_tutorial.md).
 
 From the repository root:
 
@@ -123,7 +123,7 @@ python scripts/create_real_e2e_example.py
 
 ## 8. Where to Read Next
 
-- [Student Tutorial](E:\Projects\StableSteering\docs\student_tutorial.md)
-- [User Guide](E:\Projects\StableSteering\docs\user_guide.md)
-- [Developer Guide](E:\Projects\StableSteering\docs\developer_guide.md)
-- [FAQ](E:\Projects\StableSteering\docs\faq.md)
+- [Student Tutorial](student_tutorial.md)
+- [User Guide](user_guide.md)
+- [Developer Guide](developer_guide.md)
+- [FAQ](faq.md)

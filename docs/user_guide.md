@@ -9,7 +9,7 @@ generator exists only inside explicit test harnesses.
 
 The app also records backend and frontend trace events so session behavior is easier to inspect while you work.
 
-If you are learning the system for the first time, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+If you are learning the system for the first time, start with [student_tutorial.md](student_tutorial.md).
 
 ## 2. Main Workflow
 

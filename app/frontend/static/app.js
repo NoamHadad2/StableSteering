@@ -146,6 +146,32 @@ function buildFeedbackPayload(feedbackMode, ratingEntries) {
     };
   }
 
+  if (feedbackMode === "winner_only") {
+    return {
+      feedback_type: "winner_only",
+      payload: {
+        winner_candidate_id: sorted[0].candidateId,
+      },
+    };
+  }
+
+  if (feedbackMode === "approve_reject") {
+    const approvals = Object.fromEntries(
+      ratingEntries.map((entry) => [entry.candidateId, entry.rating >= 4])
+    );
+    const approvedEntries = sorted.filter((entry) => approvals[entry.candidateId]);
+    if (!approvedEntries.length) {
+      throw new Error("Approve/reject feedback requires at least one candidate rated 4 or 5.");
+    }
+    return {
+      feedback_type: "approve_reject",
+      payload: {
+        winner_candidate_id: approvedEntries[0].candidateId,
+        approvals,
+      },
+    };
+  }
+
   if (feedbackMode === "top_k") {
     return {
       feedback_type: "top_k",

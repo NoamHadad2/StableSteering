@@ -12,10 +12,10 @@ It is the entry point for:
 
 Related documents:
 
-- [theoretical_background.md](/E:/Projects/StableSteering/docs/theoretical_background.md)
-- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
-- [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
-- [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
+- [theoretical_background.md](theoretical_background.md)
+- [system_specification.md](system_specification.md)
+- [system_test_specification.md](system_test_specification.md)
+- [pre_implementation_blueprint.md](pre_implementation_blueprint.md)
 
 ## 2. Problem Statement
 

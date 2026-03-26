@@ -33,7 +33,7 @@ These values are loaded from application settings in the backend and are not the
 
 Relevant code:
 
-- [config.py](/E:/Projects/StableSteering/app/core/config.py)
+- [config.py](../app/core/config.py)
 
 ### 2. Per-Session Strategy Configuration
 
@@ -51,11 +51,11 @@ These values are edited as YAML in the setup page and are parsed into `StrategyC
 
 Relevant code:
 
-- [schema.py](/E:/Projects/StableSteering/app/core/schema.py)
-- [config_yaml.py](/E:/Projects/StableSteering/app/core/config_yaml.py)
-- [setup.html](/E:/Projects/StableSteering/app/frontend/templates/setup.html)
-- [app.js](/E:/Projects/StableSteering/app/frontend/static/app.js)
-- [main.py](/E:/Projects/StableSteering/app/main.py)
+- [schema.py](../app/core/schema.py)
+- [config_yaml.py](../app/core/config_yaml.py)
+- [setup.html](../app/frontend/templates/setup.html)
+- [app.js](../app/frontend/static/app.js)
+- [main.py](../app/main.py)
 
 ## Session Setup Flow
 
@@ -112,7 +112,7 @@ model_name: runwayml/stable-diffusion-v1-5
 
 The exact default text is rendered by:
 
-- [config_yaml.py](/E:/Projects/StableSteering/app/core/config_yaml.py)
+- [config_yaml.py](../app/core/config_yaml.py)
 
 ## Parameter Reference
 
@@ -125,6 +125,8 @@ Supported values:
 - `random_local`
 - `exploit_orthogonal`
 - `uncertainty_guided`
+- `axis_sweep`
+- `incumbent_mix`
 
 Effect:
 
@@ -133,9 +135,11 @@ Effect:
 
 Related code:
 
-- [random_local.py](/E:/Projects/StableSteering/app/samplers/random_local.py)
-- [exploit_orthogonal.py](/E:/Projects/StableSteering/app/samplers/exploit_orthogonal.py)
-- [uncertainty.py](/E:/Projects/StableSteering/app/samplers/uncertainty.py)
+- [random_local.py](../app/samplers/random_local.py)
+- [exploit_orthogonal.py](../app/samplers/exploit_orthogonal.py)
+- [uncertainty.py](../app/samplers/uncertainty.py)
+- [axis_sweep.py](../app/samplers/axis_sweep.py)
+- [incumbent_mix.py](../app/samplers/incumbent_mix.py)
 
 ### `updater`
 
@@ -153,9 +157,9 @@ Effect:
 
 Related code:
 
-- [winner_average.py](/E:/Projects/StableSteering/app/updaters/winner_average.py)
-- [winner_copy.py](/E:/Projects/StableSteering/app/updaters/winner_copy.py)
-- [linear_pref.py](/E:/Projects/StableSteering/app/updaters/linear_pref.py)
+- [winner_average.py](../app/updaters/winner_average.py)
+- [winner_copy.py](../app/updaters/winner_copy.py)
+- [linear_pref.py](../app/updaters/linear_pref.py)
 
 ### `feedback_mode`
 
@@ -166,6 +170,8 @@ Supported values:
 - `scalar_rating`
 - `pairwise`
 - `top_k`
+- `winner_only`
+- `approve_reject`
 
 Effect:
 
@@ -173,7 +179,7 @@ Effect:
 
 Related code:
 
-- [normalization.py](/E:/Projects/StableSteering/app/feedback/normalization.py)
+- [normalization.py](../app/feedback/normalization.py)
 
 ### `seed_policy`
 
@@ -182,10 +188,25 @@ Controls how seeds are assigned across rounds.
 Current value used by the MVP:
 
 - `fixed-per-round`
+- `fixed-per-candidate`
+- `fixed-per-candidate-role`
 
 Effect:
 
-- keeps candidate seeds deterministic within the current orchestration design
+- `fixed-per-round`
+  All newly rendered candidates in the round share one seed. This is the cleanest way to reduce within-round seed noise.
+
+- `fixed-per-candidate`
+  Each visible candidate position gets its own deterministic seed. This increases variation inside a batch.
+
+- `fixed-per-candidate-role`
+  Candidates with the same sampler role share one deterministic seed, while different roles get different seeds. This is useful when the sampler uses meaningful roles such as `explore`, `refine`, `challenger`, or `validation`.
+
+Notes:
+
+- round 1 baseline prompt and later carried-forward incumbents still participate in the policy metadata
+- carried-forward incumbents preserve the original winning image and seed rather than being re-rendered under a new seed
+- all policies are deterministic for the same session and round inputs
 
 ### `steering_mode`
 
@@ -273,7 +294,7 @@ The backend validates the YAML against `StrategyConfig`.
 
 Validation happens in:
 
-- [config_yaml.py](/E:/Projects/StableSteering/app/core/config_yaml.py)
+- [config_yaml.py](../app/core/config_yaml.py)
 
 Current validation behavior:
 
@@ -382,6 +403,46 @@ Use this when:
 
 - you want sharper A/B-style comparisons
 - you want the winner to become the new incumbent exactly
+
+### Axis Sweep Ranking Session
+
+```yaml
+sampler: axis_sweep
+updater: linear_preference
+feedback_mode: top_k
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.34
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want more interpretable positive/negative axis probes
+- you want to rank the full batch rather than select only one winner
+
+### Approve / Reject Session
+
+```yaml
+sampler: incumbent_mix
+updater: winner_average
+feedback_mode: approve_reject
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.3
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want to quickly mark acceptable vs unacceptable options
+- you still want one approved candidate to become the update target
 
 ## Where To Learn More
 

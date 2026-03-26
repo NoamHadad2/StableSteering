@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -49,6 +49,7 @@
 <li>browser and backend test coverage</li>
 <li>GitHub Pages documentation publishing</li>
 </ul>
+<p>The next phase is not about making the system merely functional. It is about making it faster to trust, easier to extend, and safer to operate in real research workflows.</p>
 <h2 id="3-priority-levels">3. Priority Levels</h2>
 <ul>
 <li>
@@ -66,302 +67,358 @@
 </ul>
 <h2 id="4-p0-near-term-system-priorities">4. P0: Near-Term System Priorities</h2>
 <h3 id="41-strengthen-real-backend-end-to-end-coverage">4.1 Strengthen real-backend end-to-end coverage</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>add more browser coverage against the real Diffusers backend</li>
-<li>verify at least one full generate-feedback-generate cycle on real GPU hardware</li>
-<li>catch UI or orchestration bugs that only appear with real latency</li>
+<li>the system now depends on real GPU inference in production</li>
+<li>some failures only appear under real model latency, memory pressure, or asset loading</li>
+<li>a research system is hard to trust if only the mock path is thoroughly exercised</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>extend the opt-in real Playwright suite beyond diagnostics</li>
-<li>add a release checklist item for the real browser path</li>
-<li>persist real test artifacts for debugging</li>
+<li>expand the opt-in real Playwright suite from diagnostics into a full prompt -&gt; round -&gt; feedback -&gt; next round flow</li>
+<li>persist the generated browser and trace artifacts for failed real-backend runs</li>
+<li>add a lightweight release-gating checklist that explicitly includes one real GPU browser pass</li>
+<li>capture timing and failure metadata so regressions can be compared across releases</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>at least one repeatable real-backend browser smoke passes on a CUDA machine before release</li>
 </ul>
 <h3 id="42-add-export-packaging-for-session-trace-bundles">4.2 Add export packaging for session trace bundles</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>make one session easy to archive, share, or attach to a report</li>
-<li>keep images, replay payloads, trace logs, and <code>report.html</code> together</li>
+<li>one session currently spans images, replay data, traces, and HTML reports across several files</li>
+<li>researchers need a single portable artifact for archiving, sharing, and citation</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add a session export endpoint or script</li>
-<li>produce a zip bundle with stable manifest metadata</li>
-<li>include checksum and schema version info</li>
+<li>add a session export script or endpoint that creates a zip bundle</li>
+<li>include <code>report.html</code>, replay JSON, trace JSONL, image artifacts, and a manifest</li>
+<li>record schema version, export time, app version, and checksums in the manifest</li>
+<li>normalize exported paths to be relative so bundles remain portable across machines</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>one exported zip can be unpacked on another machine and viewed without broken links</li>
 </ul>
 <h3 id="43-improve-runtime-diagnostics-depth">4.3 Improve runtime diagnostics depth</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>make it obvious that the app is truly using GPU</li>
-<li>reduce time spent debugging environment mismatches</li>
+<li>operators need immediate proof that the app is using the intended GPU-backed runtime</li>
+<li>environment drift is one of the fastest ways to waste debugging time</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>show GPU adapter name</li>
-<li>show VRAM totals and current usage if available</li>
-<li>show torch, diffusers, and transformers versions</li>
-<li>show prepared model path and pipeline warm state</li>
+<li>extend diagnostics with GPU adapter name, VRAM totals, current device, torch version, diffusers version, and transformers version</li>
+<li>show model path, pipeline warm state, and current backend mode on both the diagnostics page and session page</li>
+<li>log a structured startup diagnostics snapshot into the trace bundle</li>
+<li>distinguish clearly between configured device, requested device, and active device</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>a user can answer “what model and device is this run using?” from the UI without inspecting code</li>
 </ul>
 <h3 id="44-harden-trace-and-export-path-hygiene">4.4 Harden trace and export path hygiene</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>keep local paths readable without leaking unnecessary machine-specific details into exports</li>
-<li>make trace bundles easier to move between machines</li>
+<li>reports should be easy to move and publish without leaking workstation-specific absolute paths</li>
+<li>brittle path handling causes broken HTML bundles and weakens reproducibility</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>reduce machine-local absolute paths in user-facing reports</li>
-<li>normalize export manifests around relative paths</li>
-<li>document which files are portable and which are local-runtime only</li>
+<li>continue replacing machine-local absolute paths in user-facing exports with relative bundle paths</li>
+<li>define which files are portable artifacts and which are local-runtime metadata</li>
+<li>add a portability check that validates copied reports still render images correctly after relocation</li>
+<li>keep internal diagnostics verbose in raw logs while keeping HTML reports cleaner and more shareable</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>exported HTML trace bundles render correctly after being copied to a different folder or machine</li>
 </ul>
 <h2 id="5-p1-workflow-and-ux-improvements">5. P1: Workflow and UX Improvements</h2>
 <h3 id="51-build-true-mode-specific-feedback-controls">5.1 Build true mode-specific feedback controls</h3>
-<p>Current gap:</p>
+<p>Why it matters:</p>
 <ul>
-<li>the UI uses rating inputs for all feedback modes and derives pairwise and top-k indirectly</li>
+<li>the backend supports several preference modes, but the UI still routes most interaction through rating-derived shortcuts</li>
+<li>this hides the real strengths and weaknesses of pairwise, ranking, and approve/reject interaction styles</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add dedicated pairwise widgets</li>
-<li>add explicit ranking controls for top-k</li>
-<li>preserve a rating-only fast path for quick testing</li>
+<li>build dedicated controls for pairwise, top-k, winner-only, and approve/reject modes</li>
+<li>keep scalar ratings as the fast general-purpose mode</li>
+<li>make the selected feedback mode visually obvious before the user starts judging candidates</li>
+<li>update trace reports so they show the actual interaction type, not only the normalized payload</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>the frontend expresses each feedback mode directly rather than inferring it from generic star ratings</li>
 </ul>
 <h3 id="52-improve-replay-and-trace-navigation">5.2 Improve replay and trace navigation</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>reduce friction when reviewing a completed session</li>
-<li>connect replay, diagnostics, and trace reports more clearly</li>
+<li>replay, diagnostics, and trace reports are now valuable assets, but they still feel like separate islands</li>
+<li>users need to move across those views quickly when auditing a session</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add navigation between replay and trace sections</li>
-<li>add per-round anchors</li>
-<li>add summary badges for winning candidates and user critique</li>
+<li>add cross-links between replay, diagnostics, and trace report pages</li>
+<li>add per-round anchors and a compact round index</li>
+<li>show badges for incumbent, baseline prompt, carried-forward winners, and final selected candidates</li>
+<li>make image lineage and candidate provenance easier to scan</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>a user can move from a winning candidate to its previous-round context in one or two clicks</li>
 </ul>
 <h3 id="53-add-richer-async-job-visibility">5.3 Add richer async job visibility</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>make long-running work easier to interpret</li>
-<li>distinguish queueing, model warm-up, image generation, and feedback application phases</li>
+<li>“running” is not detailed enough once real inference latency becomes noticeable</li>
+<li>users should know whether the system is warming the model, generating images, or applying feedback</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>refine <code>status_message</code></li>
-<li>add operation-specific milestones</li>
-<li>surface estimated duration when possible</li>
+<li>split async job progress into finer milestones such as queued, loading pipeline, generating candidates, saving artifacts, normalizing feedback, and updating state</li>
+<li>persist these milestones in backend traces and expose them through the jobs API</li>
+<li>show operation-specific progress text and timestamps in the frontend</li>
+<li>if timing history is available, estimate remaining duration conservatively</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>long operations communicate phase-level progress rather than a single coarse status</li>
 </ul>
 <h3 id="54-improve-frontend-resilience">5.4 Improve frontend resilience</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>preserve user work during recoverable failures</li>
-<li>reduce unnecessary page reloads</li>
+<li>user frustration rises sharply when ratings or critique text are lost during recoverable failures</li>
+<li>full page reloads hide useful state and make latency feel worse than it is</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>preserve unsent ratings locally until success</li>
-<li>replace full refreshes with selective in-page updates</li>
-<li>add clearer retry affordances</li>
+<li>preserve in-progress form state locally until the backend confirms success</li>
+<li>replace broad page refreshes with partial in-page updates where possible</li>
+<li>add clearer retry affordances and recovery messages</li>
+<li>distinguish transient backend failures from validation failures and GPU/runtime failures</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>a failed submission does not force the user to re-enter their judgments</li>
 </ul>
 <h2 id="6-p1-performance-improvements">6. P1: Performance Improvements</h2>
 <h3 id="61-reduce-repeated-pipeline-warm-up-cost">6.1 Reduce repeated pipeline warm-up cost</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>improve first-round latency</li>
-<li>reduce perceived slowness during interactive use</li>
+<li>real diffusion pipelines have a noticeable cold-start penalty</li>
+<li>long first-round latency makes the whole system feel slower and less trustworthy</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>preload pipeline on startup when appropriate</li>
-<li>add explicit warm-up action or startup hook</li>
-<li>report cold-start vs warm-run timing</li>
+<li>measure cold-start versus warm-run timing explicitly</li>
+<li>preload the pipeline at startup when that does not create unacceptable idle memory cost</li>
+<li>add a manual warm-up action for demo and lab setups</li>
+<li>persist warm-up timing in diagnostics so regressions are easy to spot</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>first-round latency is predictable and clearly explained to the operator</li>
 </ul>
 <h3 id="62-improve-database-structure-for-future-growth">6.2 Improve database structure for future growth</h3>
-<p>Current state:</p>
+<p>Why it matters:</p>
 <ul>
-<li>structured state is already in SQLite, but some values remain stored as JSON payloads</li>
+<li>SQLite is a strong step up from flat JSON files, but the current payload-heavy design will become harder to query as the dataset grows</li>
+<li>future analysis tooling will want cleaner round-, candidate-, and feedback-level access</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>normalize the highest-value query fields further</li>
-<li>add indexes based on observed query patterns</li>
-<li>prepare migration notes for a future shared store</li>
+<li>normalize the highest-value query dimensions out of JSON blobs first</li>
+<li>add indexes for the most common lookup paths, especially session, round order, and candidate lineage</li>
+<li>preserve replay export compatibility while changing storage layout</li>
+<li>write migration notes and tests before changing persisted schema</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>common session and replay queries remain fast as the local dataset grows</li>
 </ul>
 <h3 id="63-optimize-artifact-lifecycle">6.3 Optimize artifact lifecycle</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>avoid clutter from old runs</li>
-<li>keep storage growth understandable</li>
+<li>generated images, reports, and traces accumulate quickly in real use</li>
+<li>unclear retention rules create both clutter and accidental data loss risk</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add retention and cleanup scripts</li>
-<li>document safe deletion more clearly</li>
-<li>add optional artifact compression for exported bundles</li>
+<li>add cleanup and retention scripts with dry-run support</li>
+<li>classify artifacts by importance: essential, reproducible, or disposable</li>
+<li>document safe deletion rules for <code>data/</code>, <code>output/</code>, and exported bundles</li>
+<li>add optional compression for long-term archival bundles</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>operators can reclaim disk space confidently without breaking active sessions or published artifacts</li>
 </ul>
 <h3 id="64-add-a-synthetic-data-generation-pipeline">6.4 Add a synthetic-data generation pipeline</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>support large-scale offline algorithm evaluation</li>
-<li>generate reproducible synthetic steering sessions</li>
-<li>make synthetic datasets realistic enough to be useful for training and benchmarking</li>
+<li>algorithm iteration is slow if every evaluation depends on live human steering</li>
+<li>synthetic sessions can provide scalable regression tests, ablations, and pretraining data</li>
 </ul>
-<p>Detailed roadmap items:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add a dataset-generation script or service layer for synthetic sessions</li>
-<li>support two primary synthetic regimes:</li>
+<li>add a dedicated synthetic-session generation layer rather than overloading the interactive runtime</li>
+<li>support two core regimes:</li>
 <li>anchor-seeking trajectories toward a target steer state or reference</li>
-<li>diversity-seeking trajectories around one or more steered locations</li>
-<li>define a stable synthetic-session schema with:</li>
-<li>prompt</li>
-<li>anchor definition</li>
-<li>candidate set</li>
-<li>synthetic preference event</li>
-<li>critique text if generated</li>
-<li>next-state summary</li>
-<li>simulator metadata</li>
-<li>persist synthetic run manifests separately from ordinary interactive sessions</li>
-<li>version the simulator policy independently from the rest of the app</li>
-<li>generate analysis-ready exports for each synthetic corpus</li>
+<li>diversity-seeking trajectories around one or more promising steer locations</li>
+<li>define a stable synthetic schema with prompt, anchor, candidate batch, synthetic preference event, critique text, simulator metadata, and next-state summary</li>
+<li>version simulator behavior independently so old corpora remain interpretable</li>
+<li>emit analysis-ready exports and HTML summaries similar to user trace reports</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>synthetic corpora can be generated reproducibly and compared across simulator versions</li>
 </ul>
 <h3 id="65-expand-steering-support-to-more-diffusion-pipelines">6.5 Expand steering support to more diffusion pipelines</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>move beyond text-to-image-only steering</li>
-<li>make the system useful for more realistic creative workflows</li>
-<li>support conditioning modes that practitioners already use in production</li>
+<li>prompt-only generation is too narrow for many real creative workflows</li>
+<li>practical steering systems need to work with reference images, local edits, and structural constraints</li>
 </ul>
-<p>Detailed roadmap items:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add a pipeline adapter layer so orchestration can target multiple diffusion workflows through one stable contract</li>
-<li>support image-prompt or image-variation steering where the user starts from a reference image and refines around it</li>
-<li>support inpainting steering where the user edits only a masked region while preserving the surrounding composition</li>
-<li>support ControlNet-guided steering for structure-aware workflows such as edge, depth, pose, or segmentation control</li>
-<li>persist pipeline-specific inputs in session state and replay exports, including:</li>
-<li>reference images</li>
-<li>masks</li>
-<li>ControlNet conditioning assets</li>
-<li>pipeline-specific generation settings</li>
-<li>extend diagnostics so the active pipeline type is visible during runtime</li>
-<li>extend trace reports so they clearly show which conditioning mode each round used</li>
-<li>add storage conventions for auxiliary assets used by non-text-only pipelines</li>
-</ul>
-<p>Implementation tasks:</p>
-<ul>
-<li>define a generation request schema that can represent:</li>
+<li>define a common generation request contract that supports:</li>
 <li>pure text prompt generation</li>
 <li>text plus reference image generation</li>
 <li>text plus mask generation</li>
 <li>text plus ControlNet conditioning generation</li>
-<li>add adapter implementations for:</li>
-<li>image prompt or image variation pipeline</li>
-<li>inpainting pipeline</li>
-<li>one or more ControlNet pipelines</li>
-<li>add validation rules for required assets per pipeline type</li>
-<li>add frontend affordances for uploading and previewing reference images, masks, and control inputs</li>
-<li>add replay rendering support for these extra conditioning artifacts</li>
-<li>add test fixtures for each pipeline family</li>
+<li>add adapter implementations for image-prompt, inpainting, and ControlNet workflows</li>
+<li>validate required auxiliary assets per pipeline type</li>
+<li>extend replay, trace reports, and storage conventions so those extra assets are visible and portable</li>
+<li>update the frontend to upload, preview, and persist reference images, masks, and control inputs</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>one orchestration layer can drive multiple diffusion workflow families without special-case route logic</li>
 </ul>
 <h2 id="7-p1-synthetic-data-infrastructure-and-tooling">7. P1: Synthetic Data Infrastructure and Tooling</h2>
 <h3 id="71-support-anchor-seeking-synthetic-user-simulation">7.1 Support anchor-seeking synthetic-user simulation</h3>
-<p>System requirements:</p>
+<p>Why it matters:</p>
 <ul>
-<li>represent an anchor as one or more of:</li>
-<li>latent steering vector</li>
-<li>reference image embedding</li>
-<li>attribute target bundle</li>
-<li>text-derived target state</li>
-<li>compute candidate-to-anchor scores consistently</li>
-<li>allow configurable synthetic-user noise models</li>
-<li>emit round-by-round decisions and rationale fields</li>
+<li>anchor-seeking behavior is the most direct simulation of a user trying to steer toward a desired hidden target</li>
+<li>it creates a clean environment for comparing samplers and updaters</li>
 </ul>
-<p>Implementation tasks:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add anchor-definition models</li>
-<li>add synthetic scorer interfaces</li>
-<li>add pluggable decision policies for ratings, pairwise outcomes, and rankings</li>
-<li>add critique-template or critique-generation hooks</li>
-<li>add calibration tools to compare synthetic traces with real traces</li>
+<li>represent anchors as latent states, reference-image embeddings, attribute bundles, or text-derived targets</li>
+<li>define a synthetic scoring interface that compares candidates against the anchor consistently</li>
+<li>add configurable noise models for uncertainty, reversals, fatigue, and near-tie behavior</li>
+<li>emit synthetic rationale fields and optional generated critique text</li>
+<li>calibrate simulator behavior against real traces rather than assuming the simulator is realistic</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>anchor-seeking synthetic traces reproduce recognizable patterns seen in real sessions</li>
 </ul>
 <h3 id="72-support-diversity-seeking-synthetic-user-simulation">7.2 Support diversity-seeking synthetic-user simulation</h3>
-<p>System requirements:</p>
+<p>Why it matters:</p>
 <ul>
-<li>support one-center local diversity sampling</li>
-<li>support multi-center diversity sampling</li>
-<li>compute both quality and coverage scores</li>
-<li>prevent synthetic corpora from collapsing into near-duplicates</li>
+<li>not every useful user wants convergence to a single target</li>
+<li>many creative tasks reward local novelty and coverage around one or several promising modes</li>
 </ul>
-<p>Implementation tasks:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add local-neighborhood samplers around one steered location</li>
-<li>add multi-center batch construction around several promising locations</li>
-<li>add diversity metrics to candidate manifests</li>
-<li>add coverage-aware synthetic preference policies</li>
-<li>record whether the synthetic objective was:</li>
-<li>converge-to-anchor</li>
-<li>explore-around-anchor</li>
-<li>cover-multiple-centers</li>
+<li>support one-center and multi-center diversity objectives</li>
+<li>compute both quality and coverage metrics for candidate sets</li>
+<li>add diversity-aware preference policies such as shortlist preference and winner-plus-diversity bonus</li>
+<li>record whether the synthetic objective is convergence, neighborhood exploration, or multi-center coverage</li>
+<li>guard against near-duplicate corpora with explicit diversity checks</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>synthetic diversity tasks produce trajectories that are measurably different from pure anchor-seeking runs</li>
 </ul>
 <h3 id="73-add-synthetic-corpus-management">7.3 Add synthetic corpus management</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>make synthetic datasets inspectable, versioned, and reproducible</li>
+<li>synthetic data only becomes useful research infrastructure if it is easy to inspect, version, and subset</li>
 </ul>
-<p>Implementation tasks:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>define output folder layout for generated corpora</li>
-<li>add manifest files with seeds, simulator version, and task family</li>
-<li>add HTML summaries for synthetic runs similar to user trace reports</li>
-<li>add train/validation/test split support for synthetic corpora</li>
-<li>add filtering by prompt family, anchor type, and diversity regime</li>
+<li>define a stable output folder layout and manifest format</li>
+<li>include seeds, simulator version, task family, prompt family, and split assignment</li>
+<li>generate HTML summaries for corpora and individual sessions</li>
+<li>support filtering by anchor type, difficulty, diversity regime, and prompt family</li>
+<li>keep generated corpora separable from ordinary interactive session data</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>a synthetic corpus can be reproduced, filtered, and reused without ad hoc cleanup scripts</li>
 </ul>
 <h3 id="74-add-synthetic-data-quality-checks">7.4 Add synthetic-data quality checks</h3>
-<p>Goals:</p>
+<p>Why it matters:</p>
 <ul>
-<li>avoid training on unrealistic or degenerate synthetic traces</li>
+<li>weak synthetic traces can quietly teach the wrong lessons to algorithms and researchers</li>
+<li>corpus quality must be tested, not assumed</li>
 </ul>
-<p>Implementation tasks:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>add duplicate-detection checks</li>
-<li>add candidate-diversity threshold checks</li>
-<li>add anchor-distance sanity checks</li>
-<li>add synthetic preference consistency checks</li>
-<li>add comparison dashboards against real session statistics</li>
+<li>add duplicate detection, diversity thresholds, anchor-distance sanity checks, and preference-consistency checks</li>
+<li>compare synthetic distributions against real session statistics where possible</li>
+<li>generate quality dashboards for each corpus build</li>
+<li>fail corpus generation or mark builds degraded when thresholds are violated</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>poor-quality synthetic corpora are detected before they are used for analysis or training</li>
 </ul>
 <h2 id="8-p2-architecture-and-scale-improvements">8. P2: Architecture and Scale Improvements</h2>
-<h3 id="71-add-a-pluggable-storage-layer-for-shared-deployments">7.1 Add a pluggable storage layer for shared deployments</h3>
-<p>Goals:</p>
+<h3 id="81-add-a-pluggable-storage-layer-for-shared-deployments">8.1 Add a pluggable storage layer for shared deployments</h3>
+<p>Why it matters:</p>
 <ul>
-<li>support multi-user or hosted research workflows later</li>
+<li>local SQLite is a good MVP choice, but future hosted or collaborative deployments will need a cleaner storage abstraction</li>
 </ul>
-<p>Suggested work:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>define a storage adapter contract explicitly</li>
-<li>prepare PostgreSQL-backed implementation</li>
-<li>preserve replay export compatibility</li>
+<li>formalize the storage adapter contract around sessions, rounds, feedback, artifacts, and exports</li>
+<li>add contract tests that every backend must pass</li>
+<li>prepare a PostgreSQL-backed implementation without changing route semantics</li>
+<li>preserve replay and trace export compatibility across backends</li>
 </ul>
-<h3 id="72-improve-release-automation">7.2 Improve release automation</h3>
-<p>Goals:</p>
+<p>Success signal:</p>
 <ul>
-<li>make releases more repeatable</li>
-<li>reduce manual mistakes</li>
+<li>the storage backend can change without breaking orchestration or exported artifacts</li>
 </ul>
-<p>Suggested work:</p>
+<h3 id="82-improve-release-automation">8.2 Improve release automation</h3>
+<p>Why it matters:</p>
 <ul>
-<li>automate release zip creation in CI</li>
-<li>validate docs-site generation in CI</li>
-<li>update workflow actions for upcoming Node 24 runtime changes</li>
+<li>releases are more trustworthy when packaging, docs generation, and validation are automated</li>
+<li>manual release work is error-prone, especially as the docs site and example bundles grow</li>
 </ul>
-<h3 id="73-add-api-schema-snapshots">7.3 Add API schema snapshots</h3>
-<p>Goals:</p>
+<p>Implementation notes:</p>
 <ul>
-<li>make contract drift more visible</li>
+<li>automate release zip creation and site generation checks in CI</li>
+<li>verify that committed Pages output matches the current Markdown state</li>
+<li>refresh workflow actions before the upcoming Node runtime changes become disruptive</li>
+<li>add an explicit release checklist artifact for human sign-off</li>
 </ul>
-<p>Suggested work:</p>
+<p>Success signal:</p>
 <ul>
-<li>snapshot structured API responses</li>
-<li>snapshot replay export schema</li>
-<li>snapshot trace-report structure where stable</li>
+<li>a release candidate can be validated with one repeatable CI-backed process</li>
+</ul>
+<h3 id="83-add-api-schema-snapshots">8.3 Add API schema snapshots</h3>
+<p>Why it matters:</p>
+<ul>
+<li>contract drift is easy to miss when responses evolve gradually</li>
+<li>snapshots make accidental breaking changes visible early</li>
+</ul>
+<p>Implementation notes:</p>
+<ul>
+<li>snapshot JSON API responses for core endpoints</li>
+<li>snapshot replay export payloads and trace-report structure where stable</li>
+<li>keep snapshot tests intentionally narrow around durable fields</li>
+<li>version snapshots when intentional contract changes are made</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>meaningful API and export shape changes are deliberate, reviewable, and test-backed</li>
 </ul>
 <h2 id="9-milestone-view">9. Milestone View</h2>
 <h3 id="milestone-a-operator-trust">Milestone A: Operator Trust</h3>
@@ -392,27 +449,32 @@
 <li>improve diagnostics depth</li>
 <li>build mode-specific feedback UI</li>
 <li>refine async progress states</li>
+<li>improve replay and trace navigation</li>
+<li>reduce pipeline warm-up cost</li>
+<li>normalize high-value SQLite query paths</li>
+<li>add artifact retention and cleanup tooling</li>
+<li>add anchor-seeking synthetic-data pipeline</li>
+<li>add diversity-seeking synthetic-data pipeline</li>
+<li>build synthetic corpus management and quality checks</li>
 <li>expand generation contracts for multiple diffusion pipeline types</li>
 <li>add image-prompt steering support</li>
 <li>add inpainting steering support</li>
 <li>add ControlNet steering support</li>
-<li>add anchor-seeking synthetic-data pipeline</li>
-<li>add diversity-seeking synthetic-data pipeline</li>
-<li>improve replay and trace navigation</li>
 <li>harden release automation</li>
 <li>prepare shared-storage evolution</li>
+<li>add API schema snapshots</li>
 </ol>
 <h2 id="11-summary">11. Summary</h2>
-<p>The main system goal is no longer “make the MVP exist.” That is done.</p>
-<p>The next engineering phase should make the system:</p>
+<p>The main engineering goal is no longer “make the MVP exist.” That is done.</p>
+<p>The next system phase should make StableSteering:</p>
 <ul>
 <li>easier to trust</li>
 <li>easier to inspect</li>
 <li>easier to operate</li>
 <li>easier to extend</li>
 <li>easier to publish and reproduce</li>
-<li>easier to use for realistic synthetic-data generation at scale</li>
-<li>usable across multiple diffusion conditioning workflows, not only prompt-only generation</li>
+<li>more scalable as a synthetic-data generation platform</li>
+<li>more useful across multiple diffusion conditioning workflows, not only prompt-only generation</li>
 </ul>
       </main>
     </div>

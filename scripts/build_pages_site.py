@@ -26,6 +26,7 @@ EXCLUDED_PARTS = {
 }
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
 MARKDOWN_LINK_RE = re.compile(r"(!?\[[^\]]*\])\(([^)]+)\)")
+HTML_ATTR_LINK_RE = re.compile(r'(?P<attr>href|src)=(?P<quote>["\'])(?P<target>[^"\']+)(?P=quote)')
 
 
 def should_include(path: Path) -> bool:
@@ -161,11 +162,25 @@ def rewrite_markdown_links(text: str, current_file: Path, mapping: dict[Path, Pa
     return MARKDOWN_LINK_RE.sub(replacer, text)
 
 
+def rewrite_html_links(text: str, current_file: Path, mapping: dict[Path, Path]) -> str:
+    """Rewrite raw HTML href/src attributes to point at generated HTML or GitHub sources."""
+
+    def replacer(match: re.Match[str]) -> str:
+        attr = match.group("attr")
+        quote = match.group("quote")
+        target = match.group("target")
+        rewritten = rewrite_link(target, current_file, mapping)
+        return f"{attr}={quote}{rewritten}{quote}"
+
+    return HTML_ATTR_LINK_RE.sub(replacer, text)
+
+
 def render_page(source: Path, mapping: dict[Path, Path], all_pages: list[Path]) -> str:
     """Render one Markdown file into a full HTML document."""
 
     text = source.read_text(encoding="utf-8")
     rewritten = rewrite_markdown_links(text, source, mapping)
+    rewritten = rewrite_html_links(rewritten, source, mapping)
     body = markdown.markdown(
         rewritten,
         extensions=["extra", "toc", "sane_lists", "tables", "fenced_code"],

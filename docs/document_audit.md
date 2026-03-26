@@ -19,15 +19,15 @@ This documentation set was re-audited and synchronized with the current implemen
 
 The most heavily updated documents in this sync were:
 
-- [README.md](/E:/Projects/StableSteering/README.md)
-- [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
-- [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
-- [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
-- [faq.md](/E:/Projects/StableSteering/docs/faq.md)
-- [student_tutorial.md](/E:/Projects/StableSteering/docs/student_tutorial.md)
-- [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
-- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
-- [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
+- [README.md](../README.md)
+- [quick_start.md](quick_start.md)
+- [user_guide.md](user_guide.md)
+- [developer_guide.md](developer_guide.md)
+- [faq.md](faq.md)
+- [student_tutorial.md](student_tutorial.md)
+- [pre_implementation_blueprint.md](pre_implementation_blueprint.md)
+- [system_specification.md](system_specification.md)
+- [system_test_specification.md](system_test_specification.md)
 
 ## 1. Motivation: Top 30 Improvements Applied
 
