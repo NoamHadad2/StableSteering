@@ -103,7 +103,7 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     assert len(round_payload["candidate_metadata"]) == 4
     baseline = round_payload["candidate_metadata"][0]
     assert baseline["sampler_role"] == "baseline_prompt"
-    assert baseline["z"] == [0.0, 0.0, 0.0]
+    assert baseline["z"] == [0.0 for _ in range(5)]
     assert baseline["generation_params"]["baseline_prompt"] is True
     assert baseline["generation_params"]["steering_applied"] is False
     exploratory_candidates = round_payload["candidate_metadata"][1:]
@@ -131,7 +131,7 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     )
     assert feedback.status_code == 200
     next_state = feedback.json()["next_incumbent_state"]
-    assert next_state != [0.0, 0.0, 0.0]
+    assert next_state != [0.0 for _ in range(5)]
 
     round_two = client.post(f"/sessions/{session_id}/rounds/next")
     assert round_two.status_code == 200

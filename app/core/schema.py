@@ -80,16 +80,16 @@ class SteeringMode(str, Enum):
 class StrategyConfig(BaseModel):
     """Experiment-level strategy choices and tunable parameters."""
 
-    sampler: SamplerType = SamplerType.random_local
+    sampler: SamplerType = SamplerType.exploit_orthogonal
     updater: UpdaterType = UpdaterType.winner_average
     feedback_mode: FeedbackType = FeedbackType.scalar_rating
-    seed_policy: SeedPolicy = SeedPolicy.fixed_per_round
+    seed_policy: SeedPolicy = SeedPolicy.fixed_per_candidate
     steering_mode: SteeringMode = SteeringMode.low_dimensional
-    steering_dimension: int = Field(default=3, ge=1, le=16)
+    steering_dimension: int = Field(default=5, ge=1, le=16)
     candidate_count: int = Field(default=5, ge=1, le=12)
     image_size: str = "512x512"
-    trust_radius: float = Field(default=0.35, gt=0.0, le=1.0)
-    anchor_strength: float = Field(default=0.35, ge=0.0, le=2.0)
+    trust_radius: float = Field(default=0.55, gt=0.0, le=1.0)
+    anchor_strength: float = Field(default=0.7, ge=0.0, le=2.0)
     guidance_scale: float = Field(default=7.5, gt=0.0, le=20.0)
     num_inference_steps: int = Field(default=15, ge=1, le=100)
     model_name: str = "runwayml/stable-diffusion-v1-5"

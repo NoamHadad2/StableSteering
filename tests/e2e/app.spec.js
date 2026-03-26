@@ -114,7 +114,8 @@ test.describe("StableSteering browser flow", () => {
     await editor.fill("candidate_count: 2");
     await page.getByRole("button", { name: "Reload default YAML" }).click();
     await expect(editor).toContainText("candidate_count: 5");
-    await expect(editor).toContainText("sampler: random_local");
+    await expect(editor).toContainText("sampler: exploit_orthogonal");
+    await expect(editor).toContainText("seed_policy: fixed-per-candidate");
   });
 
   test("setup page shows a clear validation error after a broken YAML edit", async ({ page }) => {
