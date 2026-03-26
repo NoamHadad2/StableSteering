@@ -219,6 +219,8 @@ That state influences the next generation round.
 The next round should better reflect the user's preferences.
 Over multiple rounds, the session ideally becomes more aligned, more coherent, and more useful.
 
+![Session lifecycle diagram](./assets/illustrations/session_lifecycle.svg)
+
 ## 6. Why Async Jobs Matter
 
 Real image generation can take time, especially on a GPU pipeline.

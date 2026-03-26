@@ -194,6 +194,26 @@ Success signal:
 
 - a failed submission does not force the user to re-enter their judgments
 
+### 5.5 Add richer elicitation modes and UI workflows
+
+Why it matters:
+
+- users often want to express shortlist, uncertainty, local dissatisfaction, or critique, not only pick one winner
+- richer elicitation workflows can capture more faithful preference signals and make the system useful for a broader set of creative tasks
+
+Implementation notes:
+
+- add shortlist selection and "acceptable set" interaction modes
+- add explicit best-versus-incumbent comparisons so one candidate is always evaluated against the current best result
+- add critique-assisted forms with structured reason tags such as composition, realism, lighting, color, faithfulness, and artifact severity
+- add "cannot decide", "near tie", and confidence controls so ambiguous judgments are not forced into false certainty
+- add region-aware UI patterns for future inpainting and image-prompt workflows
+- ensure replay, trace, and export layers record the real elicitation workflow, not only the normalized winner payload
+
+Success signal:
+
+- the frontend supports several genuinely different preference-collection workflows with clear semantics and traceability
+
 ## 6. P1: Performance Improvements
 
 ### 6.1 Reduce repeated pipeline warm-up cost
@@ -293,6 +313,46 @@ Implementation notes:
 Success signal:
 
 - one orchestration layer can drive multiple diffusion workflow families without special-case route logic
+
+### 6.6 Add stronger sampler families
+
+Why it matters:
+
+- the sampler defines which candidate images the user ever gets to judge
+- better sampler families may improve convergence speed, diversity, and robustness under noisy or sparse feedback
+
+Implementation notes:
+
+- add contextual bandit and Thompson-style samplers that consume uncertainty estimates explicitly
+- add archive-based or quality-diversity samplers that preserve diverse high-value regions rather than only following the incumbent
+- add critique-conditioned samplers that use structured user complaints or desired attributes to bias proposals
+- add incumbent-versus-challenger samplers that guarantee one stability option and one higher-risk exploratory option in every round
+- add adaptive trust-region samplers whose radius expands or contracts based on preference stability and model confidence
+- make sampler metadata first-class in traces so proposal behavior is inspectable after the session
+
+Success signal:
+
+- the system can compare several materially different sampler families, not only local heuristic variations
+
+### 6.7 Add stronger preference-model implementations
+
+Why it matters:
+
+- current update logic is intentionally simple, but richer preference models can use ratings, pairwise choices, rankings, approvals, and critiques more effectively
+- stronger preference models could improve both learning speed and robustness to inconsistent user judgments
+
+Implementation notes:
+
+- add Bradley-Terry or Plackett-Luce style preference models for pairwise and ranking data
+- add Bayesian preference estimators with explicit uncertainty over candidate quality
+- add listwise models that use full or partial rankings rather than collapsing them to one winner
+- add critique-aware preference models that combine structured reasons with discrete selections
+- add incumbent-aware models that distinguish "best in batch" from "better than current best"
+- standardize a scorer interface so future samplers can consume posterior scores and uncertainty estimates directly
+
+Success signal:
+
+- the system can switch between heuristic update rules and explicit learned preference models through one stable contract
 
 ## 7. P1: Synthetic Data Infrastructure and Tooling
 
@@ -436,10 +496,13 @@ Success signal:
 ### Milestone B: Better Interactive Use
 
 - mode-specific feedback UI
+- richer elicitation modes and critique-aware UI
 - better async progress states
 - improved replay and trace navigation
 - first synthetic-data pipeline for anchor-seeking and diversity-seeking corpora
 - first multi-pipeline steering support for image prompt, inpainting, and ControlNet workflows
+- first advanced sampler family
+- first explicit preference-model family beyond winner heuristics
 
 ### Milestone C: Hardening and Release Maturity
 
@@ -454,21 +517,24 @@ Success signal:
 2. package session trace bundles for export
 3. improve diagnostics depth
 4. build mode-specific feedback UI
-5. refine async progress states
-6. improve replay and trace navigation
-7. reduce pipeline warm-up cost
-8. normalize high-value SQLite query paths
-9. add artifact retention and cleanup tooling
-10. add anchor-seeking synthetic-data pipeline
-11. add diversity-seeking synthetic-data pipeline
-12. build synthetic corpus management and quality checks
-13. expand generation contracts for multiple diffusion pipeline types
-14. add image-prompt steering support
-15. add inpainting steering support
-16. add ControlNet steering support
-17. harden release automation
-18. prepare shared-storage evolution
-19. add API schema snapshots
+5. add richer elicitation modes and critique-aware UI
+6. refine async progress states
+7. improve replay and trace navigation
+8. add stronger sampler families
+9. add stronger preference-model implementations
+10. reduce pipeline warm-up cost
+11. normalize high-value SQLite query paths
+12. add artifact retention and cleanup tooling
+13. add anchor-seeking synthetic-data pipeline
+14. add diversity-seeking synthetic-data pipeline
+15. build synthetic corpus management and quality checks
+16. expand generation contracts for multiple diffusion pipeline types
+17. add image-prompt steering support
+18. add inpainting steering support
+19. add ControlNet steering support
+20. harden release automation
+21. prepare shared-storage evolution
+22. add API schema snapshots
 
 ## 11. Summary
 

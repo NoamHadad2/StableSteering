@@ -93,6 +93,8 @@ The setup page now uses these routes:
 
 This means the YAML document is the source of truth for per-session strategy configuration.
 
+![YAML-to-runtime diagram](./assets/illustrations/config_to_generation.svg)
+
 ## YAML Template
 
 The setup page starts from a backend-generated YAML document similar to this:
@@ -106,7 +108,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.35
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.5
+num_inference_steps: 15
 model_name: runwayml/stable-diffusion-v1-5
 ```
 
@@ -175,11 +179,14 @@ Supported values:
 
 Effect:
 
-- changes how frontend rating input is converted into normalized feedback
+- changes which session controls the frontend renders
+- changes how the browser collects explicit user preference signals before normalization
 
 Related code:
 
 - [normalization.py](../app/feedback/normalization.py)
+
+![Feedback modes diagram](./assets/illustrations/feedback_modes.svg)
 
 ### `seed_policy`
 
@@ -218,7 +225,8 @@ Current value used by the MVP:
 
 Effect:
 
-- documents that the current session state is a small latent steering vector
+- selects the steering representation contract used by generation
+- the current implementation supports only `low_dimensional`, so this field is validated but not yet a multi-mode switch
 
 ### `candidate_count`
 
@@ -267,16 +275,37 @@ Effect:
 
 ### `anchor_strength`
 
-Reserved steering control parameter exposed in the strategy config.
+Controls how strongly the latent steering vector perturbs the encoded prompt embedding.
 
 Effect:
 
-- currently part of the structured config surface
-- useful for future work around stronger anchor-based steering behavior
+- larger values make candidate steering offsets more pronounced
+- smaller values keep steered candidates closer to the raw prompt embedding
+- this now directly affects Diffusers prompt-embedding steering and is persisted in candidate generation metadata
+
+### `guidance_scale`
+
+Controls classifier-free guidance strength during image generation.
+
+Effect:
+
+- larger values usually push images to follow the prompt more literally
+- smaller values allow looser, sometimes more varied interpretation
+- this now directly affects both real Diffusers rendering and mock trace artifacts
+
+### `num_inference_steps`
+
+Controls how many denoising steps the diffusion pipeline runs per image.
+
+Effect:
+
+- larger values typically improve quality and prompt faithfulness at the cost of latency
+- smaller values are faster but can degrade image quality or stability
+- this now directly affects both real Diffusers rendering and mock trace artifacts
 
 ### `model_name`
 
-Records the model name used for the session configuration.
+Selects the model checkpoint for the session.
 
 Current default:
 
@@ -284,8 +313,9 @@ Current default:
 
 Important note:
 
-- the real runtime also depends on process-level backend/model settings
-- this field documents session intent and config state, but model loading policy is still governed by runtime configuration
+- if a prepared local model matching this Hugging Face id exists, the real backend loads and caches that model for the session
+- if the model is missing, session generation fails clearly instead of silently ignoring the setting
+- this field now directly affects the real generation backend and is stored in candidate generation metadata
 
 ## Validation Rules
 
@@ -355,7 +385,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.25
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.0
+num_inference_steps: 20
 model_name: runwayml/stable-diffusion-v1-5
 ```
 
@@ -375,7 +407,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.4
-anchor_strength: 0.15
+anchor_strength: 0.45
+guidance_scale: 7.5
+num_inference_steps: 24
 model_name: runwayml/stable-diffusion-v1-5
 ```
 
@@ -395,7 +429,9 @@ steering_mode: low_dimensional
 candidate_count: 3
 image_size: 512x512
 trust_radius: 0.3
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 8.0
+num_inference_steps: 20
 model_name: runwayml/stable-diffusion-v1-5
 ```
 
@@ -415,7 +451,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.34
-anchor_strength: 0.15
+anchor_strength: 0.4
+guidance_scale: 7.5
+num_inference_steps: 22
 model_name: runwayml/stable-diffusion-v1-5
 ```
 
@@ -435,7 +473,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.3
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.2
+num_inference_steps: 18
 model_name: runwayml/stable-diffusion-v1-5
 ```
 

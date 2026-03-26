@@ -32,7 +32,7 @@ generator exists only inside explicit test harnesses.</p>
 <li>enter a text prompt</li>
 <li>start a session around that prompt</li>
 <li>generate a round of candidate images</li>
-<li>rate the candidates</li>
+<li>provide feedback with the active mode controls</li>
 <li>submit feedback</li>
 <li>generate the next round</li>
 <li>review the session replay</li>
@@ -47,24 +47,22 @@ generator exists only inside explicit test harnesses.</p>
 <li>a link to start a new session</li>
 </ul>
 <h3 id="setup">Setup</h3>
-<p>The setup page lets you choose:</p>
+<p>The setup page lets you set:</p>
 <ul>
 <li>prompt</li>
 <li>negative prompt</li>
 <li>experiment name</li>
 <li>experiment description</li>
-<li>sampler</li>
-<li>updater</li>
-<li>feedback mode</li>
-<li>number of candidates per round</li>
+<li>a per-session YAML configuration block</li>
 </ul>
+<p>That YAML block controls the sampler, updater, feedback mode, seed policy, candidate count, image settings, and other session-level strategy values.</p>
 <h3 id="session">Session</h3>
 <p>The session page lets you:</p>
 <ul>
 <li>generate the next round</li>
 <li>review current steering state</li>
 <li>inspect candidate images</li>
-<li>assign ratings to candidates</li>
+<li>provide mode-specific feedback to candidates</li>
 <li>submit feedback</li>
 <li>open the replay page</li>
 <li>open the trace report</li>
@@ -85,7 +83,7 @@ generator exists only inside explicit test harnesses.</p>
 <li>start from a prompt you can easily recognize</li>
 <li>keep the default settings for your first run</li>
 <li>generate the first round</li>
-<li>give the strongest candidate the highest rating</li>
+<li>use the currently selected feedback mode to express a clear preference</li>
 <li>submit feedback</li>
 <li>generate another round and compare how the state evolves</li>
 </ol>
@@ -110,14 +108,17 @@ generator exists only inside explicit test harnesses.</p>
 <li>the candidate identifier</li>
 <li>the sampler role</li>
 <li>the steering vector <code>z</code></li>
-<li>a rating input</li>
+<li>feedback controls for the active mode</li>
 </ul>
-<p>The rating inputs currently drive all three supported feedback modes:</p>
+<p>The visible controls change with the selected feedback mode:</p>
 <ul>
-<li><code>scalar_rating</code> sends the ratings directly</li>
-<li><code>pairwise</code> chooses the highest-rated candidate over the lowest-rated candidate</li>
-<li><code>top_k</code> converts the ratings into a ranked list</li>
+<li><code>scalar_rating</code> shows rating inputs</li>
+<li><code>pairwise</code> shows explicit winner and loser choices</li>
+<li><code>winner_only</code> shows a single winner choice</li>
+<li><code>approve_reject</code> shows approval choices plus a preferred approved winner</li>
+<li><code>top_k</code> shows explicit rank inputs</li>
 </ul>
+<p><img alt="Feedback modes diagram" src="assets/illustrations/feedback_modes.svg"></p>
 <h2 id="6-understanding-replay">6. Understanding Replay</h2>
 <p>Replay is useful for:</p>
 <ul>

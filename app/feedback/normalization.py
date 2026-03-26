@@ -19,11 +19,17 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         winner_candidate_id = max(ratings, key=ratings.get)
         normalized = {"winner_candidate_id": winner_candidate_id, "ratings": ratings}
     elif request.feedback_type == FeedbackType.pairwise:
-        if not payload.get("winner_candidate_id"):
+        winner_candidate_id = payload.get("winner_candidate_id")
+        loser_candidate_id = payload.get("loser_candidate_id")
+        if not winner_candidate_id:
             raise ValueError("pairwise feedback requires winner_candidate_id")
+        if not loser_candidate_id:
+            raise ValueError("pairwise feedback requires loser_candidate_id")
+        if winner_candidate_id == loser_candidate_id:
+            raise ValueError("pairwise feedback requires different winner and loser candidates")
         normalized = {
-            "winner_candidate_id": payload["winner_candidate_id"],
-            "loser_candidate_id": payload.get("loser_candidate_id"),
+            "winner_candidate_id": winner_candidate_id,
+            "loser_candidate_id": loser_candidate_id,
         }
     elif request.feedback_type == FeedbackType.winner_only:
         winner_candidate_id = payload.get("winner_candidate_id")
@@ -38,6 +44,8 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         if not approved_candidate_ids:
             raise ValueError("approve_reject feedback requires at least one approved candidate")
         winner_candidate_id = payload.get("winner_candidate_id") or approved_candidate_ids[0]
+        if winner_candidate_id not in approved_candidate_ids:
+            raise ValueError("approve_reject winner_candidate_id must also be approved")
         normalized = {
             "winner_candidate_id": winner_candidate_id,
             "approved_candidate_ids": approved_candidate_ids,
@@ -48,6 +56,10 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         ranking = payload.get("ranking", [])
         if not ranking:
             raise ValueError("ranking feedback requires a non-empty ranking list")
+        if len(ranking) < 2:
+            raise ValueError("ranking feedback requires at least two ranked candidates")
+        if len(set(ranking)) != len(ranking):
+            raise ValueError("ranking feedback requires unique candidate ids")
         normalized = {"winner_candidate_id": ranking[0], "ranking": ranking}
 
     return FeedbackEvent(

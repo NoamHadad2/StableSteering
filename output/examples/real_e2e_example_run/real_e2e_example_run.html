@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Real E2E Example Run ses_2c69476856a9</title>
+  <style>
+    :root { color-scheme: light; font-family: Georgia, 'Times New Roman', serif; }
+    body { margin: 0; background: linear-gradient(180deg, #f1e8dc 0%, #fcfaf6 100%); color: #231b15; }
+    main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 48px; }
+    .hero, .card { background: rgba(255, 252, 247, 0.96); border: 1px solid #d7ccbf; border-radius: 20px; padding: 24px; box-shadow: 0 14px 38px rgba(74, 50, 23, 0.08); }
+    .hero { margin-bottom: 18px; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; color: #87562a; font-size: 0.82rem; margin: 0 0 8px; }
+    h1, h2, h3 { margin-top: 0; font-family: 'Segoe UI', sans-serif; }
+    .lede { font-size: 1.08rem; line-height: 1.65; max-width: 900px; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 18px; }
+    .metric { background: #f8f1e7; border-radius: 16px; padding: 14px; }
+    .metric strong { display: block; font-family: 'Segoe UI', sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: #765434; margin-bottom: 6px; }
+    .metric span { font-size: 1.02rem; font-weight: 700; }
+    .stack { display: grid; gap: 18px; }
+    .round { margin-top: 18px; }
+    .candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .candidate { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #e5d9cb; }
+    .candidate img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #e9e0d4; }
+    .candidate .body { padding: 12px; font-size: 0.94rem; line-height: 1.45; }
+    .winner { outline: 3px solid #b16d1e; }
+    .pill { display: inline-block; margin-right: 8px; margin-bottom: 8px; padding: 6px 10px; background: #efe2cf; border-radius: 999px; font-size: 0.84rem; }
+    .callout { background: #f6efe4; border-left: 4px solid #a55b16; border-radius: 14px; padding: 16px 18px; }
+    .columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #f7f1e9; border-radius: 14px; padding: 14px; font-size: 0.88rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; padding: 10px; border-top: 1px solid #e7dbce; }
+    details.card { padding: 0; overflow: hidden; }
+    details.card > summary { list-style: none; cursor: pointer; padding: 22px 24px; font-family: 'Segoe UI', sans-serif; font-weight: 700; }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary::after { content: '+'; float: right; color: #87562a; }
+    details.card[open] > summary::after { content: '−'; }
+    .card-body { padding: 0 24px 24px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Real GPU Example</p>
+    <h1>A premium cinematic product hero photo of an expedition-ready electric explorer motorcycle, photographed in a desert sunrise studio set with brushed titanium surfaces, crisp rim lighting, and magazine-cover composition</h1>
+    <p class="lede">This is a real end-to-end steering run executed against the Diffusers backend on GPU. It is designed to show the core value of the system: starting from a user text prompt, proposing multiple steerable directions, recording preference-guided choices, and moving the session toward a clearer creative target over multiple rounds.</p>
+    <div class="metrics">
+      <div class="metric"><strong>Session</strong><span>ses_2c69476856a9</span></div>
+      <div class="metric"><strong>Backend</strong><span>diffusers</span></div>
+      <div class="metric"><strong>Device</strong><span>cuda</span></div>
+      <div class="metric"><strong>CUDA Available</strong><span>True</span></div>
+      <div class="metric"><strong>Rounds</strong><span>5</span></div>
+      <div class="metric"><strong>Model</strong><span>runwayml/stable-diffusion-v1-5</span></div>
+      <div class="metric"><strong>Unique images</strong><span>21</span></div>
+    </div>
+  </section>
+  <details class="card" open>
+    <summary>Demonstration Overview</summary>
+    <div class="card-body stack">
+      <div class="callout">
+      <h2>Demonstration Objective</h2>
+      <p>Demonstrate that StableSteering can start from a rich user text prompt and then guide image generation toward a sharper, more premium product-marketing result through iterative user preferences rather than one-shot prompting.</p>
+      </div>
+      <div class="columns">
+      <div>
+        <h3>Success Criteria</h3>
+        <ul>
+          <li>The first round should include the unmodified-prompt baseline plus clearly different on-theme alternatives.</li>
+          <li>Later rounds should preserve the previous winner while still exploring nearby alternatives.</li>
+          <li>User preference should steer the session toward stronger silhouette, lighting, and premium material detail.</li>
+          <li>By round five, the session should look more aligned with the desired hero-shot direction than the initial round.</li>
+          <li>The report should make the proposal, selection, and update logic easy to inspect after the run.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Demo Script</h3>
+        <ol>
+          <li>Start from a user-written product prompt rather than a hidden preset.</li>
+          <li>Generate a first comparison round and inspect the baseline prompt render beside two steered alternatives.</li>
+          <li>Choose the candidate with the strongest hero-shot silhouette and lighting.</li>
+          <li>Generate additional rounds that keep the previous winner visible while exploring nearby refinements.</li>
+          <li>Continue for five rounds so the session history shows convergence instead of a one-step jump.</li>
+          <li>Review the report to see the proposed images, critiques, and incumbent transitions together.</li>
+        </ol>
+      </div>
+    </div>
+    </div>
+  </details>
+  <details class="card" open>
+    <summary>Run Setup</summary>
+    <div class="card-body stack">
+      <div>
+      <h2>Run Setup</h2>
+      <p><strong>Initial prompt:</strong> A premium cinematic product hero photo of an expedition-ready electric explorer motorcycle, photographed in a desert sunrise studio set with brushed titanium surfaces, crisp rim lighting, and magazine-cover composition</p>
+      <p><strong>Negative prompt:</strong> blurry, low contrast, flat lighting, distorted wheels, text, watermark, cluttered background, cropped subject</p>
+      <p><strong>Sampler:</strong> <code>random_local</code> | <strong>Updater:</strong> <code>winner_average</code> | <strong>Feedback mode:</strong> <code>scalar_rating</code></p>
+      <p><strong>Output file:</strong> <code>E:\Projects\StableSteering\output\examples\real_e2e_example_run\real_e2e_example_run.html</code></p>
+      </div>
+      <pre>{
+  &quot;active_device&quot;: &quot;cuda&quot;,
+  &quot;backend&quot;: &quot;diffusers&quot;,
+  &quot;configured_device&quot;: &quot;cuda&quot;,
+  &quot;cuda_available&quot;: true,
+  &quot;local_files_only&quot;: true,
+  &quot;model_source&quot;: &quot;models\\runwayml--stable-diffusion-v1-5&quot;,
+  &quot;num_inference_steps&quot;: 30,
+  &quot;pipeline_loaded&quot;: true,
+  &quot;test_only_backend&quot;: false,
+  &quot;torch_available&quot;: true
+}</pre>
+    </div>
+  </details>
+  <details class="card" open>
+    <summary>Automated Visual Checks</summary>
+    <div class="card-body stack">
+      <div>
+      <h2>Automated Visual Checks</h2>
+      <p>These checks do not prove semantic correctness, but they do catch common generation failures such as blank-looking outputs, unreadable files, low-detail artifacts, and accidental duplication.</p>
+      </div>
+      <div class="metrics">
+      <div class="metric"><strong>Unique image files</strong><span>21</span></div>
+      <div class="metric"><strong>Reused candidates</strong><span>4</span></div>
+      <div class="metric"><strong>Flagged images</strong><span>0</span></div>
+      <div class="metric"><strong>Duplicate groups</strong><span>8</span></div>
+      </div>
+      <table>
+      <thead><tr><th>Image</th><th>Candidates</th><th>Size</th><th>Entropy</th><th>Contrast</th><th>Edges</th><th>Status</th></tr></thead>
+      <tbody>
+      <tr><td><code>images/cand_04a6741d7482.png</code></td><td>cand_04a6741d7482</td><td>512x512</td><td>7.67</td><td>72.416</td><td>20.865</td><td>ok</td></tr>
+      <tr><td><code>images/cand_0aff0d4f2c75.png</code></td><td>cand_0aff0d4f2c75</td><td>512x512</td><td>6.91</td><td>70.678</td><td>22.398</td><td>ok</td></tr>
+      <tr><td><code>images/cand_10a6328aee84.png</code></td><td>cand_10a6328aee84</td><td>512x512</td><td>7.713</td><td>70.914</td><td>20.923</td><td>ok</td></tr>
+      <tr><td><code>images/cand_1314ccbf744d.png</code></td><td>cand_1314ccbf744d</td><td>512x512</td><td>7.689</td><td>62.376</td><td>21.337</td><td>ok</td></tr>
+      <tr><td><code>images/cand_40184020ad44.png</code></td><td>cand_40184020ad44</td><td>512x512</td><td>7.613</td><td>55.575</td><td>20.497</td><td>ok</td></tr>
+      <tr><td><code>images/cand_4eb33a1805a7.png</code></td><td>cand_4eb33a1805a7, cand_dfd9ed02c820</td><td>512x512</td><td>7.716</td><td>72.684</td><td>26.238</td><td>ok</td></tr>
+      <tr><td><code>images/cand_54b5edacc97c.png</code></td><td>cand_54b5edacc97c</td><td>512x512</td><td>7.686</td><td>63.331</td><td>21.003</td><td>ok</td></tr>
+      <tr><td><code>images/cand_60e21d315701.png</code></td><td>cand_60e21d315701</td><td>512x512</td><td>6.916</td><td>70.839</td><td>22.582</td><td>ok</td></tr>
+      <tr><td><code>images/cand_6b3404d19e43.png</code></td><td>cand_6b3404d19e43</td><td>512x512</td><td>7.688</td><td>62.98</td><td>21.3</td><td>ok</td></tr>
+      <tr><td><code>images/cand_749b24fbd6a8.png</code></td><td>cand_749b24fbd6a8, cand_70e6f644d4c1</td><td>512x512</td><td>7.727</td><td>72.44</td><td>20.995</td><td>ok</td></tr>
+      <tr><td><code>images/cand_7672e8261b44.png</code></td><td>cand_7672e8261b44</td><td>512x512</td><td>7.608</td><td>54.919</td><td>20.842</td><td>ok</td></tr>
+      <tr><td><code>images/cand_77960d6abe0a.png</code></td><td>cand_77960d6abe0a</td><td>512x512</td><td>7.677</td><td>72.392</td><td>20.907</td><td>ok</td></tr>
+      <tr><td><code>images/cand_779fa4006d0d.png</code></td><td>cand_779fa4006d0d</td><td>512x512</td><td>7.599</td><td>54.23</td><td>21.204</td><td>ok</td></tr>
+      <tr><td><code>images/cand_7bb9addbefaf.png</code></td><td>cand_7bb9addbefaf</td><td>512x512</td><td>7.61</td><td>55.177</td><td>20.61</td><td>ok</td></tr>
+      <tr><td><code>images/cand_ad92e36572ab.png</code></td><td>cand_ad92e36572ab</td><td>512x512</td><td>6.917</td><td>70.719</td><td>22.651</td><td>ok</td></tr>
+      <tr><td><code>images/cand_afc9e17badeb.png</code></td><td>cand_afc9e17badeb</td><td>512x512</td><td>7.738</td><td>72.085</td><td>26.774</td><td>ok</td></tr>
+      <tr><td><code>images/cand_b4c29fa0808a.png</code></td><td>cand_b4c29fa0808a</td><td>512x512</td><td>7.671</td><td>64.868</td><td>20.904</td><td>ok</td></tr>
+      <tr><td><code>images/cand_cee625ac99e1.png</code></td><td>cand_cee625ac99e1</td><td>512x512</td><td>6.923</td><td>70.842</td><td>22.585</td><td>ok</td></tr>
+      <tr><td><code>images/cand_d4781bb0be7e.png</code></td><td>cand_d4781bb0be7e, cand_a551008d5f4e, cand_a402a3e10946</td><td>512x512</td><td>7.678</td><td>64.588</td><td>21.025</td><td>ok</td></tr>
+      <tr><td><code>images/cand_e4e9b045e4e0.png</code></td><td>cand_e4e9b045e4e0</td><td>512x512</td><td>7.713</td><td>72.845</td><td>26.016</td><td>ok</td></tr>
+      <tr><td><code>images/cand_e67a9355f386.png</code></td><td>cand_e67a9355f386</td><td>512x512</td><td>7.743</td><td>71.872</td><td>27.046</td><td>ok</td></tr>
+      </tbody>
+    </table>
+      <pre>{
+  &quot;duplicate_groups&quot;: [
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_04a6741d7482&quot;,
+        &quot;cand_77960d6abe0a&quot;
+      ],
+      &quot;hash&quot;: &quot;1111011111110111001000110000001000000000111000001100000010001100&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_04a6741d7482.png&quot;,
+        &quot;images/cand_77960d6abe0a.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_0aff0d4f2c75&quot;,
+        &quot;cand_60e21d315701&quot;,
+        &quot;cand_ad92e36572ab&quot;,
+        &quot;cand_cee625ac99e1&quot;
+      ],
+      &quot;hash&quot;: &quot;1111111111101111110011001000000100000000000000000011110011111111&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_0aff0d4f2c75.png&quot;,
+        &quot;images/cand_60e21d315701.png&quot;,
+        &quot;images/cand_ad92e36572ab.png&quot;,
+        &quot;images/cand_cee625ac99e1.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_1314ccbf744d&quot;,
+        &quot;cand_6b3404d19e43&quot;
+      ],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011101100&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_1314ccbf744d.png&quot;,
+        &quot;images/cand_6b3404d19e43.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_40184020ad44&quot;,
+        &quot;cand_779fa4006d0d&quot;
+      ],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001110&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_40184020ad44.png&quot;,
+        &quot;images/cand_779fa4006d0d.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_4eb33a1805a7&quot;,
+        &quot;cand_dfd9ed02c820&quot;,
+        &quot;cand_e4e9b045e4e0&quot;
+      ],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000000000000000&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_4eb33a1805a7.png&quot;,
+        &quot;images/cand_e4e9b045e4e0.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_54b5edacc97c&quot;,
+        &quot;cand_d4781bb0be7e&quot;,
+        &quot;cand_a551008d5f4e&quot;,
+        &quot;cand_a402a3e10946&quot;
+      ],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011111100&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_54b5edacc97c.png&quot;,
+        &quot;images/cand_d4781bb0be7e.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_7672e8261b44&quot;,
+        &quot;cand_7bb9addbefaf&quot;
+      ],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001111&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_7672e8261b44.png&quot;,
+        &quot;images/cand_7bb9addbefaf.png&quot;
+      ]
+    },
+    {
+      &quot;candidate_ids&quot;: [
+        &quot;cand_afc9e17badeb&quot;,
+        &quot;cand_e67a9355f386&quot;
+      ],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000001000000000&quot;,
+      &quot;paths&quot;: [
+        &quot;images/cand_afc9e17badeb.png&quot;,
+        &quot;images/cand_e67a9355f386.png&quot;
+      ]
+    }
+  ],
+  &quot;failing_images&quot;: [],
+  &quot;per_image&quot;: [
+    {
+      &quot;brightness_mean&quot;: 113.588,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_04a6741d7482&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.416,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.865,
+      &quot;entropy&quot;: 7.67,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111011111110111001000110000001000000000111000001100000010001100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_04a6741d7482.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_04a6741d7482.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 112.347,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_0aff0d4f2c75&quot;
+      ],
+      &quot;channel_stddev&quot;: 70.678,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 22.398,
+      &quot;entropy&quot;: 6.91,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111101111110011001000000100000000000000000011110011111111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_0aff0d4f2c75.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_0aff0d4f2c75.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 113.496,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_10a6328aee84&quot;
+      ],
+      &quot;channel_stddev&quot;: 70.914,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.923,
+      &quot;entropy&quot;: 7.713,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111011111110111001000110000001001000000111000001100100010001100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_10a6328aee84.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_10a6328aee84.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 94.413,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_1314ccbf744d&quot;
+      ],
+      &quot;channel_stddev&quot;: 62.376,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 21.337,
+      &quot;entropy&quot;: 7.689,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011101100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_1314ccbf744d.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_1314ccbf744d.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 109.637,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_40184020ad44&quot;
+      ],
+      &quot;channel_stddev&quot;: 55.575,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.497,
+      &quot;entropy&quot;: 7.613,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001110&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_40184020ad44.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_40184020ad44.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 118.777,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_4eb33a1805a7&quot;,
+        &quot;cand_dfd9ed02c820&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.684,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 26.238,
+      &quot;entropy&quot;: 7.716,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000000000000000&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_4eb33a1805a7.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_4eb33a1805a7.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 94.267,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_54b5edacc97c&quot;
+      ],
+      &quot;channel_stddev&quot;: 63.331,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 21.003,
+      &quot;entropy&quot;: 7.686,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011111100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_54b5edacc97c.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_54b5edacc97c.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 112.398,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_60e21d315701&quot;
+      ],
+      &quot;channel_stddev&quot;: 70.839,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 22.582,
+      &quot;entropy&quot;: 6.916,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111101111110011001000000100000000000000000011110011111111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_60e21d315701.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_60e21d315701.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 94.095,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_6b3404d19e43&quot;
+      ],
+      &quot;channel_stddev&quot;: 62.98,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 21.3,
+      &quot;entropy&quot;: 7.688,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011101100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_6b3404d19e43.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_6b3404d19e43.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 113.363,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_749b24fbd6a8&quot;,
+        &quot;cand_70e6f644d4c1&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.44,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.995,
+      &quot;entropy&quot;: 7.727,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111011111110111001000110000001001000000111000001100000010001100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_749b24fbd6a8.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_749b24fbd6a8.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 109.536,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_7672e8261b44&quot;
+      ],
+      &quot;channel_stddev&quot;: 54.919,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.842,
+      &quot;entropy&quot;: 7.608,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_7672e8261b44.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_7672e8261b44.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 113.683,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_77960d6abe0a&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.392,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.907,
+      &quot;entropy&quot;: 7.677,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111011111110111001000110000001000000000111000001100000010001100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_77960d6abe0a.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_77960d6abe0a.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 110.017,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_779fa4006d0d&quot;
+      ],
+      &quot;channel_stddev&quot;: 54.23,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 21.204,
+      &quot;entropy&quot;: 7.599,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001110&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_779fa4006d0d.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_779fa4006d0d.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 109.506,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_7bb9addbefaf&quot;
+      ],
+      &quot;channel_stddev&quot;: 55.177,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.61,
+      &quot;entropy&quot;: 7.61,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111011111111111111111001000000010000000000000000110000001111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_7bb9addbefaf.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_7bb9addbefaf.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 112.24,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_ad92e36572ab&quot;
+      ],
+      &quot;channel_stddev&quot;: 70.719,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 22.651,
+      &quot;entropy&quot;: 6.917,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111101111110011001000000100000000000000000011110011111111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_ad92e36572ab.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_ad92e36572ab.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 119.013,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_afc9e17badeb&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.085,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 26.774,
+      &quot;entropy&quot;: 7.738,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000001000000000&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_afc9e17badeb.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_afc9e17badeb.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 94.254,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_b4c29fa0808a&quot;
+      ],
+      &quot;channel_stddev&quot;: 64.868,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 20.904,
+      &quot;entropy&quot;: 7.671,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111111111100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_b4c29fa0808a.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_b4c29fa0808a.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 112.479,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_cee625ac99e1&quot;
+      ],
+      &quot;channel_stddev&quot;: 70.842,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 22.585,
+      &quot;entropy&quot;: 6.923,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111101111110011001000000100000000000000000011110011111111&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_cee625ac99e1.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_cee625ac99e1.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 94.171,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_d4781bb0be7e&quot;,
+        &quot;cand_a551008d5f4e&quot;,
+        &quot;cand_a402a3e10946&quot;
+      ],
+      &quot;channel_stddev&quot;: 64.588,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 21.025,
+      &quot;entropy&quot;: 7.678,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111000011110000111100001111000000011100000011110000111011111100&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_d4781bb0be7e.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_d4781bb0be7e.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 118.905,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_e4e9b045e4e0&quot;
+      ],
+      &quot;channel_stddev&quot;: 72.845,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 26.016,
+      &quot;entropy&quot;: 7.713,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000000000000000&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_e4e9b045e4e0.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_e4e9b045e4e0.png&quot;,
+      &quot;width&quot;: 512
+    },
+    {
+      &quot;brightness_mean&quot;: 118.84,
+      &quot;candidate_ids&quot;: [
+        &quot;cand_e67a9355f386&quot;
+      ],
+      &quot;channel_stddev&quot;: 71.872,
+      &quot;checks&quot;: {
+        &quot;expected_min_size&quot;: true,
+        &quot;has_contrast&quot;: true,
+        &quot;has_edge_detail&quot;: true,
+        &quot;non_blank_entropy&quot;: true,
+        &quot;readable&quot;: true
+      },
+      &quot;edge_mean&quot;: 27.046,
+      &quot;entropy&quot;: 7.743,
+      &quot;failed_checks&quot;: [],
+      &quot;hash&quot;: &quot;1111111111111111110100000000011111000011110000110000001000000000&quot;,
+      &quot;height&quot;: 512,
+      &quot;passed_checks&quot;: 5,
+      &quot;path&quot;: &quot;output\\examples\\real_e2e_example_run\\images\\cand_e67a9355f386.png&quot;,
+      &quot;relative_path&quot;: &quot;images/cand_e67a9355f386.png&quot;,
+      &quot;width&quot;: 512
+    }
+  ],
+  &quot;summary&quot;: {
+    &quot;candidate_count&quot;: 25,
+    &quot;duplicate_image_group_count&quot;: 8,
+    &quot;failing_image_count&quot;: 0,
+    &quot;reused_candidate_count&quot;: 4,
+    &quot;round_count&quot;: 5,
+    &quot;unique_image_count&quot;: 21
+  }
+}</pre>
+    </div>
+  </details>
+  <details class="card round">
+    <summary>Phase 1: propose, inspect, choose, update</summary>
+    <div class="card-body">
+    <p class="eyebrow">Round 1</p>
+    <p><span class="pill">Round id: rnd_4af3c3595d07</span><span class="pill">Latency: 75 ms</span><span class="pill">Incumbent z before update: [0.0, 0.0, 0.0]</span></p>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="images/cand_54b5edacc97c.png" alt="cand_54b5edacc97c">
+        <div class="body">
+          <p><strong>cand_54b5edacc97c</strong></p>
+          <p>Role: baseline_prompt</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[0.0, 0.0, 0.0]</code></p>
+          <p>User rating: <strong>2</strong></p>
+        </div>
+      </article>
+      <article class="candidate winner">
+        <img src="images/cand_d4781bb0be7e.png" alt="cand_d4781bb0be7e">
+        <div class="body">
+          <p><strong>cand_d4781bb0be7e</strong></p>
+          <p>Role: exploit</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[0.22567046032288227, 0.13817809383315344, -0.32615894548869057]</code></p>
+          <p>User rating: <strong>5</strong></p>
+          <p><strong>Selected as winner for the next phase.</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_1314ccbf744d.png" alt="cand_1314ccbf744d">
+        <div class="body">
+          <p><strong>cand_1314ccbf744d</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[-0.2832319610829823, -0.06182129168339038, 0.06681342766005305]</code></p>
+          <p>User rating: <strong>4</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_b4c29fa0808a.png" alt="cand_b4c29fa0808a">
+        <div class="body">
+          <p><strong>cand_b4c29fa0808a</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[0.35969798681474713, -0.2780102556505814, 0.12877851542286223]</code></p>
+          <p>User rating: <strong>3</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_6b3404d19e43.png" alt="cand_6b3404d19e43">
+        <div class="body">
+          <p><strong>cand_6b3404d19e43</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[-0.14826147778546586, -0.012191407779111561, -0.3243106658784133]</code></p>
+          <p>User rating: <strong>1</strong></p>
+        </div>
+      </article>
+    </div>
+    <h3>User Action</h3>
+    <p>The unmodified prompt baseline is promising, but candidate 2 has the clearest silhouette, the strongest sunrise rim light, and the most premium hero-shot composition. The extra alternatives are useful, but they do not beat the top two.</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_1314ccbf744d&quot;: 4,
+    &quot;cand_54b5edacc97c&quot;: 2,
+    &quot;cand_6b3404d19e43&quot;: 1,
+    &quot;cand_b4c29fa0808a&quot;: 3,
+    &quot;cand_d4781bb0be7e&quot;: 5
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_d4781bb0be7e&quot;
+}</pre>
+    <h3>Next Phase State</h3>
+    <pre>{
+  &quot;method&quot;: &quot;average&quot;,
+  &quot;updater&quot;: &quot;winner_average&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_d4781bb0be7e&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card round">
+    <summary>Phase 2: propose, inspect, choose, update</summary>
+    <div class="card-body">
+    <p class="eyebrow">Round 2</p>
+    <p><span class="pill">Round id: rnd_473c1114facf</span><span class="pill">Latency: 75 ms</span><span class="pill">Incumbent z before update: [0.112835, 0.069089, -0.163079]</span></p>
+    <div class="candidate-grid">
+      <article class="candidate winner">
+        <img src="images/cand_d4781bb0be7e.png" alt="cand_a551008d5f4e">
+        <div class="body">
+          <p><strong>cand_a551008d5f4e</strong></p>
+          <p>Role: incumbent</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[0.22567046032288227, 0.13817809383315344, -0.32615894548869057]</code></p>
+          <p>User rating: <strong>5</strong></p>
+          <p><strong>Selected as winner for the next phase.</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_60e21d315701.png" alt="cand_60e21d315701">
+        <div class="body">
+          <p><strong>cand_60e21d315701</strong></p>
+          <p>Role: exploit</p>
+          <p>Seed: 1001</p>
+          <p>z: <code>[0.2798897280857549, -0.20948468041302465, 0.016670596400102274]</code></p>
+          <p>User rating: <strong>4</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_0aff0d4f2c75.png" alt="cand_0aff0d4f2c75">
+        <div class="body">
+          <p><strong>cand_0aff0d4f2c75</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1001</p>
+          <p>z: <code>[0.2901694849843532, -0.17171420789001926, 0.09389302845588945]</code></p>
+          <p>User rating: <strong>2</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_ad92e36572ab.png" alt="cand_ad92e36572ab">
+        <div class="body">
+          <p><strong>cand_ad92e36572ab</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1001</p>
+          <p>z: <code>[0.2730457329924515, 0.0032845919203293387, -0.2189411773754123]</code></p>
+          <p>User rating: <strong>3</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_cee625ac99e1.png" alt="cand_cee625ac99e1">
+        <div class="body">
+          <p><strong>cand_cee625ac99e1</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1001</p>
+          <p>z: <code>[0.2171533598039483, -0.00026373374001016636, -0.1126013541605698]</code></p>
+          <p>User rating: <strong>1</strong></p>
+        </div>
+      </article>
+    </div>
+    <h3>User Action</h3>
+    <p>Keep the carried-forward winner, but push harder toward cleaner panel detail and a stronger studio-product framing.</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_0aff0d4f2c75&quot;: 2,
+    &quot;cand_60e21d315701&quot;: 4,
+    &quot;cand_a551008d5f4e&quot;: 5,
+    &quot;cand_ad92e36572ab&quot;: 3,
+    &quot;cand_cee625ac99e1&quot;: 1
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_a551008d5f4e&quot;
+}</pre>
+    <h3>Next Phase State</h3>
+    <pre>{
+  &quot;method&quot;: &quot;average&quot;,
+  &quot;updater&quot;: &quot;winner_average&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_a551008d5f4e&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card round">
+    <summary>Phase 3: propose, inspect, choose, update</summary>
+    <div class="card-body">
+    <p class="eyebrow">Round 3</p>
+    <p><span class="pill">Round id: rnd_f38da9fc9731</span><span class="pill">Latency: 75 ms</span><span class="pill">Incumbent z before update: [0.169253, 0.103634, -0.244619]</span></p>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="images/cand_d4781bb0be7e.png" alt="cand_a402a3e10946">
+        <div class="body">
+          <p><strong>cand_a402a3e10946</strong></p>
+          <p>Role: incumbent</p>
+          <p>Seed: 1000</p>
+          <p>z: <code>[0.22567046032288227, 0.13817809383315344, -0.32615894548869057]</code></p>
+          <p>User rating: <strong>4</strong></p>
+        </div>
+      </article>
+      <article class="candidate winner">
+        <img src="images/cand_4eb33a1805a7.png" alt="cand_4eb33a1805a7">
+        <div class="body">
+          <p><strong>cand_4eb33a1805a7</strong></p>
+          <p>Role: exploit</p>
+          <p>Seed: 1002</p>
+          <p>z: <code>[0.1342982469459871, 0.035421938344289416, -0.3212619914511644]</code></p>
+          <p>User rating: <strong>5</strong></p>
+          <p><strong>Selected as winner for the next phase.</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_afc9e17badeb.png" alt="cand_afc9e17badeb">
+        <div class="body">
+          <p><strong>cand_afc9e17badeb</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1002</p>
+          <p>z: <code>[-0.089511041258306, 0.0924044379029807, -0.15635672358638816]</code></p>
+          <p>User rating: <strong>3</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_e4e9b045e4e0.png" alt="cand_e4e9b045e4e0">
+        <div class="body">
+          <p><strong>cand_e4e9b045e4e0</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1002</p>
+          <p>z: <code>[0.19383602920696896, 0.18978442503331863, -0.22115484574398928]</code></p>
+          <p>User rating: <strong>2</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_e67a9355f386.png" alt="cand_e67a9355f386">
+        <div class="body">
+          <p><strong>cand_e67a9355f386</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1002</p>
+          <p>z: <code>[-0.14707839498962788, -0.08852670549600106, -0.042635368387300726]</code></p>
+          <p>User rating: <strong>1</strong></p>
+        </div>
+      </article>
+    </div>
+    <h3>User Action</h3>
+    <p>Candidate 2 improves the bodywork and surfacing. It feels more like a premium launch image while staying true to the concept.</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_4eb33a1805a7&quot;: 5,
+    &quot;cand_a402a3e10946&quot;: 4,
+    &quot;cand_afc9e17badeb&quot;: 3,
+    &quot;cand_e4e9b045e4e0&quot;: 2,
+    &quot;cand_e67a9355f386&quot;: 1
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_4eb33a1805a7&quot;
+}</pre>
+    <h3>Next Phase State</h3>
+    <pre>{
+  &quot;method&quot;: &quot;average&quot;,
+  &quot;updater&quot;: &quot;winner_average&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_4eb33a1805a7&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card round">
+    <summary>Phase 4: propose, inspect, choose, update</summary>
+    <div class="card-body">
+    <p class="eyebrow">Round 4</p>
+    <p><span class="pill">Round id: rnd_2e888c3de11d</span><span class="pill">Latency: 75 ms</span><span class="pill">Incumbent z before update: [0.151776, 0.069528, -0.28294]</span></p>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="images/cand_4eb33a1805a7.png" alt="cand_dfd9ed02c820">
+        <div class="body">
+          <p><strong>cand_dfd9ed02c820</strong></p>
+          <p>Role: incumbent</p>
+          <p>Seed: 1002</p>
+          <p>z: <code>[0.1342982469459871, 0.035421938344289416, -0.3212619914511644]</code></p>
+          <p>User rating: <strong>4</strong></p>
+        </div>
+      </article>
+      <article class="candidate winner">
+        <img src="images/cand_749b24fbd6a8.png" alt="cand_749b24fbd6a8">
+        <div class="body">
+          <p><strong>cand_749b24fbd6a8</strong></p>
+          <p>Role: exploit</p>
+          <p>Seed: 1003</p>
+          <p>z: <code>[0.14991499465786226, -0.028478680197820266, -0.12749677029339773]</code></p>
+          <p>User rating: <strong>5</strong></p>
+          <p><strong>Selected as winner for the next phase.</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_04a6741d7482.png" alt="cand_04a6741d7482">
+        <div class="body">
+          <p><strong>cand_04a6741d7482</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1003</p>
+          <p>z: <code>[0.06396126428287137, 0.020604975101235733, -0.34348856119587756]</code></p>
+          <p>User rating: <strong>3</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_77960d6abe0a.png" alt="cand_77960d6abe0a">
+        <div class="body">
+          <p><strong>cand_77960d6abe0a</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1003</p>
+          <p>z: <code>[0.03620662563416585, 0.05240881699163727, -0.3170135044195643]</code></p>
+          <p>User rating: <strong>2</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_10a6328aee84.png" alt="cand_10a6328aee84">
+        <div class="body">
+          <p><strong>cand_10a6328aee84</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1003</p>
+          <p>z: <code>[-0.11249688398609388, -0.06081881192678259, -0.3257998207630476]</code></p>
+          <p>User rating: <strong>1</strong></p>
+        </div>
+      </article>
+    </div>
+    <h3>User Action</h3>
+    <p>Candidate 2 has the best balance of dramatic lighting and realistic product geometry. Keep that direction for the next phase.</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_04a6741d7482&quot;: 3,
+    &quot;cand_10a6328aee84&quot;: 1,
+    &quot;cand_749b24fbd6a8&quot;: 5,
+    &quot;cand_77960d6abe0a&quot;: 2,
+    &quot;cand_dfd9ed02c820&quot;: 4
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_749b24fbd6a8&quot;
+}</pre>
+    <h3>Next Phase State</h3>
+    <pre>{
+  &quot;method&quot;: &quot;average&quot;,
+  &quot;updater&quot;: &quot;winner_average&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_749b24fbd6a8&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card round">
+    <summary>Phase 5: propose, inspect, choose, update</summary>
+    <div class="card-body">
+    <p class="eyebrow">Round 5</p>
+    <p><span class="pill">Round id: rnd_368dae396e8c</span><span class="pill">Latency: 75 ms</span><span class="pill">Incumbent z before update: [0.150845, 0.020525, -0.205218]</span></p>
+    <div class="candidate-grid">
+      <article class="candidate winner">
+        <img src="images/cand_749b24fbd6a8.png" alt="cand_70e6f644d4c1">
+        <div class="body">
+          <p><strong>cand_70e6f644d4c1</strong></p>
+          <p>Role: incumbent</p>
+          <p>Seed: 1003</p>
+          <p>z: <code>[0.14991499465786226, -0.028478680197820266, -0.12749677029339773]</code></p>
+          <p>User rating: <strong>5</strong></p>
+          <p><strong>Selected as winner for the next phase.</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_779fa4006d0d.png" alt="cand_779fa4006d0d">
+        <div class="body">
+          <p><strong>cand_779fa4006d0d</strong></p>
+          <p>Role: exploit</p>
+          <p>Seed: 1004</p>
+          <p>z: <code>[0.08637187510519709, 0.3195399262019423, -0.11372833751387325]</code></p>
+          <p>User rating: <strong>4</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_7672e8261b44.png" alt="cand_7672e8261b44">
+        <div class="body">
+          <p><strong>cand_7672e8261b44</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1004</p>
+          <p>z: <code>[0.19552183226008857, 0.01827469832834135, -0.2897192580942211]</code></p>
+          <p>User rating: <strong>3</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_7bb9addbefaf.png" alt="cand_7bb9addbefaf">
+        <div class="body">
+          <p><strong>cand_7bb9addbefaf</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1004</p>
+          <p>z: <code>[0.21646501569106288, 0.14847670648461508, -0.23151147836197966]</code></p>
+          <p>User rating: <strong>2</strong></p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="images/cand_40184020ad44.png" alt="cand_40184020ad44">
+        <div class="body">
+          <p><strong>cand_40184020ad44</strong></p>
+          <p>Role: explore</p>
+          <p>Seed: 1004</p>
+          <p>z: <code>[0.25620689110974737, 0.1607571334057184, -0.05469423166428533]</code></p>
+          <p>User rating: <strong>1</strong></p>
+        </div>
+      </article>
+    </div>
+    <h3>User Action</h3>
+    <p>The incumbent now reads like the strongest finished hero image, so preserve it as the final preferred direction.</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_40184020ad44&quot;: 1,
+    &quot;cand_70e6f644d4c1&quot;: 5,
+    &quot;cand_7672e8261b44&quot;: 3,
+    &quot;cand_779fa4006d0d&quot;: 4,
+    &quot;cand_7bb9addbefaf&quot;: 2
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_70e6f644d4c1&quot;
+}</pre>
+    <h3>Next Phase State</h3>
+    <pre>{
+  &quot;method&quot;: &quot;average&quot;,
+  &quot;updater&quot;: &quot;winner_average&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_70e6f644d4c1&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card" open>
+    <summary>Outcome</summary>
+    <div class="card-body">
+    <h2>Outcome</h2>
+    <p>The session ended at round <strong>5</strong> with incumbent candidate <code>cand_70e6f644d4c1</code>.</p>
+    <p>This report demonstrates system value by showing that the workflow does not stop at one prompt and one image. It keeps the user in a controlled compare-select-update loop with visible evidence for what was proposed, what was preferred, and how the next state was chosen.</p>
+    <p>Backend session traces and the auto-generated audit report also exist under <code>E:\Projects\StableSteering\output\examples\real_e2e_example_run\data\traces</code>.</p>
+    </div>
+  </details>
+</main>
+</body>
+</html>

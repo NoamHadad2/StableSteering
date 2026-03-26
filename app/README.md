@@ -37,7 +37,8 @@ This folder contains the running StableSteering application.
 ## Runtime flow
 
 1. `main.py` creates the FastAPI app and runtime services.
-2. `engine/orchestrator.py` coordinates experiment, session, round, and feedback lifecycle.
-3. `engine/generation.py` resolves the active generation backend.
-4. `storage/repository.py` persists experiments, sessions, rounds, artifacts, and trace data references.
-5. `frontend/` renders the UI, submits async jobs, shows progress, and posts browser events back to the backend.
+2. `frontend/` renders the prompt-first setup page, including the editable per-session YAML block.
+3. `engine/orchestrator.py` coordinates experiment, session, round, baseline or incumbent carry-forward, and feedback lifecycle.
+4. `engine/generation.py` resolves the active generation backend and applies the per-session generation settings.
+5. `storage/repository.py` persists experiments, sessions, rounds, artifacts, and trace data references.
+6. `frontend/` submits async jobs, shows progress, and posts browser events back to the backend.

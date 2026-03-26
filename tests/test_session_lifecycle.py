@@ -52,6 +52,25 @@ def test_setup_session_endpoint_rejects_invalid_yaml(client) -> None:
     assert "Invalid YAML configuration" in payload["message"]
 
 
+def test_setup_session_endpoint_rejects_unknown_sampler(client) -> None:
+    response = client.post(
+        "/setup/session",
+        json={
+            "experiment_name": "Bad sampler",
+            "description": "",
+            "prompt": "Broken sampler config",
+            "negative_prompt": "",
+            "config_yaml": """
+sampler: definitely_not_real
+""",
+        },
+    )
+    assert response.status_code == 400
+    payload = response.json()
+    assert payload["error_code"] == "invalid_input"
+    assert "sampler" in payload["message"]
+
+
 def test_session_lifecycle_round_feedback_round(client) -> None:
     experiment = client.post(
         "/experiments",

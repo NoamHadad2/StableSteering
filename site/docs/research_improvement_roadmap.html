@@ -262,6 +262,24 @@
 <ul>
 <li>the influence of interface design on measured outcomes is quantified rather than ignored</li>
 </ul>
+<h3 id="74-study-richer-elicitation-modes-and-ui-patterns">7.4 Study richer elicitation modes and UI patterns</h3>
+<p>Why it matters:</p>
+<ul>
+<li>preference quality depends not only on the model but also on how the system asks for user judgments</li>
+<li>some workflows may benefit more from shortlist, critique, or incumbent-comparison interactions than from one-shot winner choice</li>
+</ul>
+<p>Implementation notes:</p>
+<ul>
+<li>compare shortlist selection, best-versus-incumbent, approve/reject, pairwise tournament, and critique-assisted workflows</li>
+<li>study when structured reason tags improve preference consistency or update quality</li>
+<li>compare forced-choice interfaces against interfaces that allow uncertainty or "cannot decide" responses</li>
+<li>measure whether region-aware or attribute-aware elicitation helps for inpainting and image-prompt tasks</li>
+<li>analyze whether elicitation mode changes the apparent value of a sampler or preference model</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>the research program can explain which UI/elicitation modes work best for which task families and user goals</li>
+</ul>
 <h2 id="8-r1-synthetic-data-research-direction">8. R1: Synthetic Data Research Direction</h2>
 <h3 id="81-build-realistic-synthetic-steering-trajectories-toward-an-anchor">8.1 Build realistic synthetic steering trajectories toward an anchor</h3>
 <p>Why it matters:</p>
@@ -375,12 +393,32 @@
 <li>compare current samplers with Thompson-style, quality-diversity, critique-conditioned, and adaptive trust-region methods</li>
 <li>evaluate both human-judged quality and synthetic benchmark performance</li>
 <li>test whether some samplers pair better with specific feedback modes or update rules</li>
+<li>include incumbent-versus-challenger and shortlist-aware samplers that explicitly optimize for comparison quality, not only search quality</li>
+<li>compare one-step greedy samplers against multi-round planning or lookahead samplers</li>
 </ul>
 <p>Success signal:</p>
 <ul>
 <li>sampler comparisons reveal clear tradeoffs in exploration, stability, and user burden</li>
 </ul>
-<h3 id="93-add-stronger-updaters">9.3 Add stronger updaters</h3>
+<h3 id="93-add-stronger-preference-and-reward-models">9.3 Add stronger preference and reward models</h3>
+<p>Why it matters:</p>
+<ul>
+<li>simple winner heuristics are easy to inspect, but they may waste information from rankings, approvals, uncertainty, and critiques</li>
+<li>richer preference models can become the bridge between elicitation design and smarter candidate proposal</li>
+</ul>
+<p>Implementation notes:</p>
+<ul>
+<li>compare Bradley-Terry, Plackett-Luce, Bayesian preference, and listwise reward models</li>
+<li>test models that incorporate confidence, near ties, or "cannot decide" outcomes instead of discarding them</li>
+<li>test critique-aware models that combine discrete selections with structured or free-text reasons</li>
+<li>compare models that infer absolute latent quality against models that only learn relative preference</li>
+<li>study whether posterior uncertainty from preference models improves downstream samplers</li>
+</ul>
+<p>Success signal:</p>
+<ul>
+<li>the project has evidence about which preference-model family best converts user judgments into useful steering signals</li>
+</ul>
+<h3 id="94-add-stronger-updaters">9.4 Add stronger updaters</h3>
 <p>Why it matters:</p>
 <ul>
 <li>the update rule determines how user judgments become steering-state movement</li>
@@ -389,6 +427,7 @@
 <p>Implementation notes:</p>
 <ul>
 <li>compare current simple updaters with Bradley-Terry, Bayesian preference, contextual bandit, and critique-aware approaches</li>
+<li>compare direct latent-state update rules against preference-model-plus-policy decompositions</li>
 <li>evaluate update sensitivity, robustness to noisy feedback, and stability over multiple rounds</li>
 <li>test how updater choice interacts with sampler choice and feedback modality</li>
 </ul>
@@ -415,8 +454,10 @@
 <h3 id="milestone-r-c-comparative-research">Milestone R-C: Comparative Research</h3>
 <ul>
 <li>compare samplers</li>
+<li>compare preference and reward models</li>
 <li>compare updaters</li>
 <li>compare feedback modalities</li>
+<li>compare elicitation/UI modes</li>
 <li>compare representation strategies</li>
 <li>compare synthetic-user regimes against real-user outcomes</li>
 <li>compare steering behavior across text-to-image, image-prompt, inpainting, and ControlNet workflows</li>
@@ -431,13 +472,14 @@
 <li>create notebook-based analysis templates</li>
 <li>strengthen replay as an analysis asset</li>
 <li>compare feedback modalities with real users</li>
+<li>study richer elicitation modes and UI patterns</li>
 <li>evaluate consistency, fatigue, and interface bias</li>
 <li>define anchor-seeking synthetic-user tasks</li>
 <li>define diversity-seeking synthetic-user tasks</li>
 <li>build synthetic stress-test corpora</li>
 <li>evaluate synthetic-user realism</li>
 <li>extend studies to image-prompt, inpainting, and ControlNet workflows</li>
-<li>compare richer representations, samplers, and updaters</li>
+<li>compare richer representations, samplers, preference models, and updaters</li>
 </ol>
 <h2 id="12-summary">12. Summary</h2>
 <p>The next research phase should shift from “can the system run?” to “can the system support credible conclusions?”</p>

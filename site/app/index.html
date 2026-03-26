@@ -67,10 +67,11 @@
 <h2 id="runtime-flow">Runtime flow</h2>
 <ol>
 <li><code>main.py</code> creates the FastAPI app and runtime services.</li>
-<li><code>engine/orchestrator.py</code> coordinates experiment, session, round, and feedback lifecycle.</li>
-<li><code>engine/generation.py</code> resolves the active generation backend.</li>
+<li><code>frontend/</code> renders the prompt-first setup page, including the editable per-session YAML block.</li>
+<li><code>engine/orchestrator.py</code> coordinates experiment, session, round, baseline or incumbent carry-forward, and feedback lifecycle.</li>
+<li><code>engine/generation.py</code> resolves the active generation backend and applies the per-session generation settings.</li>
 <li><code>storage/repository.py</code> persists experiments, sessions, rounds, artifacts, and trace data references.</li>
-<li><code>frontend/</code> renders the UI, submits async jobs, shows progress, and posts browser events back to the backend.</li>
+<li><code>frontend/</code> submits async jobs, shows progress, and posts browser events back to the backend.</li>
 </ol>
       </main>
     </div>

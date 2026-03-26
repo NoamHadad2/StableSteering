@@ -165,6 +165,7 @@ npm run test:e2e:chrome
 <li>replay export exposes the persisted trajectory</li>
 <li>the backend refreshes the saved HTML trace report for the session</li>
 </ol>
+<p><img alt="Runtime architecture diagram" src="assets/illustrations/runtime_flow.svg"></p>
 <p>When a prepared local model is available and the backend is set to <code>diffusers</code>,
 the generation step uses a real Stable Diffusion pipeline, pins inference to
 GPU, and applies a deterministic steering offset to <code>prompt_embeds</code> before
@@ -219,6 +220,7 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li>errors are shown inline if the job fails</li>
 </ul>
 <p>This keeps the UI responsive while the real GPU-backed backend works in the background.</p>
+<p><img alt="Session lifecycle diagram" src="assets/illustrations/session_lifecycle.svg"></p>
 <h2 id="6-core-extension-points">6. Core Extension Points</h2>
 <h3 id="61-add-a-sampler">6.1 Add a sampler</h3>
 <p>To add a sampler:</p>
@@ -267,6 +269,15 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li>replay exports include explicit schema and app versions</li>
 <li>long-running session actions are exposed as async jobs with pollable status</li>
 <li>session trace reports are backend-owned artifacts, not frontend-only console output</li>
+<li>setup-time config validation rejects unsupported sampler and updater values before a session is created</li>
+</ul>
+<p>The current feedback-mode contract is:</p>
+<ul>
+<li><code>scalar_rating</code> uses explicit rating inputs</li>
+<li><code>pairwise</code> uses explicit winner and loser selection controls</li>
+<li><code>winner_only</code> uses an explicit winner selection control</li>
+<li><code>approve_reject</code> uses explicit approval checkboxes plus winner selection</li>
+<li><code>top_k</code> uses explicit rank inputs with uniqueness validation</li>
 </ul>
 <p>The current seed policy contract is:</p>
 <ul>

@@ -104,6 +104,7 @@ Examples include:</p>
 </li>
 </ul>
 <p>This means the YAML document is the source of truth for per-session strategy configuration.</p>
+<p><img alt="YAML-to-runtime diagram" src="assets/illustrations/config_to_generation.svg"></p>
 <h2 id="yaml-template">YAML Template</h2>
 <p>The setup page starts from a backend-generated YAML document similar to this:</p>
 <pre><code class="language-yaml">sampler: random_local
@@ -114,7 +115,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.35
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.5
+num_inference_steps: 15
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>The exact default text is rendered by:</p>
@@ -175,12 +178,14 @@ model_name: runwayml/stable-diffusion-v1-5
 </ul>
 <p>Effect:</p>
 <ul>
-<li>changes how frontend rating input is converted into normalized feedback</li>
+<li>changes which session controls the frontend renders</li>
+<li>changes how the browser collects explicit user preference signals before normalization</li>
 </ul>
 <p>Related code:</p>
 <ul>
 <li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/feedback/normalization.py">normalization.py</a></li>
 </ul>
+<p><img alt="Feedback modes diagram" src="assets/illustrations/feedback_modes.svg"></p>
 <h3 id="seed_policy"><code>seed_policy</code></h3>
 <p>Controls how seeds are assigned across rounds.</p>
 <p>Current value used by the MVP:</p>
@@ -218,7 +223,8 @@ model_name: runwayml/stable-diffusion-v1-5
 </ul>
 <p>Effect:</p>
 <ul>
-<li>documents that the current session state is a small latent steering vector</li>
+<li>selects the steering representation contract used by generation</li>
+<li>the current implementation supports only <code>low_dimensional</code>, so this field is validated but not yet a multi-mode switch</li>
 </ul>
 <h3 id="candidate_count"><code>candidate_count</code></h3>
 <p>Controls how many candidates are shown per round.</p>
@@ -259,22 +265,40 @@ model_name: runwayml/stable-diffusion-v1-5
 <li>smaller values keep proposals closer to the incumbent direction</li>
 </ul>
 <h3 id="anchor_strength"><code>anchor_strength</code></h3>
-<p>Reserved steering control parameter exposed in the strategy config.</p>
+<p>Controls how strongly the latent steering vector perturbs the encoded prompt embedding.</p>
 <p>Effect:</p>
 <ul>
-<li>currently part of the structured config surface</li>
-<li>useful for future work around stronger anchor-based steering behavior</li>
+<li>larger values make candidate steering offsets more pronounced</li>
+<li>smaller values keep steered candidates closer to the raw prompt embedding</li>
+<li>this now directly affects Diffusers prompt-embedding steering and is persisted in candidate generation metadata</li>
+</ul>
+<h3 id="guidance_scale"><code>guidance_scale</code></h3>
+<p>Controls classifier-free guidance strength during image generation.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values usually push images to follow the prompt more literally</li>
+<li>smaller values allow looser, sometimes more varied interpretation</li>
+<li>this now directly affects both real Diffusers rendering and mock trace artifacts</li>
+</ul>
+<h3 id="num_inference_steps"><code>num_inference_steps</code></h3>
+<p>Controls how many denoising steps the diffusion pipeline runs per image.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values typically improve quality and prompt faithfulness at the cost of latency</li>
+<li>smaller values are faster but can degrade image quality or stability</li>
+<li>this now directly affects both real Diffusers rendering and mock trace artifacts</li>
 </ul>
 <h3 id="model_name"><code>model_name</code></h3>
-<p>Records the model name used for the session configuration.</p>
+<p>Selects the model checkpoint for the session.</p>
 <p>Current default:</p>
 <ul>
 <li><code>runwayml/stable-diffusion-v1-5</code></li>
 </ul>
 <p>Important note:</p>
 <ul>
-<li>the real runtime also depends on process-level backend/model settings</li>
-<li>this field documents session intent and config state, but model loading policy is still governed by runtime configuration</li>
+<li>if a prepared local model matching this Hugging Face id exists, the real backend loads and caches that model for the session</li>
+<li>if the model is missing, session generation fails clearly instead of silently ignoring the setting</li>
+<li>this field now directly affects the real generation backend and is stored in candidate generation metadata</li>
 </ul>
 <h2 id="validation-rules">Validation Rules</h2>
 <p>The YAML editor is flexible, but it is not free-form.
@@ -334,7 +358,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.25
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.0
+num_inference_steps: 20
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>Use this when:</p>
@@ -351,7 +377,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.4
-anchor_strength: 0.15
+anchor_strength: 0.45
+guidance_scale: 7.5
+num_inference_steps: 24
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>Use this when:</p>
@@ -368,7 +396,9 @@ steering_mode: low_dimensional
 candidate_count: 3
 image_size: 512x512
 trust_radius: 0.3
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 8.0
+num_inference_steps: 20
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>Use this when:</p>
@@ -385,7 +415,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.34
-anchor_strength: 0.15
+anchor_strength: 0.4
+guidance_scale: 7.5
+num_inference_steps: 22
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>Use this when:</p>
@@ -402,7 +434,9 @@ steering_mode: low_dimensional
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.3
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.2
+num_inference_steps: 18
 model_name: runwayml/stable-diffusion-v1-5
 </code></pre>
 <p>Use this when:</p>

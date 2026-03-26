@@ -74,22 +74,29 @@ Users often know which result is better before they know how to rewrite the prom
 <li>browser and backend test coverage</li>
 <li>a real GPU-backed example-run generator with standalone HTML output</li>
 </ul>
+<p>Example artifacts checked into the repo:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/output/examples/real_e2e_example_run/real_e2e_example_run.html">Sample HTML walkthrough</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/output/examples/real_e2e_example_run/session_trace_report.html">Sample trace report</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/output/examples/real_e2e_example_run/manifest.json">Sample manifest</a></li>
+</ul>
 <h2 id="user-flow">User Flow</h2>
 <p>The main workflow is prompt-first:</p>
 <ol>
 <li>the user opens <code>/setup</code></li>
 <li>enters a text prompt</li>
+<li>optionally edits the per-session YAML configuration</li>
 <li>creates a session</li>
 <li>generates a round of candidate images</li>
-<li>submits ratings or preferences</li>
+<li>submits explicit feedback for the active mode</li>
 <li>waits for the async update job to finish</li>
 <li>inspects replay and the saved trace report</li>
 </ol>
 <p>The normal runtime is GPU-only and uses the real Diffusers backend. If CUDA is unavailable, the app refuses to start instead of silently falling back.</p>
+<p><img alt="Runtime architecture diagram" src="docs/assets/illustrations/runtime_flow.svg"></p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Install the project:</p>
-<pre><code class="language-bash">python -m pip install -e .[dev]
-python -m pip install -e .[dev,inference]
+<pre><code class="language-bash">python -m pip install -e .[dev,inference]
 </code></pre>
 <p>Prepare model assets:</p>
 <pre><code class="language-bash">python scripts/setup_huggingface.py
@@ -146,6 +153,11 @@ npm run test:e2e:chrome
 <p>Real end-to-end example bundle:</p>
 <pre><code class="language-bash">python scripts/create_real_e2e_example.py
 </code></pre>
+<p>Checked-in sample bundle:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/output/examples/real_e2e_example_run/real_e2e_example_run.html">real_e2e_example_run.html</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/output/examples/real_e2e_example_run/session_trace_report.html">session_trace_report.html</a></li>
+</ul>
 <h2 id="repo-guides">Repo Guides</h2>
 <p>Per-folder documentation is available in:</p>
 <ul>
@@ -171,6 +183,10 @@ npm run test:e2e:chrome
 <li><a href="docs/assets/illustrations/steering_loop.png">docs/assets/illustrations/steering_loop.png</a></li>
 <li><a href="docs/assets/illustrations/system_architecture.png">docs/assets/illustrations/system_architecture.png</a></li>
 <li><a href="docs/assets/illustrations/trace_report.png">docs/assets/illustrations/trace_report.png</a></li>
+<li><a href="docs/assets/illustrations/runtime_flow.svg">docs/assets/illustrations/runtime_flow.svg</a></li>
+<li><a href="docs/assets/illustrations/session_lifecycle.svg">docs/assets/illustrations/session_lifecycle.svg</a></li>
+<li><a href="docs/assets/illustrations/feedback_modes.svg">docs/assets/illustrations/feedback_modes.svg</a></li>
+<li><a href="docs/assets/illustrations/config_to_generation.svg">docs/assets/illustrations/config_to_generation.svg</a></li>
 </ul>
 <p>They can be regenerated with:</p>
 <pre><code class="language-bash">python scripts/generate_readme_banner.py

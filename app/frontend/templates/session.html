@@ -57,14 +57,57 @@
                 <h3>{{ candidate.id }}</h3>
                 <p>Role: {{ candidate.sampler_role }}</p>
                 <p>z: {{ candidate.z }}</p>
-                <label>Rating
-                  <input type="number" min="1" max="5" value="3" class="rating-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
-                </label>
+                <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode }}">
+                  {% if session.config.feedback_mode == "scalar_rating" %}
+                    <label>Rating
+                      <input type="number" min="1" max="5" class="rating-input" data-candidate-id="{{ candidate.id }}" inputmode="numeric" {% if current_round.feedback_events %}disabled{% endif %}>
+                    </label>
+                  {% elif session.config.feedback_mode == "pairwise" %}
+                    <label class="choice-row">
+                      <input type="radio" name="pairwise_winner" class="pairwise-winner-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
+                      <span>Winner</span>
+                    </label>
+                    <label class="choice-row">
+                      <input type="radio" name="pairwise_loser" class="pairwise-loser-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
+                      <span>Loser</span>
+                    </label>
+                  {% elif session.config.feedback_mode == "winner_only" %}
+                    <label class="choice-row">
+                      <input type="radio" name="winner_only" class="winner-only-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
+                      <span>Select as winner</span>
+                    </label>
+                  {% elif session.config.feedback_mode == "approve_reject" %}
+                    <label class="choice-row">
+                      <input type="checkbox" class="approve-checkbox" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
+                      <span>Approved</span>
+                    </label>
+                    <label class="choice-row">
+                      <input type="radio" name="approve_reject_winner" class="approve-winner-input" data-candidate-id="{{ candidate.id }}" {% if current_round.feedback_events %}disabled{% endif %}>
+                      <span>Preferred approved winner</span>
+                    </label>
+                  {% elif session.config.feedback_mode == "top_k" %}
+                    <label>Rank
+                      <input type="number" min="1" max="{{ current_round.candidates|length }}" class="rank-input" data-candidate-id="{{ candidate.id }}" inputmode="numeric" {% if current_round.feedback_events %}disabled{% endif %}>
+                    </label>
+                  {% endif %}
+                </div>
               </article>
             {% endfor %}
           </div>
           {% if not current_round.feedback_events %}
-            <p class="hint">Ratings are reused according to the selected feedback mode. For pairwise, the highest-rated candidate beats the lowest-rated one. For top-k, candidates are ranked by rating.</p>
+            <p class="hint">
+              {% if session.config.feedback_mode == "scalar_rating" %}
+                Rate one or more candidates from 1 to 5. The highest-rated candidate becomes the winner.
+              {% elif session.config.feedback_mode == "pairwise" %}
+                Choose one winner and one loser.
+              {% elif session.config.feedback_mode == "winner_only" %}
+                Choose a single winner.
+              {% elif session.config.feedback_mode == "approve_reject" %}
+                Mark approved candidates, then choose the preferred winner from the approved set.
+              {% elif session.config.feedback_mode == "top_k" %}
+                Assign unique ranks starting at 1. Lower numbers mean better preference.
+              {% endif %}
+            </p>
             <div class="actions">
               <button class="button" id="submit-feedback-button" data-round-id="{{ current_round.id }}" data-feedback-mode="{{ session.config.feedback_mode }}">Submit feedback</button>
             </div>

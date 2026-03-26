@@ -59,18 +59,38 @@ class SeedPolicy(str, Enum):
     fixed_per_candidate_role = "fixed-per-candidate-role"
 
 
+class SamplerType(str, Enum):
+    random_local = "random_local"
+    exploit_orthogonal = "exploit_orthogonal"
+    uncertainty_guided = "uncertainty_guided"
+    axis_sweep = "axis_sweep"
+    incumbent_mix = "incumbent_mix"
+
+
+class UpdaterType(str, Enum):
+    winner_average = "winner_average"
+    winner_copy = "winner_copy"
+    linear_preference = "linear_preference"
+
+
+class SteeringMode(str, Enum):
+    low_dimensional = "low_dimensional"
+
+
 class StrategyConfig(BaseModel):
     """Experiment-level strategy choices and tunable parameters."""
 
-    sampler: str = "random_local"
-    updater: str = "winner_average"
+    sampler: SamplerType = SamplerType.random_local
+    updater: UpdaterType = UpdaterType.winner_average
     feedback_mode: FeedbackType = FeedbackType.scalar_rating
     seed_policy: SeedPolicy = SeedPolicy.fixed_per_round
-    steering_mode: str = "low_dimensional"
-    candidate_count: int = 5
+    steering_mode: SteeringMode = SteeringMode.low_dimensional
+    candidate_count: int = Field(default=5, ge=1, le=12)
     image_size: str = "512x512"
-    trust_radius: float = 0.35
-    anchor_strength: float = 0.15
+    trust_radius: float = Field(default=0.35, gt=0.0, le=1.0)
+    anchor_strength: float = Field(default=0.35, ge=0.0, le=2.0)
+    guidance_scale: float = Field(default=7.5, gt=0.0, le=20.0)
+    num_inference_steps: int = Field(default=15, ge=1, le=100)
     model_name: str = "runwayml/stable-diffusion-v1-5"
 
 

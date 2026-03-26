@@ -61,6 +61,8 @@ The system consists of six major parts:
 5. **Preference / Update Module**: learns from feedback and computes the next incumbent
 6. **Storage and Evaluation Layer**: persists state, computes metrics, and reconstructs replay data
 
+![Runtime architecture diagram](./assets/illustrations/runtime_flow.svg)
+
 ## 5. Primary User Workflow
 
 The canonical workflow is:
@@ -205,6 +207,8 @@ Recommended states:
 - `updating`
 - `completed`
 - `failed`
+
+![Session lifecycle diagram](./assets/illustrations/session_lifecycle.svg)
 - `paused`
 
 ### 8.3 Candidate render states

@@ -181,6 +181,8 @@ The current runtime flow is:
 12. replay export exposes the persisted trajectory
 13. the backend refreshes the saved HTML trace report for the session
 
+![Runtime architecture diagram](./assets/illustrations/runtime_flow.svg)
+
 When a prepared local model is available and the backend is set to `diffusers`,
 the generation step uses a real Stable Diffusion pipeline, pins inference to
 GPU, and applies a deterministic steering offset to `prompt_embeds` before
@@ -235,6 +237,8 @@ During round generation and feedback submission:
 - errors are shown inline if the job fails
 
 This keeps the UI responsive while the real GPU-backed backend works in the background.
+
+![Session lifecycle diagram](./assets/illustrations/session_lifecycle.svg)
 
 ## 6. Core Extension Points
 
@@ -292,6 +296,15 @@ The current API quality contract is:
 - replay exports include explicit schema and app versions
 - long-running session actions are exposed as async jobs with pollable status
 - session trace reports are backend-owned artifacts, not frontend-only console output
+- setup-time config validation rejects unsupported sampler and updater values before a session is created
+
+The current feedback-mode contract is:
+
+- `scalar_rating` uses explicit rating inputs
+- `pairwise` uses explicit winner and loser selection controls
+- `winner_only` uses an explicit winner selection control
+- `approve_reject` uses explicit approval checkboxes plus winner selection
+- `top_k` uses explicit rank inputs with uniqueness validation
 
 The current seed policy contract is:
 

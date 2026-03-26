@@ -17,7 +17,9 @@ steering_mode: low_dimensional
 candidate_count: ${options.candidateCount || 5}
 image_size: 512x512
 trust_radius: 0.35
-anchor_strength: 0.15
+anchor_strength: 0.35
+guidance_scale: 7.5
+num_inference_steps: 15
 model_name: runwayml/stable-diffusion-v1-5`
   );
   await page.getByRole("button", { name: "Create and open session" }).click();
@@ -87,6 +89,21 @@ test.describe("StableSteering browser flow", () => {
     expect(replay.rounds[0].candidates).toHaveLength(5);
     expect(replay.rounds[0].feedback_events).toHaveLength(1);
     expect(replay.rounds[0].update_summary.winner_candidate_id).toBeTruthy();
+  });
+
+  test("winner-only mode uses explicit winner selection controls", async ({ page }) => {
+    await createSessionViaBrowser(page, {
+      experimentName: "Winner only flow",
+      description: "Winner-only control test",
+      feedbackMode: "winner_only",
+    });
+
+    await page.getByRole("button", { name: "Generate next round" }).click();
+    await expect(page.getByRole("heading", { name: /Round 1/ })).toBeVisible();
+    await expect(page.locator(".winner-only-input")).toHaveCount(5);
+    await page.locator(".winner-only-input").nth(2).check();
+    await page.getByRole("button", { name: "Submit feedback" }).click();
+    await expect(page.getByText("Status:")).toBeVisible();
   });
 
   test("setup page can reload the default YAML template", async ({ page }) => {

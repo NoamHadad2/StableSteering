@@ -20,11 +20,12 @@ The current repository also includes a runnable prototype. The most implementati
 Current implementation highlights reflected in these guides:
 
 - GPU-only real Diffusers runtime by default
+- prompt-first setup with editable per-session YAML configuration
 - async round-generation and feedback jobs with visible progress
 - SQLite-backed local persistence
 - backend-saved per-session HTML trace reports
 - real GPU-backed end-to-end example bundle under `output/examples/real_e2e_example_run/`
-- Gemini-generated illustration assets embedded into the student tutorial and published HTML docs
+- Gemini-generated conceptual illustration assets plus precise SVG diagrams in the published HTML docs
 
 ## Core Documents
 
@@ -54,6 +55,18 @@ Current implementation highlights reflected in these guides:
 
 - [assets/illustrations/trace_report.png](assets/illustrations/trace_report.png)
   Gemini-generated conceptual illustration of the saved HTML session trace report.
+
+- [assets/illustrations/runtime_flow.svg](assets/illustrations/runtime_flow.svg)
+  Precise SVG diagram of the main runtime architecture from frontend to generation, storage, and trace reporting.
+
+- [assets/illustrations/session_lifecycle.svg](assets/illustrations/session_lifecycle.svg)
+  Precise SVG diagram of the prompt-first session lifecycle, including async jobs and incumbent carry-forward.
+
+- [assets/illustrations/feedback_modes.svg](assets/illustrations/feedback_modes.svg)
+  Precise SVG diagram of the supported feedback modes and the signal each one sends to the backend.
+
+- [assets/illustrations/config_to_generation.svg](assets/illustrations/config_to_generation.svg)
+  Precise SVG diagram of how per-session YAML becomes a validated config snapshot and affects runtime behavior.
 
 - [quick_start.md](quick_start.md)
   Gives the shortest path to installing, running, and trying the prototype.

@@ -18,7 +18,7 @@ The basic flow is:
 1. enter a text prompt
 2. start a session around that prompt
 3. generate a round of candidate images
-4. rate the candidates
+4. provide feedback with the active mode controls
 5. submit feedback
 6. generate the next round
 7. review the session replay
@@ -37,16 +37,15 @@ The home page shows:
 
 ### Setup
 
-The setup page lets you choose:
+The setup page lets you set:
 
 - prompt
 - negative prompt
 - experiment name
 - experiment description
-- sampler
-- updater
-- feedback mode
-- number of candidates per round
+- a per-session YAML configuration block
+
+That YAML block controls the sampler, updater, feedback mode, seed policy, candidate count, image settings, and other session-level strategy values.
 
 ### Session
 
@@ -55,7 +54,7 @@ The session page lets you:
 - generate the next round
 - review current steering state
 - inspect candidate images
-- assign ratings to candidates
+- provide mode-specific feedback to candidates
 - submit feedback
 - open the replay page
 - open the trace report
@@ -78,7 +77,7 @@ Recommended usage:
 2. start from a prompt you can easily recognize
 3. keep the default settings for your first run
 4. generate the first round
-5. give the strongest candidate the highest rating
+5. use the currently selected feedback mode to express a clear preference
 6. submit feedback
 7. generate another round and compare how the state evolves
 
@@ -106,13 +105,17 @@ Each card shows:
 - the candidate identifier
 - the sampler role
 - the steering vector `z`
-- a rating input
+- feedback controls for the active mode
 
-The rating inputs currently drive all three supported feedback modes:
+The visible controls change with the selected feedback mode:
 
-- `scalar_rating` sends the ratings directly
-- `pairwise` chooses the highest-rated candidate over the lowest-rated candidate
-- `top_k` converts the ratings into a ranked list
+- `scalar_rating` shows rating inputs
+- `pairwise` shows explicit winner and loser choices
+- `winner_only` shows a single winner choice
+- `approve_reject` shows approval choices plus a preferred approved winner
+- `top_k` shows explicit rank inputs
+
+![Feedback modes diagram](./assets/illustrations/feedback_modes.svg)
 
 ## 6. Understanding Replay
 

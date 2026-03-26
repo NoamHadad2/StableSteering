@@ -124,8 +124,10 @@ The schema supports:
 - scalar rating
 - pairwise comparison
 - top-k ranking
+- winner-only selection
+- approve/reject with preferred approved winner
 
-The current UI uses rating inputs for all supported modes and derives the final payload from the selected feedback mode.
+The current UI uses mode-specific controls for the selected feedback mode.
 
 ## Are other diffusion workflows in scope?
 
@@ -144,6 +146,8 @@ The current MVP includes:
 - `random_local`
 - `exploit_orthogonal`
 - `uncertainty_guided`
+- `axis_sweep`
+- `incumbent_mix`
 
 ## What updaters are implemented?
 

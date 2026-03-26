@@ -257,6 +257,25 @@ Success signal:
 
 - the influence of interface design on measured outcomes is quantified rather than ignored
 
+### 7.4 Study richer elicitation modes and UI patterns
+
+Why it matters:
+
+- preference quality depends not only on the model but also on how the system asks for user judgments
+- some workflows may benefit more from shortlist, critique, or incumbent-comparison interactions than from one-shot winner choice
+
+Implementation notes:
+
+- compare shortlist selection, best-versus-incumbent, approve/reject, pairwise tournament, and critique-assisted workflows
+- study when structured reason tags improve preference consistency or update quality
+- compare forced-choice interfaces against interfaces that allow uncertainty or "cannot decide" responses
+- measure whether region-aware or attribute-aware elicitation helps for inpainting and image-prompt tasks
+- analyze whether elicitation mode changes the apparent value of a sampler or preference model
+
+Success signal:
+
+- the research program can explain which UI/elicitation modes work best for which task families and user goals
+
 ## 8. R1: Synthetic Data Research Direction
 
 ### 8.1 Build realistic synthetic steering trajectories toward an anchor
@@ -379,12 +398,33 @@ Implementation notes:
 - compare current samplers with Thompson-style, quality-diversity, critique-conditioned, and adaptive trust-region methods
 - evaluate both human-judged quality and synthetic benchmark performance
 - test whether some samplers pair better with specific feedback modes or update rules
+- include incumbent-versus-challenger and shortlist-aware samplers that explicitly optimize for comparison quality, not only search quality
+- compare one-step greedy samplers against multi-round planning or lookahead samplers
 
 Success signal:
 
 - sampler comparisons reveal clear tradeoffs in exploration, stability, and user burden
 
-### 9.3 Add stronger updaters
+### 9.3 Add stronger preference and reward models
+
+Why it matters:
+
+- simple winner heuristics are easy to inspect, but they may waste information from rankings, approvals, uncertainty, and critiques
+- richer preference models can become the bridge between elicitation design and smarter candidate proposal
+
+Implementation notes:
+
+- compare Bradley-Terry, Plackett-Luce, Bayesian preference, and listwise reward models
+- test models that incorporate confidence, near ties, or "cannot decide" outcomes instead of discarding them
+- test critique-aware models that combine discrete selections with structured or free-text reasons
+- compare models that infer absolute latent quality against models that only learn relative preference
+- study whether posterior uncertainty from preference models improves downstream samplers
+
+Success signal:
+
+- the project has evidence about which preference-model family best converts user judgments into useful steering signals
+
+### 9.4 Add stronger updaters
 
 Why it matters:
 
@@ -394,6 +434,7 @@ Why it matters:
 Implementation notes:
 
 - compare current simple updaters with Bradley-Terry, Bayesian preference, contextual bandit, and critique-aware approaches
+- compare direct latent-state update rules against preference-model-plus-policy decompositions
 - evaluate update sensitivity, robustness to noisy feedback, and stability over multiple rounds
 - test how updater choice interacts with sampler choice and feedback modality
 
@@ -421,8 +462,10 @@ Success signal:
 ### Milestone R-C: Comparative Research
 
 - compare samplers
+- compare preference and reward models
 - compare updaters
 - compare feedback modalities
+- compare elicitation/UI modes
 - compare representation strategies
 - compare synthetic-user regimes against real-user outcomes
 - compare steering behavior across text-to-image, image-prompt, inpainting, and ControlNet workflows
@@ -437,13 +480,14 @@ Success signal:
 6. create notebook-based analysis templates
 7. strengthen replay as an analysis asset
 8. compare feedback modalities with real users
-9. evaluate consistency, fatigue, and interface bias
-10. define anchor-seeking synthetic-user tasks
-11. define diversity-seeking synthetic-user tasks
-12. build synthetic stress-test corpora
-13. evaluate synthetic-user realism
-14. extend studies to image-prompt, inpainting, and ControlNet workflows
-15. compare richer representations, samplers, and updaters
+9. study richer elicitation modes and UI patterns
+10. evaluate consistency, fatigue, and interface bias
+11. define anchor-seeking synthetic-user tasks
+12. define diversity-seeking synthetic-user tasks
+13. build synthetic stress-test corpora
+14. evaluate synthetic-user realism
+15. extend studies to image-prompt, inpainting, and ControlNet workflows
+16. compare richer representations, samplers, preference models, and updaters
 
 ## 12. Summary
 

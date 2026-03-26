@@ -122,64 +122,99 @@ function collectRatings() {
   return Array.from(document.querySelectorAll(".rating-input")).map((input) => ({
     candidateId: input.dataset.candidateId,
     rating: Number(input.value || 0),
-  }));
+  })).filter((entry) => entry.rating > 0);
 }
 
-function buildFeedbackPayload(feedbackMode, ratingEntries) {
-  if (!ratingEntries.length) {
-    throw new Error("No candidate ratings were provided.");
-  }
-
-  const sorted = [...ratingEntries].sort((left, right) => right.rating - left.rating || left.candidateId.localeCompare(right.candidateId));
-  const ratings = Object.fromEntries(ratingEntries.map((entry) => [entry.candidateId, entry.rating]));
-
+function buildFeedbackPayload(feedbackMode) {
   if (feedbackMode === "pairwise") {
-    if (sorted.length < 2) {
-      throw new Error("Pairwise feedback requires at least two rated candidates.");
+    const winner = document.querySelector(".pairwise-winner-input:checked")?.dataset.candidateId;
+    const loser = document.querySelector(".pairwise-loser-input:checked")?.dataset.candidateId;
+    if (!winner || !loser) {
+      throw new Error("Pairwise feedback requires one explicit winner and one explicit loser.");
+    }
+    if (winner === loser) {
+      throw new Error("Pairwise feedback requires different winner and loser candidates.");
     }
     return {
       feedback_type: "pairwise",
       payload: {
-        winner_candidate_id: sorted[0].candidateId,
-        loser_candidate_id: sorted[sorted.length - 1].candidateId,
+        winner_candidate_id: winner,
+        loser_candidate_id: loser,
       },
     };
   }
 
   if (feedbackMode === "winner_only") {
+    const winner = document.querySelector(".winner-only-input:checked")?.dataset.candidateId;
+    if (!winner) {
+      throw new Error("Winner-only feedback requires choosing one winner.");
+    }
     return {
       feedback_type: "winner_only",
       payload: {
-        winner_candidate_id: sorted[0].candidateId,
+        winner_candidate_id: winner,
       },
     };
   }
 
   if (feedbackMode === "approve_reject") {
+    const approvalInputs = Array.from(document.querySelectorAll(".approve-checkbox"));
     const approvals = Object.fromEntries(
-      ratingEntries.map((entry) => [entry.candidateId, entry.rating >= 4])
+      approvalInputs.map((input) => [input.dataset.candidateId, Boolean(input.checked)])
     );
-    const approvedEntries = sorted.filter((entry) => approvals[entry.candidateId]);
+    const approvedEntries = approvalInputs.filter((input) => input.checked);
     if (!approvedEntries.length) {
-      throw new Error("Approve/reject feedback requires at least one candidate rated 4 or 5.");
+      throw new Error("Approve/reject feedback requires at least one approved candidate.");
+    }
+    const winner = document.querySelector(".approve-winner-input:checked")?.dataset.candidateId;
+    if (!winner) {
+      throw new Error("Approve/reject feedback requires choosing the preferred approved winner.");
+    }
+    if (!approvals[winner]) {
+      throw new Error("The approve/reject winner must also be marked approved.");
     }
     return {
       feedback_type: "approve_reject",
       payload: {
-        winner_candidate_id: approvedEntries[0].candidateId,
+        winner_candidate_id: winner,
         approvals,
       },
     };
   }
 
   if (feedbackMode === "top_k") {
+    const ranks = Array.from(document.querySelectorAll(".rank-input"))
+      .map((input) => ({
+        candidateId: input.dataset.candidateId,
+        rank: Number(input.value || 0),
+      }))
+      .filter((entry) => entry.rank > 0);
+    if (ranks.length < 2) {
+      throw new Error("Top-k feedback requires ranking at least two candidates.");
+    }
+    const uniqueRanks = new Set(ranks.map((entry) => entry.rank));
+    if (uniqueRanks.size !== ranks.length) {
+      throw new Error("Top-k feedback requires unique ranks.");
+    }
+    ranks.sort((left, right) => left.rank - right.rank || left.candidateId.localeCompare(right.candidateId));
+    const approvals = Object.fromEntries(
+      ranks.map((entry) => [entry.candidateId, entry.rank])
+    );
     return {
       feedback_type: "top_k",
       payload: {
-        ranking: sorted.map((entry) => entry.candidateId),
+        ranking: ranks.map((entry) => entry.candidateId),
+        ranks: approvals,
       },
     };
   }
+
+  const ratingEntries = collectRatings();
+  if (!ratingEntries.length) {
+    throw new Error("Scalar rating feedback requires at least one explicit rating.");
+  }
+  const sorted = [...ratingEntries].sort((left, right) => right.rating - left.rating || left.candidateId.localeCompare(right.candidateId));
+  const ratings = Object.fromEntries(ratingEntries.map((entry) => [entry.candidateId, entry.rating]));
 
   return {
     feedback_type: "scalar_rating",
@@ -271,12 +306,11 @@ if (submitFeedbackButton) {
     if (submitFeedbackButton.disabled) return;
     const feedbackMode = submitFeedbackButton.dataset.feedbackMode || "scalar_rating";
     try {
-      const ratingEntries = collectRatings();
-      const request = buildFeedbackPayload(feedbackMode, ratingEntries);
+      const request = buildFeedbackPayload(feedbackMode);
       traceFrontend("feedback.submit.clicked", {
         round_id: submitFeedbackButton.dataset.roundId,
         feedback_mode: feedbackMode,
-        rated_candidates: ratingEntries.length,
+        interaction_mode: feedbackMode,
       });
       submitFeedbackButton.disabled = true;
       setStatus("Queueing feedback submission...");

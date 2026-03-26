@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from enum import Enum
-from threading import Lock, Thread
+from threading import Lock
 from typing import Any, Callable
 from uuid import uuid4
 
@@ -36,17 +36,20 @@ class JobRecord(BaseModel):
 class AsyncJobManager:
     """Small in-memory async job manager for long-running user operations."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, max_workers: int = 4, max_jobs: int = 200) -> None:
         self._jobs: dict[str, JobRecord] = {}
         self._lock = Lock()
+        self._executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="stable-steering-job")
+        self._max_jobs = max_jobs
 
     async def submit(self, operation: str, fn: Callable[[], Any]) -> JobRecord:
         """Create a job record and execute the callable in a worker thread."""
 
         job = JobRecord(operation=operation)
         with self._lock:
+            self._prune_locked()
             self._jobs[job.id] = job
-        Thread(target=self._run_sync, args=(job.id, fn), daemon=True).start()
+        self._executor.submit(self._run_sync, job.id, fn)
         return job.model_copy(deep=True)
 
     async def get(self, job_id: str) -> JobRecord | None:
@@ -90,3 +93,18 @@ class AsyncJobManager:
             for key, value in changes.items():
                 setattr(job, key, value)
             job.updated_at = utc_now()
+            self._prune_locked()
+
+    def _prune_locked(self) -> None:
+        """Drop old completed jobs so the in-memory registry remains bounded."""
+
+        overflow = len(self._jobs) - self._max_jobs
+        if overflow <= 0:
+            return
+        completed_ids = [
+            job.id
+            for job in sorted(self._jobs.values(), key=lambda record: (record.updated_at, record.created_at))
+            if job.state in {JobState.succeeded, JobState.failed}
+        ]
+        for job_id in completed_ids[:overflow]:
+            self._jobs.pop(job_id, None)

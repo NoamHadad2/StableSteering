@@ -56,8 +56,9 @@ class MockGenerationEngine:
         """Render one candidate to an SVG artifact and attach its public path."""
 
         primary, secondary = _color_from_candidate(candidate)
+        width, height = parse_image_size(session.config.image_size)
         path = self.artifacts_dir / f"{candidate.id}.svg"
-        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">
 <defs>
   <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
     <stop offset="0%" stop-color="{primary}" />
@@ -65,16 +66,30 @@ class MockGenerationEngine:
   </linearGradient>
 </defs>
 <rect width="100%" height="100%" fill="url(#bg)" />
-<rect x="24" y="24" width="464" height="464" rx="18" fill="rgba(255,255,255,0.14)" stroke="white" stroke-opacity="0.35" />
+<rect x="24" y="24" width="{max(width - 48, 0)}" height="{max(height - 48, 0)}" rx="18" fill="rgba(255,255,255,0.14)" stroke="white" stroke-opacity="0.35" />
 <text x="40" y="70" fill="white" font-size="28" font-family="Arial">StableSteering Mock Render</text>
 <text x="40" y="120" fill="white" font-size="18" font-family="Arial">Prompt: {escape(session.prompt[:50])}</text>
 <text x="40" y="155" fill="white" font-size="18" font-family="Arial">Candidate: {escape(candidate.id)}</text>
 <text x="40" y="190" fill="white" font-size="18" font-family="Arial">Role: {escape(candidate.sampler_role)}</text>
 <text x="40" y="225" fill="white" font-size="18" font-family="Arial">Seed: {candidate.seed}</text>
 <text x="40" y="260" fill="white" font-size="18" font-family="Arial">z: {escape(', '.join(f'{v:.3f}' for v in candidate.z))}</text>
+<text x="40" y="295" fill="white" font-size="18" font-family="Arial">Model: {escape(session.config.model_name)}</text>
+<text x="40" y="330" fill="white" font-size="18" font-family="Arial">CFG: {session.config.guidance_scale:.2f}</text>
+<text x="40" y="365" fill="white" font-size="18" font-family="Arial">Steps: {session.config.num_inference_steps}</text>
+<text x="40" y="400" fill="white" font-size="18" font-family="Arial">Anchor strength: {session.config.anchor_strength:.2f}</text>
 </svg>"""
         path.write_text(svg, encoding="utf-8")
         candidate.image_path = f"/artifacts/{path.name}"
+        candidate.generation_params.update(
+            {
+                "backend": "mock",
+                "image_size": session.config.image_size,
+                "guidance_scale": session.config.guidance_scale,
+                "num_inference_steps": session.config.num_inference_steps,
+                "model_source": session.config.model_name,
+                "anchor_strength": session.config.anchor_strength,
+            }
+        )
         return candidate
 
     def diagnostics(self) -> dict:
@@ -113,14 +128,15 @@ class DiffusersGenerationEngine:
         local_files_only: bool = True,
         require_gpu: bool = True,
     ) -> None:
-        self.model_source = model_source
+        self.default_model_source = model_source
         self.artifacts_dir = artifacts_dir or settings.artifacts_dir
         self.device = device
-        self.num_inference_steps = num_inference_steps or settings.diffusion_num_inference_steps
+        self.default_num_inference_steps = num_inference_steps or settings.diffusion_num_inference_steps
         self.local_files_only = local_files_only
         self.require_gpu = require_gpu
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)
-        self._pipeline = None
+        self._pipelines: dict[str, object] = {}
+        self._active_model_source = model_source
         self._torch = None
 
     def _resolve_device(self, torch) -> str:
@@ -146,11 +162,13 @@ class DiffusersGenerationEngine:
 
         return requested_device
 
-    def _load_pipeline(self):
+    def _load_pipeline(self, model_source: str | None = None):
         """Load and cache the Stable Diffusion pipeline on first use."""
 
-        if self._pipeline is not None:
-            return self._pipeline
+        source = model_source or self.default_model_source
+        if source in self._pipelines:
+            self._active_model_source = source
+            return self._pipelines[source]
 
         import torch
         from diffusers import StableDiffusionPipeline
@@ -159,7 +177,7 @@ class DiffusersGenerationEngine:
         dtype = torch.float16 if resolved_device == "cuda" else torch.float32
 
         pipeline = StableDiffusionPipeline.from_pretrained(
-            self.model_source,
+            source,
             torch_dtype=dtype,
             local_files_only=self.local_files_only,
             safety_checker=None,
@@ -171,7 +189,8 @@ class DiffusersGenerationEngine:
 
         self._torch = torch
         self.device = resolved_device
-        self._pipeline = pipeline
+        self._pipelines[source] = pipeline
+        self._active_model_source = source
         return pipeline
 
     def diagnostics(self) -> dict:
@@ -192,21 +211,43 @@ class DiffusersGenerationEngine:
         if configured_device == "auto":
             configured_device = "cuda"
 
-        active_device = self.device if self._pipeline is not None else configured_device
+        pipeline_loaded = bool(self._pipelines)
+        active_device = self.device if pipeline_loaded else configured_device
         return {
             "backend": "diffusers",
-            "model_source": self.model_source,
+            "model_source": self._active_model_source,
+            "default_model_source": self.default_model_source,
             "configured_device": configured_device,
             "active_device": active_device,
-            "pipeline_loaded": self._pipeline is not None,
+            "pipeline_loaded": pipeline_loaded,
             "cuda_available": cuda_available,
             "torch_available": torch_available,
             "local_files_only": self.local_files_only,
             "test_only_backend": False,
-            "num_inference_steps": self.num_inference_steps,
+            "default_num_inference_steps": self.default_num_inference_steps,
+            "loaded_model_sources": sorted(self._pipelines.keys()),
         }
 
-    def _steering_offset(self, prompt_embeds, z):
+    def _resolve_model_source(self, session: Session) -> str:
+        """Resolve the per-session model source from YAML config."""
+
+        requested_model = (session.config.model_name or "").strip()
+        if not requested_model:
+            return self.default_model_source
+
+        prepared_path = resolve_prepared_model_path(requested_model)
+        if prepared_path.exists():
+            return str(prepared_path)
+        if requested_model == settings.huggingface_model_id:
+            return self.default_model_source
+        if settings.allow_remote_model_download:
+            return requested_model
+        raise FileNotFoundError(
+            f"Prepared model not found for session model_name={requested_model!r} at {prepared_path}. "
+            "Run scripts/setup_huggingface.py first or enable STABLE_STEERING_ALLOW_REMOTE_MODEL_DOWNLOAD=true."
+        )
+
+    def _steering_offset(self, prompt_embeds, z, anchor_strength: float):
         """Project the low-dimensional steering vector into embedding space."""
 
         torch = self._torch
@@ -218,13 +259,13 @@ class DiffusersGenerationEngine:
         for i, value in enumerate(z):
             basis = torch.sin(index * (i + 1) * torch.pi) + torch.cos(index * (i + 1) * 0.5 * torch.pi)
             basis = basis / torch.norm(basis)
-            offset = offset + (float(value) * 0.35) * basis.view(1, 1, hidden)
+            offset = offset + (float(value) * float(anchor_strength)) * basis.view(1, 1, hidden)
         return offset
 
     def _encode_steered_embeddings(self, session: Session, candidate: Candidate):
         """Encode prompt text, then apply a deterministic steering offset."""
 
-        pipe = self._load_pipeline()
+        pipe = self._load_pipeline(self._resolve_model_source(session))
         prompt_embeds, negative_prompt_embeds = pipe.encode_prompt(
             prompt=session.prompt,
             device=self.device,
@@ -232,25 +273,27 @@ class DiffusersGenerationEngine:
             do_classifier_free_guidance=True,
             negative_prompt=session.negative_prompt or "",
         )
-        steered_prompt_embeds = prompt_embeds + self._steering_offset(prompt_embeds, candidate.z)
+        steered_prompt_embeds = prompt_embeds + self._steering_offset(prompt_embeds, candidate.z, session.config.anchor_strength)
         return steered_prompt_embeds, negative_prompt_embeds
 
     def render_candidate(self, session: Session, candidate: Candidate) -> Candidate:
         """Render a candidate to a PNG using Diffusers prompt-embedding control."""
 
-        pipe = self._load_pipeline()
+        model_source = self._resolve_model_source(session)
+        pipe = self._load_pipeline(model_source)
         prompt_embeds, negative_prompt_embeds = self._encode_steered_embeddings(session, candidate)
         width, height = parse_image_size(session.config.image_size)
         torch = self._torch
         generator = torch.Generator(device=self.device).manual_seed(candidate.seed)
-        guidance_scale = max(4.5, min(10.0, 7.5 + (candidate.z[0] * 1.2)))
+        guidance_scale = float(session.config.guidance_scale)
+        num_inference_steps = int(session.config.num_inference_steps)
 
         result = pipe(
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=negative_prompt_embeds,
             width=width,
             height=height,
-            num_inference_steps=self.num_inference_steps,
+            num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
             generator=generator,
             output_type="pil",
@@ -263,8 +306,10 @@ class DiffusersGenerationEngine:
             {
                 "backend": "diffusers",
                 "guidance_scale": guidance_scale,
-                "num_inference_steps": self.num_inference_steps,
-                "model_source": self.model_source,
+                "num_inference_steps": num_inference_steps,
+                "model_source": model_source,
+                "anchor_strength": session.config.anchor_strength,
+                "steering_mode": session.config.steering_mode,
             }
         )
         return candidate

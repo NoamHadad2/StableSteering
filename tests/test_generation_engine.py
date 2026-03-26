@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.core.config import settings
+from app.core.schema import Candidate, StrategyConfig, Session
 from app.engine.generation import DiffusersGenerationEngine, MockGenerationEngine, build_generation_engine, parse_image_size, resolve_prepared_model_path
 
 
@@ -72,6 +73,71 @@ def test_diffusers_engine_requires_cuda_when_gpu_is_mandatory(tmp_path: Path) ->
 
     with pytest.raises(RuntimeError, match="CUDA-capable GPU"):
         engine._resolve_device(SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)))
+
+
+def test_mock_render_uses_session_generation_config(tmp_path: Path) -> None:
+    engine = MockGenerationEngine(tmp_path / "artifacts")
+    session = Session(
+        experiment_id="exp_test",
+        prompt="A configurable test prompt",
+        negative_prompt="blurry",
+        model_name="custom/model",
+        config=StrategyConfig(
+            image_size="320x640",
+            anchor_strength=0.8,
+            guidance_scale=9.5,
+            num_inference_steps=28,
+            model_name="custom/model",
+        ),
+    )
+    candidate = Candidate(
+        round_id="rnd_test",
+        candidate_index=0,
+        z=[0.1, 0.2, -0.1],
+        sampler_role="baseline_prompt",
+        seed=123,
+        generation_params={},
+    )
+
+    rendered = engine.render_candidate(session, candidate)
+    svg_path = tmp_path / "artifacts" / f"{candidate.id}.svg"
+    svg = svg_path.read_text(encoding="utf-8")
+
+    assert rendered.generation_params["image_size"] == "320x640"
+    assert rendered.generation_params["guidance_scale"] == 9.5
+    assert rendered.generation_params["num_inference_steps"] == 28
+    assert rendered.generation_params["anchor_strength"] == 0.8
+    assert rendered.generation_params["model_source"] == "custom/model"
+    assert 'width="320"' in svg
+    assert 'height="640"' in svg
+    assert "CFG: 9.50" in svg
+    assert "Steps: 28" in svg
+    assert "Anchor strength: 0.80" in svg
+
+
+def test_diffusers_engine_resolves_per_session_model_name(tmp_path: Path) -> None:
+    prepared = tmp_path / "models" / "custom--model"
+    prepared.mkdir(parents=True)
+    original_models_dir = settings.models_dir
+    settings.models_dir = tmp_path / "models"
+    engine = DiffusersGenerationEngine(
+        model_source=str(tmp_path / "models" / "runwayml--stable-diffusion-v1-5"),
+        artifacts_dir=tmp_path / "artifacts",
+        device="cuda",
+        require_gpu=True,
+    )
+    session = Session(
+        experiment_id="exp_test",
+        prompt="A model resolution test",
+        model_name="custom/model",
+        config=StrategyConfig(model_name="custom/model"),
+    )
+
+    try:
+        resolved = engine._resolve_model_source(session)
+        assert resolved == str(prepared)
+    finally:
+        settings.models_dir = original_models_dir
 
 
 def test_auto_backend_uses_diffusers_engine_when_model_exists(tmp_path: Path) -> None:

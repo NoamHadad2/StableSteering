@@ -59,26 +59,34 @@ The current system includes:
 - browser and backend test coverage
 - a real GPU-backed example-run generator with standalone HTML output
 
+Example artifacts checked into the repo:
+
+- [Sample HTML walkthrough](./output/examples/real_e2e_example_run/real_e2e_example_run.html)
+- [Sample trace report](./output/examples/real_e2e_example_run/session_trace_report.html)
+- [Sample manifest](./output/examples/real_e2e_example_run/manifest.json)
+
 ## User Flow
 
 The main workflow is prompt-first:
 
 1. the user opens `/setup`
 2. enters a text prompt
-3. creates a session
-4. generates a round of candidate images
-5. submits ratings or preferences
-6. waits for the async update job to finish
-7. inspects replay and the saved trace report
+3. optionally edits the per-session YAML configuration
+4. creates a session
+5. generates a round of candidate images
+6. submits explicit feedback for the active mode
+7. waits for the async update job to finish
+8. inspects replay and the saved trace report
 
 The normal runtime is GPU-only and uses the real Diffusers backend. If CUDA is unavailable, the app refuses to start instead of silently falling back.
+
+![Runtime architecture diagram](./docs/assets/illustrations/runtime_flow.svg)
 
 ## Getting Started
 
 Install the project:
 
 ```bash
-python -m pip install -e .[dev]
 python -m pip install -e .[dev,inference]
 ```
 
@@ -163,6 +171,11 @@ Real end-to-end example bundle:
 python scripts/create_real_e2e_example.py
 ```
 
+Checked-in sample bundle:
+
+- [real_e2e_example_run.html](./output/examples/real_e2e_example_run/real_e2e_example_run.html)
+- [session_trace_report.html](./output/examples/real_e2e_example_run/session_trace_report.html)
+
 ## Repo Guides
 
 Per-folder documentation is available in:
@@ -197,6 +210,10 @@ Current visual assets include:
 - [docs/assets/illustrations/steering_loop.png](./docs/assets/illustrations/steering_loop.png)
 - [docs/assets/illustrations/system_architecture.png](./docs/assets/illustrations/system_architecture.png)
 - [docs/assets/illustrations/trace_report.png](./docs/assets/illustrations/trace_report.png)
+- [docs/assets/illustrations/runtime_flow.svg](./docs/assets/illustrations/runtime_flow.svg)
+- [docs/assets/illustrations/session_lifecycle.svg](./docs/assets/illustrations/session_lifecycle.svg)
+- [docs/assets/illustrations/feedback_modes.svg](./docs/assets/illustrations/feedback_modes.svg)
+- [docs/assets/illustrations/config_to_generation.svg](./docs/assets/illustrations/config_to_generation.svg)
 
 They can be regenerated with:
 

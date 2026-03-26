@@ -34,14 +34,14 @@ http://127.0.0.1:8000
 1. open `/setup`
 2. enter a text prompt
 3. enter an experiment name
-4. keep the default sampler, updater, and feedback mode
+4. keep the default YAML configuration for your first run
 5. submit the form
 
 ## 4. Run One Steering Cycle
 
 1. click `Generate next round`
 2. watch the progress bar while the async generation job runs
-3. rate the candidates
+3. use the visible controls for the active feedback mode
 4. click `Submit feedback`
 5. watch the status message while the async feedback job runs
 6. click `Generate next round` again
