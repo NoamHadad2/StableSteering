@@ -24,6 +24,7 @@ EXCLUDED_PARTS = {
     "temp",
     "tmp_real_smoke",
 }
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
 MARKDOWN_LINK_RE = re.compile(r"(!?\[[^\]]*\])\(([^)]+)\)")
 
 
@@ -34,6 +35,8 @@ def should_include(path: Path) -> bool:
     if parts & EXCLUDED_PARTS:
         return False
     if path.suffix.lower() != ".md":
+        return False
+    if path.parts and path.parts[0] == "output" and path.name.lower() != "readme.md":
         return False
     return True
 
@@ -116,6 +119,9 @@ def rewrite_link(target: str, current_file: Path, mapping: dict[Path, Path]) -> 
 
     if resolved.suffix.lower() == ".md" and resolved in mapping:
         return relative_href(mapping[current_file], mapping[resolved], anchor)
+
+    if resolved.suffix.lower() in IMAGE_SUFFIXES and resolved.is_relative_to(REPO_ROOT):
+        return relative_href(mapping[current_file], resolved.relative_to(REPO_ROOT), anchor)
 
     if resolved.is_relative_to(REPO_ROOT):
         repo_rel = resolved.relative_to(REPO_ROOT).as_posix()
@@ -269,6 +275,23 @@ def build_site() -> None:
         output = SITE_ROOT / mapping[source]
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(render_page(source, mapping, files), encoding="utf-8")
+    copy_static_assets()
+
+
+def copy_static_assets() -> None:
+    """Copy publishable image assets used by the Markdown docs into the site."""
+
+    for asset_root in (REPO_ROOT / "docs" / "assets",):
+        if not asset_root.exists():
+            continue
+        for source in asset_root.rglob("*"):
+            if not source.is_file():
+                continue
+            if source.suffix.lower() not in IMAGE_SUFFIXES:
+                continue
+            destination = SITE_ROOT / source.relative_to(REPO_ROOT)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
 
 
 if __name__ == "__main__":

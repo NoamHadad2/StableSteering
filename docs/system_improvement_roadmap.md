@@ -192,7 +192,143 @@ Suggested work:
 - document safe deletion more clearly
 - add optional artifact compression for exported bundles
 
-## 7. P2: Architecture and Scale Improvements
+### 6.4 Add a synthetic-data generation pipeline
+
+Goals:
+
+- support large-scale offline algorithm evaluation
+- generate reproducible synthetic steering sessions
+- make synthetic datasets realistic enough to be useful for training and benchmarking
+
+Detailed roadmap items:
+
+- add a dataset-generation script or service layer for synthetic sessions
+- support two primary synthetic regimes:
+  - anchor-seeking trajectories toward a target steer state or reference
+  - diversity-seeking trajectories around one or more steered locations
+- define a stable synthetic-session schema with:
+  - prompt
+  - anchor definition
+  - candidate set
+  - synthetic preference event
+  - critique text if generated
+  - next-state summary
+  - simulator metadata
+- persist synthetic run manifests separately from ordinary interactive sessions
+- version the simulator policy independently from the rest of the app
+- generate analysis-ready exports for each synthetic corpus
+
+### 6.5 Expand steering support to more diffusion pipelines
+
+Goals:
+
+- move beyond text-to-image-only steering
+- make the system useful for more realistic creative workflows
+- support conditioning modes that practitioners already use in production
+
+Detailed roadmap items:
+
+- add a pipeline adapter layer so orchestration can target multiple diffusion workflows through one stable contract
+- support image-prompt or image-variation steering where the user starts from a reference image and refines around it
+- support inpainting steering where the user edits only a masked region while preserving the surrounding composition
+- support ControlNet-guided steering for structure-aware workflows such as edge, depth, pose, or segmentation control
+- persist pipeline-specific inputs in session state and replay exports, including:
+  - reference images
+  - masks
+  - ControlNet conditioning assets
+  - pipeline-specific generation settings
+- extend diagnostics so the active pipeline type is visible during runtime
+- extend trace reports so they clearly show which conditioning mode each round used
+- add storage conventions for auxiliary assets used by non-text-only pipelines
+
+Implementation tasks:
+
+- define a generation request schema that can represent:
+  - pure text prompt generation
+  - text plus reference image generation
+  - text plus mask generation
+  - text plus ControlNet conditioning generation
+- add adapter implementations for:
+  - image prompt or image variation pipeline
+  - inpainting pipeline
+  - one or more ControlNet pipelines
+- add validation rules for required assets per pipeline type
+- add frontend affordances for uploading and previewing reference images, masks, and control inputs
+- add replay rendering support for these extra conditioning artifacts
+- add test fixtures for each pipeline family
+
+## 7. P1: Synthetic Data Infrastructure and Tooling
+
+### 7.1 Support anchor-seeking synthetic-user simulation
+
+System requirements:
+
+- represent an anchor as one or more of:
+  - latent steering vector
+  - reference image embedding
+  - attribute target bundle
+  - text-derived target state
+- compute candidate-to-anchor scores consistently
+- allow configurable synthetic-user noise models
+- emit round-by-round decisions and rationale fields
+
+Implementation tasks:
+
+- add anchor-definition models
+- add synthetic scorer interfaces
+- add pluggable decision policies for ratings, pairwise outcomes, and rankings
+- add critique-template or critique-generation hooks
+- add calibration tools to compare synthetic traces with real traces
+
+### 7.2 Support diversity-seeking synthetic-user simulation
+
+System requirements:
+
+- support one-center local diversity sampling
+- support multi-center diversity sampling
+- compute both quality and coverage scores
+- prevent synthetic corpora from collapsing into near-duplicates
+
+Implementation tasks:
+
+- add local-neighborhood samplers around one steered location
+- add multi-center batch construction around several promising locations
+- add diversity metrics to candidate manifests
+- add coverage-aware synthetic preference policies
+- record whether the synthetic objective was:
+  - converge-to-anchor
+  - explore-around-anchor
+  - cover-multiple-centers
+
+### 7.3 Add synthetic corpus management
+
+Goals:
+
+- make synthetic datasets inspectable, versioned, and reproducible
+
+Implementation tasks:
+
+- define output folder layout for generated corpora
+- add manifest files with seeds, simulator version, and task family
+- add HTML summaries for synthetic runs similar to user trace reports
+- add train/validation/test split support for synthetic corpora
+- add filtering by prompt family, anchor type, and diversity regime
+
+### 7.4 Add synthetic-data quality checks
+
+Goals:
+
+- avoid training on unrealistic or degenerate synthetic traces
+
+Implementation tasks:
+
+- add duplicate-detection checks
+- add candidate-diversity threshold checks
+- add anchor-distance sanity checks
+- add synthetic preference consistency checks
+- add comparison dashboards against real session statistics
+
+## 8. P2: Architecture and Scale Improvements
 
 ### 7.1 Add a pluggable storage layer for shared deployments
 
@@ -231,7 +367,7 @@ Suggested work:
 - snapshot replay export schema
 - snapshot trace-report structure where stable
 
-## 8. Milestone View
+## 9. Milestone View
 
 ### Milestone A: Operator Trust
 
@@ -244,25 +380,34 @@ Suggested work:
 - mode-specific feedback UI
 - better async progress states
 - improved replay and trace navigation
+- first synthetic-data pipeline for anchor-seeking and diversity-seeking corpora
+- first multi-pipeline steering support for image prompt, inpainting, and ControlNet workflows
 
 ### Milestone C: Hardening and Release Maturity
 
 - stronger CI release automation
 - better export portability
 - shared-store preparation
+- synthetic corpus validation and packaging
 
-## 9. Suggested Execution Order
+## 10. Suggested Execution Order
 
 1. expand real-backend end-to-end validation
 2. package session trace bundles for export
 3. improve diagnostics depth
 4. build mode-specific feedback UI
 5. refine async progress states
-6. improve replay and trace navigation
-7. harden release automation
-8. prepare shared-storage evolution
+6. expand generation contracts for multiple diffusion pipeline types
+7. add image-prompt steering support
+8. add inpainting steering support
+9. add ControlNet steering support
+10. add anchor-seeking synthetic-data pipeline
+11. add diversity-seeking synthetic-data pipeline
+12. improve replay and trace navigation
+13. harden release automation
+14. prepare shared-storage evolution
 
-## 10. Summary
+## 11. Summary
 
 The main system goal is no longer “make the MVP exist.” That is done.
 
@@ -273,3 +418,5 @@ The next engineering phase should make the system:
 - easier to operate
 - easier to extend
 - easier to publish and reproduce
+- easier to use for realistic synthetic-data generation at scale
+- usable across multiple diffusion conditioning workflows, not only prompt-only generation

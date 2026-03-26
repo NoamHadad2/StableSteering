@@ -25,6 +25,7 @@ Published HTML documentation:
 - [README.md](E:\Projects\StableSteering\README.md)
 - [INSTALL.md](E:\Projects\StableSteering\INSTALL.md)
 - [RELEASE.md](E:\Projects\StableSteering\RELEASE.md)
+- [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md)
 - [quick_start.md](E:\Projects\StableSteering\docs\quick_start.md)
 - [developer_guide.md](E:\Projects\StableSteering\docs\developer_guide.md)
 - [user_guide.md](E:\Projects\StableSteering\docs\user_guide.md)
@@ -33,6 +34,7 @@ Published HTML documentation:
 
 - `python -m pytest`
 - `npm run test:e2e:chrome`
+- `python scripts/build_pages_site.py`
 
 ## Notes
 

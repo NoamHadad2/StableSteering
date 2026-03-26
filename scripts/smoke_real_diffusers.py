@@ -29,6 +29,7 @@ def main() -> int:
         model_id="runwayml/stable-diffusion-v1-5",
         models_root=Path("models"),
         artifacts_dir=root / "data" / "artifacts",
+        num_inference_steps=25,
     )
     orchestrator = Orchestrator(repository=repository, generator=generator)
     experiment = orchestrator.create_experiment(
@@ -37,7 +38,7 @@ def main() -> int:
             description="single-candidate real backend smoke test",
             config=StrategyConfig(
                 candidate_count=1,
-                image_size="256x256",
+                image_size="512x512",
                 sampler="random_local",
                 updater="winner_average",
                 model_name="runwayml/stable-diffusion-v1-5",

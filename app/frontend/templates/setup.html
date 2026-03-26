@@ -10,38 +10,22 @@
     <main class="page narrow">
       <section class="hero compact">
         <p class="eyebrow">Setup</p>
-        <h1>Create an experiment and start a session</h1>
+        <h1>Start from your text prompt</h1>
+        <p class="lede">Describe the image you want first, then tune the session settings around that prompt.</p>
       </section>
       <section class="card">
         <form id="setup-form" class="form-grid">
           <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
-          <label>Experiment name<input name="experiment_name" value="Baseline experiment" required></label>
-          <label>Description<input name="description" value="Initial mock generation workflow"></label>
-          <label>Prompt<textarea name="prompt" required>A cinematic mountain road at sunrise</textarea></label>
+          <label>Prompt<textarea name="prompt" required autofocus>A cinematic mountain road at sunrise</textarea></label>
           <label>Negative prompt<textarea name="negative_prompt">blurry, distorted</textarea></label>
-          <label>Sampler
-            <select name="sampler">
-              <option value="random_local">random_local</option>
-              <option value="exploit_orthogonal">exploit_orthogonal</option>
-              <option value="uncertainty_guided">uncertainty_guided</option>
-            </select>
+          <label>Experiment name<input name="experiment_name" value="Baseline experiment" required></label>
+          <label>Description<input name="description" value="Initial real generation workflow"></label>
+          <label>Session configuration (YAML)
+            <textarea name="config_yaml" id="config-yaml-editor" class="yaml-editor" spellcheck="false">{{ config_yaml }}</textarea>
           </label>
-          <label>Updater
-            <select name="updater">
-              <option value="winner_average">winner_average</option>
-              <option value="winner_copy">winner_copy</option>
-              <option value="linear_preference">linear_preference</option>
-            </select>
-          </label>
-          <label>Feedback mode
-            <select name="feedback_mode">
-              <option value="scalar_rating">scalar_rating</option>
-              <option value="pairwise">pairwise</option>
-              <option value="top_k">top_k</option>
-            </select>
-          </label>
-          <label>Candidates per round<input type="number" name="candidate_count" value="4" min="2" max="8"></label>
+          <p class="hint">All per-session strategy values live in this YAML document. Edit it before creating a session, or reload the default template.</p>
           <div class="actions">
+            <button class="button secondary" type="button" id="reload-config-button">Reload default YAML</button>
             <button class="button" type="submit" id="setup-submit-button">Create and open session</button>
             <a class="button secondary" href="/">Back</a>
           </div>

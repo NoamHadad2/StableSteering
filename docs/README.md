@@ -9,6 +9,8 @@ Published HTML version:
 The current repository also includes a runnable prototype. The most implementation-specific documents are:
 
 - [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
+- [configuration_manual.md](/E:/Projects/StableSteering/docs/configuration_manual.md)
+- [student_tutorial.md](/E:/Projects/StableSteering/docs/student_tutorial.md)
 - [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
 - [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
 - [faq.md](/E:/Projects/StableSteering/docs/faq.md)
@@ -22,6 +24,7 @@ Current implementation highlights reflected in these guides:
 - SQLite-backed local persistence
 - backend-saved per-session HTML trace reports
 - real GPU-backed end-to-end example bundle under `output/examples/real_e2e_example_run/`
+- Gemini-generated illustration assets embedded into the student tutorial and published HTML docs
 
 ## Core Documents
 
@@ -40,8 +43,23 @@ Current implementation highlights reflected in these guides:
 - [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
   Converts the specification set into an implementation-ready plan with defaults, scope, and milestones.
 
+- [student_tutorial.md](/E:/Projects/StableSteering/docs/student_tutorial.md)
+  Provides a student-oriented walkthrough from motivation and theory to the implementation structure and learning exercises.
+
+- [assets/illustrations/steering_loop.png](/E:/Projects/StableSteering/docs/assets/illustrations/steering_loop.png)
+  Gemini-generated conceptual illustration of the steering loop.
+
+- [assets/illustrations/system_architecture.png](/E:/Projects/StableSteering/docs/assets/illustrations/system_architecture.png)
+  Gemini-generated conceptual illustration of the main system layers.
+
+- [assets/illustrations/trace_report.png](/E:/Projects/StableSteering/docs/assets/illustrations/trace_report.png)
+  Gemini-generated conceptual illustration of the saved HTML session trace report.
+
 - [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
   Gives the shortest path to installing, running, and trying the prototype.
+
+- [configuration_manual.md](/E:/Projects/StableSteering/docs/configuration_manual.md)
+  Explains the per-session YAML configuration flow, parameter meanings, validation rules, and practical editing patterns.
 
 - [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
   Explains the current app from the perspective of a user running sessions.
@@ -69,10 +87,12 @@ Current implementation highlights reflected in these guides:
 ## Suggested Reading Order
 
 1. [motivation.md](/E:/Projects/StableSteering/docs/motivation.md)
-2. [theoretical_background.md](/E:/Projects/StableSteering/docs/theoretical_background.md)
-3. [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
-4. [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
-5. [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
-6. [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
-7. [system_improvement_roadmap.md](/E:/Projects/StableSteering/docs/system_improvement_roadmap.md)
-8. [research_improvement_roadmap.md](/E:/Projects/StableSteering/docs/research_improvement_roadmap.md)
+2. [student_tutorial.md](/E:/Projects/StableSteering/docs/student_tutorial.md)
+3. [theoretical_background.md](/E:/Projects/StableSteering/docs/theoretical_background.md)
+4. [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
+5. [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
+6. [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
+7. [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
+8. [configuration_manual.md](/E:/Projects/StableSteering/docs/configuration_manual.md)
+9. [system_improvement_roadmap.md](/E:/Projects/StableSteering/docs/system_improvement_roadmap.md)
+10. [research_improvement_roadmap.md](/E:/Projects/StableSteering/docs/research_improvement_roadmap.md)

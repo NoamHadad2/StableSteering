@@ -3,6 +3,53 @@ from __future__ import annotations
 import time
 
 
+def test_setup_session_endpoint_accepts_yaml_config(client) -> None:
+    response = client.post(
+        "/setup/session",
+        json={
+            "experiment_name": "YAML setup",
+            "description": "Setup page yaml flow",
+            "prompt": "A structured YAML setup prompt",
+            "negative_prompt": "blurry",
+            "config_yaml": """
+sampler: exploit_orthogonal
+updater: linear_preference
+feedback_mode: pairwise
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 3
+image_size: 512x512
+trust_radius: 0.25
+anchor_strength: 0.2
+model_name: runwayml/stable-diffusion-v1-5
+""",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["experiment"]["config"]["sampler"] == "exploit_orthogonal"
+    assert payload["experiment"]["config"]["updater"] == "linear_preference"
+    assert payload["session"]["config"]["feedback_mode"] == "pairwise"
+    assert payload["session"]["config"]["candidate_count"] == 3
+
+
+def test_setup_session_endpoint_rejects_invalid_yaml(client) -> None:
+    response = client.post(
+        "/setup/session",
+        json={
+            "experiment_name": "Broken YAML setup",
+            "description": "",
+            "prompt": "Broken config",
+            "negative_prompt": "",
+            "config_yaml": "sampler: [oops",
+        },
+    )
+    assert response.status_code == 400
+    payload = response.json()
+    assert payload["error_code"] == "invalid_input"
+    assert "Invalid YAML configuration" in payload["message"]
+
+
 def test_session_lifecycle_round_feedback_round(client) -> None:
     experiment = client.post(
         "/experiments",
@@ -31,6 +78,11 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
     assert round_one.status_code == 200
     round_payload = round_one.json()
     assert len(round_payload["candidate_metadata"]) == 4
+    baseline = round_payload["candidate_metadata"][0]
+    assert baseline["sampler_role"] == "baseline_prompt"
+    assert baseline["z"] == [0.0, 0.0, 0.0]
+    assert baseline["generation_params"]["baseline_prompt"] is True
+    assert baseline["generation_params"]["steering_applied"] is False
 
     blocked_round = client.post(f"/sessions/{session_id}/rounds/next")
     assert blocked_round.status_code == 409
@@ -51,7 +103,19 @@ def test_session_lifecycle_round_feedback_round(client) -> None:
 
     round_two = client.post(f"/sessions/{session_id}/rounds/next")
     assert round_two.status_code == 200
-    assert round_two.json()["state_summary"]["round_index"] == 2
+    round_two_payload = round_two.json()
+    assert round_two_payload["state_summary"]["round_index"] == 2
+    carried = round_two_payload["candidate_metadata"][0]
+    winning_candidate_id = feedback.json()["update_summary"]["winner_candidate_id"]
+    previous_winner = next(
+        candidate for candidate in round_payload["candidate_metadata"] if candidate["id"] == winning_candidate_id
+    )
+    assert carried["sampler_role"] == "incumbent"
+    assert carried["z"] == previous_winner["z"]
+    assert carried["image_path"] == previous_winner["image_path"]
+    assert carried["generation_params"]["carried_forward"] is True
+    assert carried["generation_params"]["carried_forward_candidate_id"] == previous_winner["id"]
+    assert len(round_two_payload["candidate_metadata"]) == 4
 
     duplicate_feedback = client.post(
         f"/rounds/{round_payload['round_id']}/feedback",

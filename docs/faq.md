@@ -4,6 +4,8 @@
 
 StableSteering is a research prototype for studying interactive prompt-embedding steering in text-to-image systems.
 
+If you want the easiest conceptual introduction, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+
 ## Does it generate real AI images yet?
 
 Yes, if you install the inference dependencies, prepare a local model snapshot, and run with the Diffusers backend enabled.
@@ -27,6 +29,12 @@ without requiring real image generation in every automated test.
 ## What is the normal runtime path?
 
 The normal app runtime uses the real Diffusers backend on GPU. The mock generator exists only for explicit test harnesses.
+
+## Does the user flow start from a text prompt?
+
+Yes.
+
+The normal workflow begins on `/setup`, where the user enters a text prompt and then starts a session from that prompt.
 
 ## Is there a setup script for Hugging Face models?
 
@@ -107,6 +115,8 @@ This creates a real GPU-backed example bundle under:
 output/examples/real_e2e_example_run/
 ```
 
+That bundle includes generated images, a manifest, a standalone walkthrough HTML file, and the session trace report.
+
 ## What feedback modes are supported?
 
 The schema supports:
@@ -116,6 +126,16 @@ The schema supports:
 - top-k ranking
 
 The current UI uses rating inputs for all supported modes and derives the final payload from the selected feedback mode.
+
+## Are other diffusion workflows in scope?
+
+Yes, on the roadmap.
+
+The current implementation focuses on prompt-first text-to-image steering, but the roadmaps now also include:
+
+- image-prompt or image-variation steering
+- inpainting steering
+- ControlNet-guided steering
 
 ## What samplers are implemented?
 

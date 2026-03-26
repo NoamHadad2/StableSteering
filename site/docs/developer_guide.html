@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -30,6 +30,7 @@
 <li>change storage or generation behavior</li>
 <li>maintain test coverage while evolving the system</li>
 </ul>
+<p>For a student-oriented conceptual walkthrough, start with <a href="student_tutorial.html">student_tutorial.md</a>.</p>
 <h2 id="2-current-implementation-scope">2. Current Implementation Scope</h2>
 <p>The current implementation is a minimal research MVP with:</p>
 <ul>
@@ -44,6 +45,7 @@
 <li>per-session HTML trace reports saved by the backend</li>
 <li>frontend trace capture and visible trace panels</li>
 <li>automated tests for feedback, lifecycle, tracing, and replay export</li>
+<li>a reusable real GPU-backed example-run generator for demos and teaching</li>
 </ul>
 <p>It does not yet include:</p>
 <ul>
@@ -114,6 +116,9 @@ server runtime now requires that path and should fail fast when a CUDA-capable
 GPU is not available.</p>
 <p>Run the standalone real-model smoke test:</p>
 <pre><code class="language-bash">python scripts/smoke_real_diffusers.py
+</code></pre>
+<p>Generate the full example walkthrough bundle:</p>
+<pre><code class="language-bash">python scripts/create_real_e2e_example.py
 </code></pre>
 <p>Open:</p>
 <pre><code class="language-text">http://127.0.0.1:8000
@@ -262,6 +267,12 @@ rendering. If the model or GPU requirements are not satisfied, startup fails.</p
 <li>replay exports include explicit schema and app versions</li>
 <li>long-running session actions are exposed as async jobs with pollable status</li>
 <li>session trace reports are backend-owned artifacts, not frontend-only console output</li>
+</ul>
+<p>The current roadmap also includes expanding steering support beyond prompt-only generation into:</p>
+<ul>
+<li>image-prompt or image-variation workflows</li>
+<li>inpainting workflows</li>
+<li>ControlNet-guided workflows</li>
 </ul>
 <h3 id="64-evolve-persistence">6.4 Evolve persistence</h3>
 <p>To move from SQLite to PostgreSQL or another shared store:</p>

@@ -14,7 +14,7 @@ This folder contains developer-facing helper scripts.
   Runs a real-model smoke test through the orchestration path and writes output artifacts.
 
 - `create_real_e2e_example.py`
-  Executes a real multi-round steering session on GPU and writes a standalone HTML walkthrough plus a trace bundle under `output/examples/real_e2e_example_run/`.
+  Executes a real multi-round steering session on GPU and writes a standalone HTML walkthrough plus a trace bundle under `output/examples/real_e2e_example_run/`. The example is intended to demonstrate system value starting from a strong user text prompt and a clear objective.
 
 - `run_e2e_debug.ps1`
   Launches the Playwright suite headed in Chrome for interactive debugging.
@@ -26,7 +26,13 @@ This folder contains developer-facing helper scripts.
   Builds an optional source release zip from tracked repository files into `output/releases/`.
 
 - `build_pages_site.py`
-  Converts the repository Markdown set into a static HTML site under `site/` with rewritten inter-document links for GitHub Pages.
+  Converts the repository Markdown set into a static HTML site under `site/`, rewrites inter-document links for GitHub Pages, and copies published image assets used by the docs.
+
+- `generate_readme_banner.py`
+  Uses the Gemini image-generation API to create the repository banner asset used in the main README.
+
+- `generate_doc_illustrations.py`
+  Uses the Gemini image-generation API to create conceptual illustration assets for the student tutorial and published HTML docs.
 
 ## Usage
 

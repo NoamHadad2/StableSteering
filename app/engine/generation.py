@@ -283,6 +283,7 @@ def build_generation_engine(
     model_id: str | None = None,
     models_root: Path | None = None,
     artifacts_dir: Path | None = None,
+    num_inference_steps: int | None = None,
 ) -> GenerationEngine:
     """Build the configured generation backend.
 
@@ -313,6 +314,7 @@ def build_generation_engine(
             model_source=source,
             artifacts_dir=artifacts_dir,
             device=settings.inference_device,
+            num_inference_steps=num_inference_steps,
             local_files_only=prepared_path.exists() or not settings.allow_remote_model_download,
             require_gpu=True,
         )
@@ -327,6 +329,7 @@ def build_generation_engine(
             model_source=str(prepared_path),
             artifacts_dir=artifacts_dir,
             device=settings.inference_device,
+            num_inference_steps=num_inference_steps,
             local_files_only=True,
             require_gpu=True,
         )

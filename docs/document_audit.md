@@ -12,6 +12,8 @@ This documentation set was re-audited and synchronized with the current implemen
 - per-session HTML trace reports were added under `data/traces/sessions/<session_id>/report.html`
 - async round generation and feedback submission were exposed through job endpoints with visible progress
 - a real GPU-backed end-to-end example bundle was added under `output/examples/real_e2e_example_run/`
+- a student-oriented tutorial was added to bridge motivation, theory, and implementation
+- the roadmap set was expanded to include image-prompt, inpainting, and ControlNet steering directions
 - lifecycle guards were added for duplicate feedback and premature next-round generation
 - browser coverage was expanded with headed debug support and replay export API smoke coverage
 
@@ -22,6 +24,7 @@ The most heavily updated documents in this sync were:
 - [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
 - [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
 - [faq.md](/E:/Projects/StableSteering/docs/faq.md)
+- [student_tutorial.md](/E:/Projects/StableSteering/docs/student_tutorial.md)
 - [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
 - [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
 - [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)

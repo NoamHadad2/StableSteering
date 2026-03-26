@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -199,7 +199,136 @@
 <li>document safe deletion more clearly</li>
 <li>add optional artifact compression for exported bundles</li>
 </ul>
-<h2 id="7-p2-architecture-and-scale-improvements">7. P2: Architecture and Scale Improvements</h2>
+<h3 id="64-add-a-synthetic-data-generation-pipeline">6.4 Add a synthetic-data generation pipeline</h3>
+<p>Goals:</p>
+<ul>
+<li>support large-scale offline algorithm evaluation</li>
+<li>generate reproducible synthetic steering sessions</li>
+<li>make synthetic datasets realistic enough to be useful for training and benchmarking</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>add a dataset-generation script or service layer for synthetic sessions</li>
+<li>support two primary synthetic regimes:</li>
+<li>anchor-seeking trajectories toward a target steer state or reference</li>
+<li>diversity-seeking trajectories around one or more steered locations</li>
+<li>define a stable synthetic-session schema with:</li>
+<li>prompt</li>
+<li>anchor definition</li>
+<li>candidate set</li>
+<li>synthetic preference event</li>
+<li>critique text if generated</li>
+<li>next-state summary</li>
+<li>simulator metadata</li>
+<li>persist synthetic run manifests separately from ordinary interactive sessions</li>
+<li>version the simulator policy independently from the rest of the app</li>
+<li>generate analysis-ready exports for each synthetic corpus</li>
+</ul>
+<h3 id="65-expand-steering-support-to-more-diffusion-pipelines">6.5 Expand steering support to more diffusion pipelines</h3>
+<p>Goals:</p>
+<ul>
+<li>move beyond text-to-image-only steering</li>
+<li>make the system useful for more realistic creative workflows</li>
+<li>support conditioning modes that practitioners already use in production</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>add a pipeline adapter layer so orchestration can target multiple diffusion workflows through one stable contract</li>
+<li>support image-prompt or image-variation steering where the user starts from a reference image and refines around it</li>
+<li>support inpainting steering where the user edits only a masked region while preserving the surrounding composition</li>
+<li>support ControlNet-guided steering for structure-aware workflows such as edge, depth, pose, or segmentation control</li>
+<li>persist pipeline-specific inputs in session state and replay exports, including:</li>
+<li>reference images</li>
+<li>masks</li>
+<li>ControlNet conditioning assets</li>
+<li>pipeline-specific generation settings</li>
+<li>extend diagnostics so the active pipeline type is visible during runtime</li>
+<li>extend trace reports so they clearly show which conditioning mode each round used</li>
+<li>add storage conventions for auxiliary assets used by non-text-only pipelines</li>
+</ul>
+<p>Implementation tasks:</p>
+<ul>
+<li>define a generation request schema that can represent:</li>
+<li>pure text prompt generation</li>
+<li>text plus reference image generation</li>
+<li>text plus mask generation</li>
+<li>text plus ControlNet conditioning generation</li>
+<li>add adapter implementations for:</li>
+<li>image prompt or image variation pipeline</li>
+<li>inpainting pipeline</li>
+<li>one or more ControlNet pipelines</li>
+<li>add validation rules for required assets per pipeline type</li>
+<li>add frontend affordances for uploading and previewing reference images, masks, and control inputs</li>
+<li>add replay rendering support for these extra conditioning artifacts</li>
+<li>add test fixtures for each pipeline family</li>
+</ul>
+<h2 id="7-p1-synthetic-data-infrastructure-and-tooling">7. P1: Synthetic Data Infrastructure and Tooling</h2>
+<h3 id="71-support-anchor-seeking-synthetic-user-simulation">7.1 Support anchor-seeking synthetic-user simulation</h3>
+<p>System requirements:</p>
+<ul>
+<li>represent an anchor as one or more of:</li>
+<li>latent steering vector</li>
+<li>reference image embedding</li>
+<li>attribute target bundle</li>
+<li>text-derived target state</li>
+<li>compute candidate-to-anchor scores consistently</li>
+<li>allow configurable synthetic-user noise models</li>
+<li>emit round-by-round decisions and rationale fields</li>
+</ul>
+<p>Implementation tasks:</p>
+<ul>
+<li>add anchor-definition models</li>
+<li>add synthetic scorer interfaces</li>
+<li>add pluggable decision policies for ratings, pairwise outcomes, and rankings</li>
+<li>add critique-template or critique-generation hooks</li>
+<li>add calibration tools to compare synthetic traces with real traces</li>
+</ul>
+<h3 id="72-support-diversity-seeking-synthetic-user-simulation">7.2 Support diversity-seeking synthetic-user simulation</h3>
+<p>System requirements:</p>
+<ul>
+<li>support one-center local diversity sampling</li>
+<li>support multi-center diversity sampling</li>
+<li>compute both quality and coverage scores</li>
+<li>prevent synthetic corpora from collapsing into near-duplicates</li>
+</ul>
+<p>Implementation tasks:</p>
+<ul>
+<li>add local-neighborhood samplers around one steered location</li>
+<li>add multi-center batch construction around several promising locations</li>
+<li>add diversity metrics to candidate manifests</li>
+<li>add coverage-aware synthetic preference policies</li>
+<li>record whether the synthetic objective was:</li>
+<li>converge-to-anchor</li>
+<li>explore-around-anchor</li>
+<li>cover-multiple-centers</li>
+</ul>
+<h3 id="73-add-synthetic-corpus-management">7.3 Add synthetic corpus management</h3>
+<p>Goals:</p>
+<ul>
+<li>make synthetic datasets inspectable, versioned, and reproducible</li>
+</ul>
+<p>Implementation tasks:</p>
+<ul>
+<li>define output folder layout for generated corpora</li>
+<li>add manifest files with seeds, simulator version, and task family</li>
+<li>add HTML summaries for synthetic runs similar to user trace reports</li>
+<li>add train/validation/test split support for synthetic corpora</li>
+<li>add filtering by prompt family, anchor type, and diversity regime</li>
+</ul>
+<h3 id="74-add-synthetic-data-quality-checks">7.4 Add synthetic-data quality checks</h3>
+<p>Goals:</p>
+<ul>
+<li>avoid training on unrealistic or degenerate synthetic traces</li>
+</ul>
+<p>Implementation tasks:</p>
+<ul>
+<li>add duplicate-detection checks</li>
+<li>add candidate-diversity threshold checks</li>
+<li>add anchor-distance sanity checks</li>
+<li>add synthetic preference consistency checks</li>
+<li>add comparison dashboards against real session statistics</li>
+</ul>
+<h2 id="8-p2-architecture-and-scale-improvements">8. P2: Architecture and Scale Improvements</h2>
 <h3 id="71-add-a-pluggable-storage-layer-for-shared-deployments">7.1 Add a pluggable storage layer for shared deployments</h3>
 <p>Goals:</p>
 <ul>
@@ -234,7 +363,7 @@
 <li>snapshot replay export schema</li>
 <li>snapshot trace-report structure where stable</li>
 </ul>
-<h2 id="8-milestone-view">8. Milestone View</h2>
+<h2 id="9-milestone-view">9. Milestone View</h2>
 <h3 id="milestone-a-operator-trust">Milestone A: Operator Trust</h3>
 <ul>
 <li>richer diagnostics</li>
@@ -246,25 +375,34 @@
 <li>mode-specific feedback UI</li>
 <li>better async progress states</li>
 <li>improved replay and trace navigation</li>
+<li>first synthetic-data pipeline for anchor-seeking and diversity-seeking corpora</li>
+<li>first multi-pipeline steering support for image prompt, inpainting, and ControlNet workflows</li>
 </ul>
 <h3 id="milestone-c-hardening-and-release-maturity">Milestone C: Hardening and Release Maturity</h3>
 <ul>
 <li>stronger CI release automation</li>
 <li>better export portability</li>
 <li>shared-store preparation</li>
+<li>synthetic corpus validation and packaging</li>
 </ul>
-<h2 id="9-suggested-execution-order">9. Suggested Execution Order</h2>
+<h2 id="10-suggested-execution-order">10. Suggested Execution Order</h2>
 <ol>
 <li>expand real-backend end-to-end validation</li>
 <li>package session trace bundles for export</li>
 <li>improve diagnostics depth</li>
 <li>build mode-specific feedback UI</li>
 <li>refine async progress states</li>
+<li>expand generation contracts for multiple diffusion pipeline types</li>
+<li>add image-prompt steering support</li>
+<li>add inpainting steering support</li>
+<li>add ControlNet steering support</li>
+<li>add anchor-seeking synthetic-data pipeline</li>
+<li>add diversity-seeking synthetic-data pipeline</li>
 <li>improve replay and trace navigation</li>
 <li>harden release automation</li>
 <li>prepare shared-storage evolution</li>
 </ol>
-<h2 id="10-summary">10. Summary</h2>
+<h2 id="11-summary">11. Summary</h2>
 <p>The main system goal is no longer “make the MVP exist.” That is done.</p>
 <p>The next engineering phase should make the system:</p>
 <ul>
@@ -273,6 +411,8 @@
 <li>easier to operate</li>
 <li>easier to extend</li>
 <li>easier to publish and reproduce</li>
+<li>easier to use for realistic synthetic-data generation at scale</li>
+<li>usable across multiple diffusion conditioning workflows, not only prompt-only generation</li>
 </ul>
       </main>
     </div>

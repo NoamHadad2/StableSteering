@@ -4,6 +4,8 @@ const progressPanel = document.getElementById("progress-panel");
 const progressBar = document.getElementById("progress-bar");
 const progressValue = document.getElementById("progress-value");
 const progressLabel = document.getElementById("progress-label");
+const configYamlEditor = document.getElementById("config-yaml-editor");
+const reloadConfigButton = document.getElementById("reload-config-button");
 
 function appendTrace(message) {
   if (!traceLog) return;
@@ -88,6 +90,14 @@ async function postJson(url, body) {
   return data;
 }
 
+async function getJson(url) {
+  const response = await fetch(url, { method: "GET" });
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+  return response.json();
+}
+
 async function pollJob(statusUrl, { onProgress } = {}) {
   for (;;) {
     const response = await fetch(statusUrl, { method: "GET" });
@@ -155,36 +165,46 @@ const setupForm = document.getElementById("setup-form");
 const setupSubmitButton = document.getElementById("setup-submit-button");
 if (setupForm) {
   traceFrontend("page.loaded", { view: "setup" });
+  reloadConfigButton?.addEventListener("click", async () => {
+    reloadConfigButton.disabled = true;
+    setStatus("Reloading default YAML template...");
+    traceFrontend("setup.config.reload.clicked");
+    try {
+      const payload = await getJson("/setup/config-template");
+      if (configYamlEditor) {
+        configYamlEditor.value = payload.config_yaml || "";
+      }
+      setStatus("Default YAML template reloaded.");
+    } catch (error) {
+      setStatus(error.message, true);
+    } finally {
+      reloadConfigButton.disabled = false;
+    }
+  });
   setupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     traceFrontend("setup.submit.clicked");
     if (setupSubmitButton) setupSubmitButton.disabled = true;
-    setStatus("Creating experiment and session...");
+    if (reloadConfigButton) reloadConfigButton.disabled = true;
+    setStatus("Creating experiment and session from YAML configuration...");
     try {
       const form = new FormData(setupForm);
-      const experiment = await postJson("/experiments", {
-        name: form.get("experiment_name"),
+      const payload = await postJson("/setup/session", {
+        experiment_name: form.get("experiment_name"),
         description: form.get("description"),
-        config: {
-          sampler: form.get("sampler"),
-          updater: form.get("updater"),
-          feedback_mode: form.get("feedback_mode"),
-          candidate_count: Number(form.get("candidate_count")),
-        },
-      });
-      traceFrontend("experiment.created", { experiment_id: experiment.id });
-      const session = await postJson("/sessions", {
-        experiment_id: experiment.id,
         prompt: form.get("prompt"),
         negative_prompt: form.get("negative_prompt"),
+        config_yaml: form.get("config_yaml"),
       });
-      traceFrontend("session.created", { session_id: session.id });
+      traceFrontend("experiment.created", { experiment_id: payload.experiment.id });
+      traceFrontend("session.created", { session_id: payload.session.id });
       setStatus("Session created. Opening the interactive view...");
-      window.location.href = `/sessions/${session.id}/view`;
+      window.location.href = `/sessions/${payload.session.id}/view`;
     } catch (error) {
       setStatus(error.message, true);
     } finally {
       if (setupSubmitButton) setupSubmitButton.disabled = false;
+      if (reloadConfigButton) reloadConfigButton.disabled = false;
     }
   });
 }

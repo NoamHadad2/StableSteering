@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from app.core.config import settings
 from app.core.schema import (
+    Candidate,
     Experiment,
     ExperimentCreate,
     FeedbackRequest,
@@ -133,11 +136,21 @@ class Orchestrator:
             "round.generation.started",
             {"session_id": session.id, "round_index": round_index, "sampler": session.config.sampler},
         )
-        candidates = sampler.propose(session, seed)
+        carried_forward = self._build_carried_forward_candidate(session)
+        baseline_candidate = self._build_baseline_prompt_candidate(session)
+        proposed_candidates = sampler.propose(session, seed)
+        candidates = self._compose_round_candidates(
+            pinned_candidate=carried_forward or baseline_candidate,
+            proposed_candidates=proposed_candidates,
+            candidate_count=session.config.candidate_count,
+        )
         # Render each candidate independently so future versions can tolerate
         # partial round failures without changing the orchestration contract.
         for candidate in candidates:
             candidate.round_id = round_obj.id
+            if candidate.generation_params.get("carried_forward") and candidate.image_path:
+                candidate.render_status = RenderStatus.succeeded
+                continue
             candidate.seed = seed
             candidate = self.generator.render_candidate(session, candidate)
             candidate.render_status = RenderStatus.succeeded
@@ -279,3 +292,88 @@ class Orchestrator:
             "predicted_score": candidate.predicted_score,
             "predicted_uncertainty": candidate.predicted_uncertainty,
         }
+
+    def _build_carried_forward_candidate(self, session: Session) -> Candidate | None:
+        """Clone the prior round's winning candidate so the next round preserves it."""
+
+        if not session.incumbent_candidate_id or session.current_round == 0:
+            return None
+
+        previous_rounds = self.repository.list_rounds_for_session(session.id)
+        if not previous_rounds:
+            return None
+
+        previous_round = previous_rounds[-1]
+        winner = next(
+            (candidate for candidate in previous_round.candidates if candidate.id == session.incumbent_candidate_id),
+            None,
+        )
+        if winner is None:
+            logger.warning(
+                "Could not find incumbent candidate %s in previous round %s for session %s",
+                session.incumbent_candidate_id,
+                previous_round.id,
+                session.id,
+            )
+            return None
+
+        generation_params = deepcopy(winner.generation_params)
+        generation_params.update(
+            {
+                "carried_forward": True,
+                "carried_forward_candidate_id": winner.id,
+                "carried_forward_round_id": previous_round.id,
+            }
+        )
+        return Candidate(
+            round_id="",
+            candidate_index=0,
+            z=list(winner.z),
+            sampler_role="incumbent",
+            predicted_score=winner.predicted_score,
+            predicted_uncertainty=winner.predicted_uncertainty,
+            seed=winner.seed,
+            generation_params=generation_params,
+            image_path=winner.image_path,
+            render_status=winner.render_status,
+        )
+
+    @staticmethod
+    def _build_baseline_prompt_candidate(session: Session) -> Candidate | None:
+        """Create the unmodified-prompt candidate for the very first round."""
+
+        if session.current_round != 0:
+            return None
+
+        return Candidate(
+            round_id="",
+            candidate_index=0,
+            z=[0.0 for _ in session.current_z],
+            sampler_role="baseline_prompt",
+            predicted_score=0.0,
+            predicted_uncertainty=0.05,
+            seed=0,
+            generation_params={
+                "image_size": session.config.image_size,
+                "baseline_prompt": True,
+                "steering_applied": False,
+            },
+        )
+
+    @staticmethod
+    def _compose_round_candidates(
+        *,
+        pinned_candidate: Candidate | None,
+        proposed_candidates: list[Candidate],
+        candidate_count: int,
+    ) -> list[Candidate]:
+        """Build one round batch with a required leading candidate when available."""
+
+        selected = []
+        if pinned_candidate is not None:
+            selected.append(pinned_candidate)
+        remaining_slots = max(0, candidate_count - len(selected))
+        selected.extend(proposed_candidates[:remaining_slots])
+        for index, candidate in enumerate(selected):
+            candidate.candidate_index = index
+        return selected

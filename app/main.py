@@ -12,9 +12,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.config import settings
+from app.core.config_yaml import parse_strategy_config_yaml, render_strategy_config_yaml
 from app.core.jobs import AsyncJobManager
 from app.core.logging import configure_logging, logger, set_request_id
-from app.core.schema import ApiError, ExperimentCreate, FeedbackRequest, SessionCreate
+from app.core.schema import ApiError, ExperimentCreate, FeedbackRequest, SessionCreate, SetupSessionRequest
 from app.core.tracing import TraceRecorder
 from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
@@ -164,7 +165,21 @@ def setup_page(request: Request) -> HTMLResponse:
     """Render the session setup page."""
 
     experiments = request.app.state.orchestrator.list_experiments()
-    return templates.TemplateResponse("setup.html", {"request": request, "experiments": experiments})
+    return templates.TemplateResponse(
+        "setup.html",
+        {
+            "request": request,
+            "experiments": experiments,
+            "config_yaml": render_strategy_config_yaml(),
+        },
+    )
+
+
+@app.get("/setup/config-template")
+def setup_config_template():
+    """Return the default editable YAML block for per-session configuration."""
+
+    return {"config_yaml": render_strategy_config_yaml()}
 
 
 @app.get("/sessions/{session_id}/view", response_class=HTMLResponse)
@@ -245,6 +260,36 @@ def create_session(request: SessionCreate):
         return api_error_response(404, "not_found", str(exc))
     except ValueError as exc:
         return api_error_response(400, "invalid_input", str(exc))
+
+
+@app.post("/setup/session")
+def create_session_from_setup(request: SetupSessionRequest):
+    """Create one experiment and session from the setup page's YAML config."""
+
+    try:
+        config = parse_strategy_config_yaml(request.config_yaml)
+        experiment = app.state.orchestrator.create_experiment(
+            ExperimentCreate(
+                name=request.experiment_name,
+                description=request.description,
+                config=config,
+            )
+        )
+        session = app.state.orchestrator.create_session(
+            SessionCreate(
+                experiment_id=experiment.id,
+                prompt=request.prompt,
+                negative_prompt=request.negative_prompt,
+            )
+        )
+    except ValueError as exc:
+        return api_error_response(400, "invalid_input", str(exc))
+    except KeyError as exc:
+        return api_error_response(404, "not_found", str(exc))
+    return {
+        "experiment": experiment.model_dump(mode="json"),
+        "session": session.model_dump(mode="json"),
+    }
 
 
 @app.get("/sessions/{session_id}")

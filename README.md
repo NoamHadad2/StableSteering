@@ -1,86 +1,97 @@
-# StableSteering
+<p align="center">
+  <img src="./docs/assets/readme_banner.png" alt="StableSteering banner" width="100%">
+</p>
 
-StableSteering is a research documentation repository for an interactive system that studies prompt-embedding steering for text-to-image diffusion models.
+<h1 align="center">StableSteering</h1>
 
-The runtime app is now GPU-only by default and expects CUDA-backed Diffusers inference.
+<p align="center">
+  Interactive steering for diffusion image generation, from a user text prompt to preference-guided refinement.
+</p>
 
-Published HTML documentation:
+<p align="center">
+  <a href="https://apartsinprojects.github.io/StableSteering/">Docs Site</a> ·
+  <a href="./docs/quick_start.md">Quick Start</a> ·
+  <a href="./docs/configuration_manual.md">Configuration Manual</a> ·
+  <a href="./docs/student_tutorial.md">Student Tutorial</a> ·
+  <a href="./docs/user_guide.md">User Guide</a> ·
+  <a href="./docs/developer_guide.md">Developer Guide</a>
+</p>
 
-- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+## What It Is
 
-The current repository contains the specification set used to define the project before implementation:
+StableSteering is a research-oriented system for interactive image generation with diffusion models.
 
-- [Motivation](./docs/motivation.md)
-- [Theoretical Background](./docs/theoretical_background.md)
-- [System Specification](./docs/system_specification.md)
-- [System Test Specification](./docs/system_test_specification.md)
-- [Pre-Implementation Blueprint](./docs/pre_implementation_blueprint.md)
-- [Documentation Audit Ledger](./docs/document_audit.md)
-- [Quick Start](./docs/quick_start.md)
-- [User Guide](./docs/user_guide.md)
-- [Developer Guide](./docs/developer_guide.md)
-- [FAQ](./docs/faq.md)
-- [Install Guide](./INSTALL.md)
-- [Release Guide](./RELEASE.md)
-- [Release Notes v0.1.0](./RELEASE_NOTES_v0.1.0.md)
-- [System Improvement Roadmap](./docs/system_improvement_roadmap.md)
-- [Research Improvement Roadmap](./docs/research_improvement_roadmap.md)
+Instead of relying on one-shot prompt rewriting, the system starts from a user text prompt, proposes multiple candidate directions, records user preferences, updates an internal steering state, and generates the next round from that evolving state.
 
-## Folder Guides
+The current repository includes both:
 
-Per-folder documentation is available in:
+- the original specification and research documents
+- a runnable FastAPI-based MVP with a real GPU-backed Diffusers backend
+- Gemini-generated visual assets used to make the Markdown and HTML docs easier to learn
 
-- [app/README.md](./app/README.md)
-- [app/bootstrap/README.md](./app/bootstrap/README.md)
-- [app/core/README.md](./app/core/README.md)
-- [app/engine/README.md](./app/engine/README.md)
-- [app/feedback/README.md](./app/feedback/README.md)
-- [app/frontend/README.md](./app/frontend/README.md)
-- [app/frontend/templates/README.md](./app/frontend/templates/README.md)
-- [app/frontend/static/README.md](./app/frontend/static/README.md)
-- [app/samplers/README.md](./app/samplers/README.md)
-- [app/storage/README.md](./app/storage/README.md)
-- [app/updaters/README.md](./app/updaters/README.md)
-- [tests/README.md](./tests/README.md)
-- [tests/e2e/README.md](./tests/e2e/README.md)
-- [scripts/README.md](./scripts/README.md)
-- [docs/README.md](./docs/README.md)
+## Why It Matters
 
-## Repo Status
+Text-to-image generation is powerful, but creative control is still awkward in practice.
+Users often know which result is better before they know how to rewrite the prompt that would produce it.
 
-This repository now contains:
+StableSteering is built around that gap. It turns generation into a feedback loop:
 
-- the original research and specification documents
-- a runnable FastAPI-based MVP
-- a real GPU-backed Diffusers generation workflow
-- a deterministic mock generation path reserved for tests
-- rich backend logging and persisted trace events
-- per-session HTML trace reports that capture proposed images, user actions, and preference outcomes
-- frontend trace capture and visible trace panels
-- automated API, lifecycle, and browser tests including replay export smoke coverage
+1. start from a text prompt
+2. generate candidate images
+3. capture user preference
+4. update steering state
+5. generate a stronger next round
 
-## Recommended Reading Order
+That makes the project useful both as:
 
-1. [Motivation](./docs/motivation.md)
-2. [Theoretical Background](./docs/theoretical_background.md)
-3. [System Specification](./docs/system_specification.md)
-4. [System Test Specification](./docs/system_test_specification.md)
-5. [Pre-Implementation Blueprint](./docs/pre_implementation_blueprint.md)
-6. [Quick Start](./docs/quick_start.md)
-7. [System Improvement Roadmap](./docs/system_improvement_roadmap.md)
-8. [Research Improvement Roadmap](./docs/research_improvement_roadmap.md)
+- a research platform for studying human-in-the-loop steering
+- a concrete prototype for interactive generative workflows
 
-## Run Locally
+## Current MVP
+
+The current system includes:
+
+- a FastAPI backend for experiments, sessions, async jobs, replay, diagnostics, and trace reporting
+- a real Diffusers-backed runtime on GPU by default
+- a mock generator reserved strictly for tests
+- SQLite-backed local persistence
+- backend and frontend tracing with per-session HTML reports
+- browser and backend test coverage
+- a real GPU-backed example-run generator with standalone HTML output
+
+## User Flow
+
+The main workflow is prompt-first:
+
+1. the user opens `/setup`
+2. enters a text prompt
+3. creates a session
+4. generates a round of candidate images
+5. submits ratings or preferences
+6. waits for the async update job to finish
+7. inspects replay and the saved trace report
+
+The normal runtime is GPU-only and uses the real Diffusers backend. If CUDA is unavailable, the app refuses to start instead of silently falling back.
+
+## Getting Started
+
+Install the project:
 
 ```bash
 python -m pip install -e .[dev]
-python scripts/run_dev.py
+python -m pip install -e .[dev,inference]
 ```
 
-Install real inference dependencies:
+Prepare model assets:
 
 ```bash
-python -m pip install -e .[dev,inference]
+python scripts/setup_huggingface.py
+```
+
+Run the app:
+
+```bash
+python scripts/run_dev.py
 ```
 
 Open:
@@ -89,86 +100,115 @@ Open:
 http://127.0.0.1:8000
 ```
 
-Run tests:
+Helpful pages:
+
+- `http://127.0.0.1:8000/setup`
+- `http://127.0.0.1:8000/diagnostics/view`
+- `http://127.0.0.1:8000/sessions/{session_id}/trace-report`
+
+## Read Next
+
+Recommended reading order:
+
+1. [Motivation](./docs/motivation.md)
+2. [Student Tutorial](./docs/student_tutorial.md)
+3. [Theoretical Background](./docs/theoretical_background.md)
+4. [System Specification](./docs/system_specification.md)
+5. [System Test Specification](./docs/system_test_specification.md)
+6. [Pre-Implementation Blueprint](./docs/pre_implementation_blueprint.md)
+7. [Quick Start](./docs/quick_start.md)
+8. [Configuration Manual](./docs/configuration_manual.md)
+9. [System Improvement Roadmap](./docs/system_improvement_roadmap.md)
+10. [Research Improvement Roadmap](./docs/research_improvement_roadmap.md)
+
+Additional docs:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+- [Install Guide](./INSTALL.md)
+- [Release Guide](./RELEASE.md)
+- [Release Notes v0.1.0](./RELEASE_NOTES_v0.1.0.md)
+- [Configuration Manual](./docs/configuration_manual.md)
+- [FAQ](./docs/faq.md)
+
+## Run Tests
+
+Backend tests:
 
 ```bash
 python -m pytest
 ```
 
-Run browser end-to-end tests in Chrome:
+Browser tests:
 
 ```bash
 npm install
 npm run test:e2e:chrome
 ```
 
-Run a headed Chrome debug session:
+Headed browser debug:
 
 ```bash
 npm run test:e2e:debug
 ```
 
-Prepare Hugging Face assets for the real generator:
-
-```bash
-python scripts/setup_huggingface.py
-```
-
-Bootstrap a fresh local machine:
-
-```bash
-powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1
-```
-
-Select the real Diffusers backend:
-
-```bash
-set STABLE_STEERING_GENERATION_BACKEND=diffusers
-python scripts/run_dev.py
-```
-
-Real Diffusers inference is GPU-only. The app now targets `cuda` explicitly for
-model runs and will fail fast if a CUDA-capable GPU is not available. The
-default server runtime also enforces the `diffusers` backend and never falls
-back to mock automatically. The mock generator is reserved for explicit test
-harnesses only.
-
-Trace logs are persisted under `data/traces/`.
-Per-session reports are written under `data/traces/sessions/<session_id>/report.html` and are also available in the app at `/sessions/{session_id}/trace-report`.
-
-Run a one-off real-model smoke test:
+Real model smoke:
 
 ```bash
 python scripts/smoke_real_diffusers.py
 ```
 
-Create a full real GPU-backed example run with a readable HTML walkthrough:
+Real end-to-end example bundle:
 
 ```bash
 python scripts/create_real_e2e_example.py
 ```
 
-Build an optional release zip:
+## Repo Guides
+
+Per-folder documentation is available in:
+
+- [docs/README.md](./docs/README.md)
+- [app/README.md](./app/README.md)
+- [tests/README.md](./tests/README.md)
+- [scripts/README.md](./scripts/README.md)
+- [data/README.md](./data/README.md)
+- [models/README.md](./models/README.md)
+- [output/README.md](./output/README.md)
+
+## Banner Asset
+
+The README banner is stored at [docs/assets/readme_banner.png](./docs/assets/readme_banner.png).
+
+It can be regenerated with:
 
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0
+python scripts/generate_readme_banner.py
 ```
 
-Build the static HTML documentation site locally:
+The generation script expects `GEMINI_API_KEY` in the environment and uses the official Gemini image-generation API.
+
+## Diagrams And Illustrations
+
+The documentation layer can include Gemini-generated illustrations to make the Markdown and published HTML easier to scan.
+
+Current visual assets include:
+
+- [docs/assets/readme_banner.png](./docs/assets/readme_banner.png)
+- [docs/assets/illustrations/steering_loop.png](./docs/assets/illustrations/steering_loop.png)
+- [docs/assets/illustrations/system_architecture.png](./docs/assets/illustrations/system_architecture.png)
+- [docs/assets/illustrations/trace_report.png](./docs/assets/illustrations/trace_report.png)
+
+They can be regenerated with:
 
 ```bash
-python scripts/build_pages_site.py
+python scripts/generate_readme_banner.py
+python scripts/generate_doc_illustrations.py
 ```
+
+The Pages builder copies these assets into the generated HTML site automatically.
 
 ## Legacy Source
 
 The original combined specification is preserved as:
 
 - [Legacy Combined Spec](./docs/system_spec_legacy_combined.md)
-
-## Next Suggested Steps
-
-- expand browser coverage for pairwise and top-k feedback flows
-- add export packaging for session trace bundles
-- surface richer GPU diagnostics like adapter name and VRAM in the UI
-- add CI automation for the release packaging flow

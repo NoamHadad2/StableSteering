@@ -9,6 +9,7 @@ A release should include:
 - tagged source in Git
 - release notes
 - installation instructions
+- published HTML documentation
 - optional packaged zip artifact
 - updated user/developer docs for async jobs, trace reports, and example bundles
 
@@ -27,14 +28,17 @@ Current release notes:
    `python scripts/smoke_real_diffusers.py`
 5. If releasing from a CUDA-capable machine, optionally refresh the real example bundle:
    `python scripts/create_real_e2e_example.py`
-6. Review:
+6. Rebuild the documentation site:
+   `python scripts/build_pages_site.py`
+7. Review:
    - [INSTALL.md](E:\Projects\StableSteering\INSTALL.md)
    - [README.md](E:\Projects\StableSteering\README.md)
+   - [docs/student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md)
    - [RELEASE_NOTES_v0.1.0.md](E:\Projects\StableSteering\RELEASE_NOTES_v0.1.0.md)
-7. Build a source zip if needed:
+8. Build a source zip if needed:
    `powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0`
-8. Create the Git tag.
-9. Push the tag and upload the zip if desired.
+9. Create the Git tag.
+10. Push the tag and upload the zip if desired.
 
 ## Suggested Tagging Flow
 
@@ -53,4 +57,4 @@ The zip is written to `output/releases/`.
 
 ## Release Scope
 
-The current release line is a research-oriented MVP. It is suitable for local development, evaluation, and architectural review, but not intended as a production deployment package.
+The current release line is a research-oriented MVP. It is suitable for local development, evaluation, teaching, and architectural review, but not intended as a production deployment package.

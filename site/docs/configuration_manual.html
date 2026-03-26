@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>configuration_manual | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/configuration_manual.md">View source Markdown</a></p>
+        <h1 id="configuration-manual">Configuration Manual</h1>
+<h2 id="purpose">Purpose</h2>
+<p>This guide explains how StableSteering configuration works today, with a focus on the prompt-first session setup flow.</p>
+<p>It is the reference document for:</p>
+<ul>
+<li>per-session YAML configuration in the HTML setup page</li>
+<li>how YAML maps to backend <code>StrategyConfig</code> values</li>
+<li>which parameters affect generation, steering, and feedback behavior</li>
+<li>how to safely edit, reset, and validate session config</li>
+</ul>
+<p>For the shortest run path, see <a href="quick_start.html">quick_start.md</a>.
+For the code-level view, see <a href="developer_guide.html">developer_guide.md</a>.
+For the user-facing workflow, see <a href="user_guide.html">user_guide.md</a>.</p>
+<h2 id="where-configuration-lives">Where Configuration Lives</h2>
+<p>StableSteering currently uses configuration at two different levels.</p>
+<h3 id="1-runtime-environment-configuration">1. Runtime Environment Configuration</h3>
+<p>This controls how the app process runs.
+Examples include:</p>
+<ul>
+<li>active backend</li>
+<li>GPU/device policy</li>
+<li>model location</li>
+<li>filesystem roots</li>
+</ul>
+<p>These values are loaded from application settings in the backend and are not the same as per-session strategy choices.</p>
+<p>Relevant code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config.py">config.py</a></li>
+</ul>
+<h3 id="2-per-session-strategy-configuration">2. Per-Session Strategy Configuration</h3>
+<p>This controls how one user session behaves.
+Examples include:</p>
+<ul>
+<li>sampler</li>
+<li>updater</li>
+<li>feedback mode</li>
+<li>candidate count</li>
+<li>image size</li>
+<li>trust radius</li>
+</ul>
+<p>These values are edited as YAML in the setup page and are parsed into <code>StrategyConfig</code> for each new session.</p>
+<p>Relevant code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/schema.py">schema.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/frontend/templates/setup.html">setup.html</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/frontend/static/app.js">app.js</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/main.py">main.py</a></li>
+</ul>
+<h2 id="session-setup-flow">Session Setup Flow</h2>
+<p>The current setup flow is:</p>
+<ol>
+<li>open <code>/setup</code></li>
+<li>enter the user text prompt</li>
+<li>optionally edit the negative prompt</li>
+<li>edit the YAML strategy block</li>
+<li>submit the setup form</li>
+<li>backend validates the YAML and creates:
+   - an experiment
+   - a session linked to that experiment</li>
+<li>browser opens the new session view</li>
+</ol>
+<p>The YAML block is reloaded fresh from the backend template when:</p>
+<ul>
+<li>the setup page is rendered</li>
+<li>the user clicks <code>Reload default YAML</code></li>
+</ul>
+<p>That makes each session configuration explicit and editable instead of being spread across several independent form controls.</p>
+<h2 id="setup-endpoints">Setup Endpoints</h2>
+<p>The setup page now uses these routes:</p>
+<ul>
+<li>
+<p><code>GET /setup</code>
+  Renders the HTML page and injects the default YAML template.</p>
+</li>
+<li>
+<p><code>GET /setup/config-template</code>
+  Returns the canonical default YAML as JSON.</p>
+</li>
+<li>
+<p><code>POST /setup/session</code>
+  Accepts prompt fields plus <code>config_yaml</code>, validates the YAML, creates the experiment, then creates the session.</p>
+</li>
+</ul>
+<p>This means the YAML document is the source of truth for per-session strategy configuration.</p>
+<h2 id="yaml-template">YAML Template</h2>
+<p>The setup page starts from a backend-generated YAML document similar to this:</p>
+<pre><code class="language-yaml">sampler: random_local
+updater: winner_average
+feedback_mode: scalar_rating
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 4
+image_size: 512x512
+trust_radius: 0.35
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>The exact default text is rendered by:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+</ul>
+<h2 id="parameter-reference">Parameter Reference</h2>
+<h3 id="sampler"><code>sampler</code></h3>
+<p>Controls how candidate steering vectors are proposed for a round.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>random_local</code></li>
+<li><code>exploit_orthogonal</code></li>
+<li><code>uncertainty_guided</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes how exploration behaves around the current steering state</li>
+<li>changes the balance between exploitation and diversity</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/random_local.py">random_local.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/exploit_orthogonal.py">exploit_orthogonal.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/uncertainty.py">uncertainty.py</a></li>
+</ul>
+<h3 id="updater"><code>updater</code></h3>
+<p>Controls how user feedback updates the incumbent steering state.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>winner_average</code></li>
+<li><code>winner_copy</code></li>
+<li><code>linear_preference</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>determines how aggressively the system moves toward the selected winner</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/winner_average.py">winner_average.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/winner_copy.py">winner_copy.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/linear_pref.py">linear_pref.py</a></li>
+</ul>
+<h3 id="feedback_mode"><code>feedback_mode</code></h3>
+<p>Controls how the UI feedback payload is interpreted.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>scalar_rating</code></li>
+<li><code>pairwise</code></li>
+<li><code>top_k</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes how frontend rating input is converted into normalized feedback</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/feedback/normalization.py">normalization.py</a></li>
+</ul>
+<h3 id="seed_policy"><code>seed_policy</code></h3>
+<p>Controls how seeds are assigned across rounds.</p>
+<p>Current value used by the MVP:</p>
+<ul>
+<li><code>fixed-per-round</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>keeps candidate seeds deterministic within the current orchestration design</li>
+</ul>
+<h3 id="steering_mode"><code>steering_mode</code></h3>
+<p>Describes the steering representation family.</p>
+<p>Current value used by the MVP:</p>
+<ul>
+<li><code>low_dimensional</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>documents that the current session state is a small latent steering vector</li>
+</ul>
+<h3 id="candidate_count"><code>candidate_count</code></h3>
+<p>Controls how many candidates are shown per round.</p>
+<p>Typical values:</p>
+<ul>
+<li><code>3</code></li>
+<li><code>4</code></li>
+<li><code>5</code></li>
+</ul>
+<p>Current round policy:</p>
+<ul>
+<li>round 1 includes the unmodified prompt baseline as candidate <code>0</code></li>
+<li>later rounds include the previous round winner as candidate <code>0</code></li>
+<li>remaining candidates come from the sampler</li>
+</ul>
+<p>This means <code>candidate_count</code> is the total visible batch size, not the number of newly sampled alternatives.</p>
+<h3 id="image_size"><code>image_size</code></h3>
+<p>Controls the rendered image size.</p>
+<p>Format:</p>
+<ul>
+<li><code>WIDTHxHEIGHT</code></li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li><code>512x512</code></li>
+<li><code>768x512</code></li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>the current real Diffusers path parses this string directly</li>
+<li>poor-quality settings can hurt output quality, especially with SD 1.5</li>
+</ul>
+<h3 id="trust_radius"><code>trust_radius</code></h3>
+<p>Controls how far the sampler is allowed to move from the current steering state.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values increase exploration</li>
+<li>smaller values keep proposals closer to the incumbent direction</li>
+</ul>
+<h3 id="anchor_strength"><code>anchor_strength</code></h3>
+<p>Reserved steering control parameter exposed in the strategy config.</p>
+<p>Effect:</p>
+<ul>
+<li>currently part of the structured config surface</li>
+<li>useful for future work around stronger anchor-based steering behavior</li>
+</ul>
+<h3 id="model_name"><code>model_name</code></h3>
+<p>Records the model name used for the session configuration.</p>
+<p>Current default:</p>
+<ul>
+<li><code>runwayml/stable-diffusion-v1-5</code></li>
+</ul>
+<p>Important note:</p>
+<ul>
+<li>the real runtime also depends on process-level backend/model settings</li>
+<li>this field documents session intent and config state, but model loading policy is still governed by runtime configuration</li>
+</ul>
+<h2 id="validation-rules">Validation Rules</h2>
+<p>The YAML editor is flexible, but it is not free-form.
+The backend validates the YAML against <code>StrategyConfig</code>.</p>
+<p>Validation happens in:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+</ul>
+<p>Current validation behavior:</p>
+<ul>
+<li>invalid YAML syntax is rejected</li>
+<li>non-mapping YAML is rejected</li>
+<li>missing required structure falls back only where <code>StrategyConfig</code> defines defaults</li>
+<li>invalid enum-like values are rejected by schema validation</li>
+<li>invalid numeric types are rejected by schema validation</li>
+</ul>
+<p>If validation fails, the setup request returns a structured API error.</p>
+<h2 id="practical-editing-guidance">Practical Editing Guidance</h2>
+<p>Good workflow:</p>
+<ol>
+<li>start from the default YAML</li>
+<li>change one or two parameters at a time</li>
+<li>create a session</li>
+<li>observe the session behavior</li>
+<li>compare the resulting trace report and replay</li>
+</ol>
+<p>Recommended beginner changes:</p>
+<ul>
+<li>switch <code>sampler</code></li>
+<li>switch <code>updater</code></li>
+<li>change <code>candidate_count</code> from <code>4</code> to <code>3</code> or <code>5</code></li>
+<li>increase or decrease <code>trust_radius</code></li>
+</ul>
+<p>Changes to make carefully:</p>
+<ul>
+<li>unusual <code>image_size</code></li>
+<li>very large <code>candidate_count</code></li>
+<li>combinations that make comparisons harder rather than easier</li>
+</ul>
+<h2 id="relationship-to-runtime-settings">Relationship To Runtime Settings</h2>
+<p>Per-session YAML does not override every backend runtime rule.</p>
+<p>Examples of process-level rules that still apply:</p>
+<ul>
+<li>GPU-only real Diffusers runtime by default</li>
+<li>no silent fallback to the mock backend</li>
+<li>model preparation requirements</li>
+<li>trace and artifact storage locations</li>
+</ul>
+<p>So the session YAML controls the strategy of the run, while the app settings control the environment in which the run is executed.</p>
+<h2 id="example-configurations">Example Configurations</h2>
+<h3 id="conservative-comparison-session">Conservative Comparison Session</h3>
+<pre><code class="language-yaml">sampler: random_local
+updater: winner_average
+feedback_mode: scalar_rating
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 4
+image_size: 512x512
+trust_radius: 0.25
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want stable nearby comparisons</li>
+<li>you want smoother updates between rounds</li>
+</ul>
+<h3 id="more-exploratory-session">More Exploratory Session</h3>
+<pre><code class="language-yaml">sampler: uncertainty_guided
+updater: linear_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.4
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want broader exploration around the current direction</li>
+<li>you want stronger movement after feedback</li>
+</ul>
+<h3 id="pairwise-preference-session">Pairwise Preference Session</h3>
+<pre><code class="language-yaml">sampler: exploit_orthogonal
+updater: winner_copy
+feedback_mode: pairwise
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 3
+image_size: 512x512
+trust_radius: 0.3
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want sharper A/B-style comparisons</li>
+<li>you want the winner to become the new incumbent exactly</li>
+</ul>
+<h2 id="where-to-learn-more">Where To Learn More</h2>
+<ul>
+<li><a href="quick_start.html">quick_start.md</a></li>
+<li><a href="user_guide.html">user_guide.md</a></li>
+<li><a href="developer_guide.html">developer_guide.md</a></li>
+<li><a href="student_tutorial.html">student_tutorial.md</a></li>
+<li><a href="system_specification.html">system_specification.md</a></li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

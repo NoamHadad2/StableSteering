@@ -6,6 +6,12 @@ Published HTML documentation:
 
 - [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
 
+Recommended reading before installation:
+
+- [Student Tutorial](./docs/student_tutorial.md)
+- [Quick Start](./docs/quick_start.md)
+- [User Guide](./docs/user_guide.md)
+
 ## Requirements
 
 - Windows with PowerShell
@@ -88,6 +94,7 @@ http://127.0.0.1:8000
 Useful runtime pages:
 
 - `http://127.0.0.1:8000/`
+- `http://127.0.0.1:8000/setup`
 - `http://127.0.0.1:8000/diagnostics/view`
 - `http://127.0.0.1:8000/sessions/{session_id}/trace-report`
 
@@ -122,7 +129,9 @@ npm run test:e2e:real
 
 - The normal app runtime is GPU-only and uses the real Diffusers backend.
 - The mock generator is reserved for tests and explicit test harnesses only.
+- The normal user flow starts from the user's text prompt on `/setup`.
 - Round generation and feedback submission run as async jobs with visible progress in the UI.
 - Trace logs are written under `data/traces/`.
 - Per-session trace bundles and readable `report.html` files are written under `data/traces/sessions/<session_id>/`.
 - You can generate a complete real GPU example bundle with `python scripts/create_real_e2e_example.py`.
+- The docs site is generated locally with `python scripts/build_pages_site.py`.

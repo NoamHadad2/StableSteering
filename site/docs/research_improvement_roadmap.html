@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -208,7 +208,165 @@
 <li>compare grid sizes and density</li>
 <li>compare replay-rich vs replay-light workflows</li>
 </ul>
-<h2 id="8-r2-strategy-research-expansions">8. R2: Strategy Research Expansions</h2>
+<h2 id="8-r1-synthetic-data-research-direction">8. R1: Synthetic Data Research Direction</h2>
+<h3 id="81-build-realistic-synthetic-steering-trajectories-toward-an-anchor">8.1 Build realistic synthetic steering trajectories toward an anchor</h3>
+<p>Research motivation:</p>
+<ul>
+<li>real user studies are expensive and noisy</li>
+<li>early-stage algorithm comparison needs more coverage than human evaluation alone can provide</li>
+<li>a synthetic user should not be random preference noise; it should behave like a user steering toward a latent target or anchor</li>
+</ul>
+<p>Core question:</p>
+<ul>
+<li>can we generate realistic synthetic steering traces that approximate how a user would move toward a desired visual anchor over multiple rounds?</li>
+</ul>
+<p>Target capability:</p>
+<ul>
+<li>define an anchor state, anchor image, or anchor attribute profile</li>
+<li>simulate round-by-round user preferences based on distance to that anchor</li>
+<li>include imperfect but structured behavior rather than perfect oracle choices</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>define anchor types:</li>
+<li>latent steering anchor</li>
+<li>reference image anchor</li>
+<li>attribute-vector anchor</li>
+<li>text-derived anchor</li>
+<li>build a synthetic user model that prefers candidates moving closer to the anchor</li>
+<li>inject bounded inconsistency so the synthetic user is realistic rather than omniscient</li>
+<li>model user behaviors such as:</li>
+<li>near-tie uncertainty</li>
+<li>occasional reversals</li>
+<li>fatigue-induced noise</li>
+<li>critique text consistent with the chosen winner</li>
+<li>compare synthetic trajectories against real user traces to calibrate realism</li>
+<li>study whether synthetic traces preserve:</li>
+<li>round count distributions</li>
+<li>winner stability</li>
+<li>preference consistency</li>
+<li>typical path shapes in steering space</li>
+</ul>
+<h3 id="82-build-diversity-oriented-synthetic-sampling-around-one-or-more-steered-locations">8.2 Build diversity-oriented synthetic sampling around one or more steered locations</h3>
+<p>Research motivation:</p>
+<ul>
+<li>realistic steering is not only about converging to one target</li>
+<li>many useful workflows involve exploring neighborhoods around one promising location or several distinct promising locations</li>
+</ul>
+<p>Core question:</p>
+<ul>
+<li>how should synthetic data generation represent a user who wants diversity around one or more already-steered locations rather than only direct convergence?</li>
+</ul>
+<p>Target capability:</p>
+<ul>
+<li>sample diverse candidates around one selected steer location</li>
+<li>sample around multiple local attractors to model ambiguity or multi-modal user intent</li>
+<li>label both quality and diversity utility</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>define one-center diversity tasks:</li>
+<li>hold core concept fixed</li>
+<li>vary composition, lighting, material, pose, or background</li>
+<li>reward local novelty without collapsing semantic identity</li>
+<li>define multi-center diversity tasks:</li>
+<li>two or more steered centers</li>
+<li>user prefers batches covering multiple plausible directions</li>
+<li>synthetic preference balances desirability and coverage</li>
+<li>formalize diversity objectives:</li>
+<li>distance from anchor center</li>
+<li>distance between candidates</li>
+<li>coverage of local manifold neighborhoods</li>
+<li>avoidance of trivial duplicates</li>
+<li>test several synthetic preference policies:</li>
+<li>best-single-sample preference</li>
+<li>shortlist preference</li>
+<li>winner-plus-diversity bonus</li>
+<li>coverage-seeking ranking</li>
+<li>compare whether diversity-seeking synthetic users produce trajectories distinct from pure anchor-seeking users</li>
+<li>measure whether algorithms tuned on one synthetic regime transfer to the other</li>
+</ul>
+<h3 id="83-use-synthetic-data-to-pretrain-and-stress-test-steering-algorithms">8.3 Use synthetic data to pretrain and stress-test steering algorithms</h3>
+<p>Goals:</p>
+<ul>
+<li>reduce dependence on scarce human-in-the-loop collection</li>
+<li>identify weak samplers and updaters before real studies</li>
+<li>create large controlled corpora for ablations</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>generate synthetic session corpora with known hidden targets</li>
+<li>train or tune preference/update components on those corpora</li>
+<li>use synthetic runs for regression testing of strategy changes</li>
+<li>build challenge sets with:</li>
+<li>misleading local optima</li>
+<li>seed-sensitive candidates</li>
+<li>high-similarity near-ties</li>
+<li>diversity-versus-quality tradeoffs</li>
+<li>measure sim-to-real transfer by comparing behavior tuned on synthetic traces against later human traces</li>
+</ul>
+<h3 id="84-treat-synthetic-user-realism-itself-as-a-research-problem">8.4 Treat synthetic-user realism itself as a research problem</h3>
+<p>Research motivation:</p>
+<ul>
+<li>poor synthetic data can mislead the whole program</li>
+<li>the simulator should be evaluated, not assumed</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>define realism metrics for synthetic traces</li>
+<li>compare synthetic and real sessions on:</li>
+<li>win/loss structure</li>
+<li>rating distributions</li>
+<li>critique patterns</li>
+<li>stop-time distributions</li>
+<li>path geometry in steering space</li>
+<li>fit simulator parameters to better match observed human behavior</li>
+<li>study which simulator simplifications are harmless and which bias conclusions</li>
+<li>maintain multiple synthetic-user families instead of one universal simulator</li>
+</ul>
+<h3 id="85-extend-steering-research-to-richer-diffusion-workflows">8.5 Extend steering research to richer diffusion workflows</h3>
+<p>Research motivation:</p>
+<ul>
+<li>many real creative workflows do not begin and end with text-only prompting</li>
+<li>user intent is often expressed through images, masks, layout hints, or structural controls</li>
+<li>a steering method that only works for plain text-to-image may be too narrow to matter in practice</li>
+</ul>
+<p>Core question:</p>
+<ul>
+<li>does iterative steering remain useful and interpretable when the generation pipeline is conditioned by reference images, masked edits, or explicit structural controls?</li>
+</ul>
+<p>Target directions:</p>
+<ul>
+<li>image-prompt or image-variation steering</li>
+<li>inpainting steering</li>
+<li>ControlNet-guided steering</li>
+</ul>
+<p>Detailed roadmap items:</p>
+<ul>
+<li>study whether the same preference-update logic transfers across pipeline families or whether each needs its own update geometry</li>
+<li>compare how users steer when the anchor is:</li>
+<li>a text prompt</li>
+<li>a reference image</li>
+<li>a masked region edit target</li>
+<li>a structural control target such as pose, edge, or depth</li>
+<li>analyze whether preference signals mean different things in different workflows:</li>
+<li>global style preference in text-to-image</li>
+<li>local correction preference in inpainting</li>
+<li>structure-preserving refinement in ControlNet workflows</li>
+<li>build task families for:</li>
+<li>image-to-image refinement toward a more premium or more faithful result</li>
+<li>localized defect repair through inpainting</li>
+<li>structure-constrained exploration using ControlNet inputs</li>
+<li>test whether steering helps users balance faithfulness versus creativity differently in each pipeline type</li>
+<li>study cross-workflow transfer:</li>
+<li>can a strategy tuned on text-to-image sessions help in inpainting?</li>
+<li>can a synthetic user model calibrated for image-prompt steering transfer to ControlNet tasks?</li>
+<li>add comparative metrics for pipeline-specific goals, such as:</li>
+<li>background preservation in inpainting</li>
+<li>structure adherence in ControlNet</li>
+<li>content faithfulness to a reference image in image-prompt workflows</li>
+</ul>
+<h2 id="9-r2-strategy-research-expansions">9. R2: Strategy Research Expansions</h2>
 <h3 id="81-add-richer-steering-representations">8.1 Add richer steering representations</h3>
 <p>Suggested expansions:</p>
 <ul>
@@ -232,7 +390,7 @@
 <li>contextual bandit approaches</li>
 <li>critique-aware updates</li>
 </ul>
-<h2 id="9-study-program-milestones">9. Study Program Milestones</h2>
+<h2 id="10-study-program-milestones">10. Study Program Milestones</h2>
 <h3 id="milestone-r-a-pilot-validity">Milestone R-A: Pilot Validity</h3>
 <ul>
 <li>establish baseline comparison tasks</li>
@@ -245,6 +403,8 @@
 <li>add stronger metrics</li>
 <li>add analysis exports</li>
 <li>add notebooks and replay summaries</li>
+<li>build first realistic anchor-seeking synthetic-user pipeline</li>
+<li>build first diversity-seeking synthetic-user pipeline</li>
 </ul>
 <h3 id="milestone-r-c-comparative-research">Milestone R-C: Comparative Research</h3>
 <ul>
@@ -252,19 +412,24 @@
 <li>compare updaters</li>
 <li>compare feedback modalities</li>
 <li>compare representation strategies</li>
+<li>compare synthetic-user regimes against real-user outcomes</li>
+<li>compare steering behavior across text-to-image, image-prompt, inpainting, and ControlNet workflows</li>
 </ul>
-<h2 id="10-suggested-execution-order">10. Suggested Execution Order</h2>
+<h2 id="11-suggested-execution-order">11. Suggested Execution Order</h2>
 <ol>
 <li>define baseline comparison matrix</li>
 <li>define pilot protocol and prompt/task sets</li>
 <li>add stronger confound logging</li>
 <li>add analysis-ready exports</li>
+<li>define anchor-seeking synthetic-user tasks</li>
+<li>define diversity-seeking synthetic-user tasks</li>
 <li>add replay-based comparative summaries</li>
+<li>extend task design to image-prompt, inpainting, and ControlNet steering studies</li>
 <li>compare feedback modalities</li>
 <li>compare samplers and updaters</li>
 <li>expand representation strategies</li>
 </ol>
-<h2 id="11-summary">11. Summary</h2>
+<h2 id="12-summary">12. Summary</h2>
 <p>The next research phase should shift from “can the system run?” to “can the system support credible conclusions?”</p>
 <p>That means focusing on:</p>
 <ul>
@@ -273,6 +438,9 @@
 <li>better confound control</li>
 <li>better analysis workflows</li>
 <li>better human-study structure</li>
+<li>realistic synthetic-user generation</li>
+<li>diversity-aware synthetic data regimes</li>
+<li>research coverage beyond text-only generation into richer diffusion pipeline families</li>
 </ul>
       </main>
     </div>

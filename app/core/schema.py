@@ -95,6 +95,16 @@ class SessionCreate(BaseModel):
     negative_prompt: str = ""
 
 
+class SetupSessionRequest(BaseModel):
+    """Prompt-first setup payload that carries an editable YAML config blob."""
+
+    experiment_name: str
+    description: str = ""
+    prompt: str
+    negative_prompt: str = ""
+    config_yaml: str
+
+
 class Candidate(BaseModel):
     """One proposed point in steering space and its render metadata."""
 

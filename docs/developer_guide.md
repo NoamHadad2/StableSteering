@@ -12,6 +12,8 @@ It is intended for developers who want to:
 - change storage or generation behavior
 - maintain test coverage while evolving the system
 
+For a student-oriented conceptual walkthrough, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+
 ## 2. Current Implementation Scope
 
 The current implementation is a minimal research MVP with:
@@ -27,6 +29,7 @@ The current implementation is a minimal research MVP with:
 - per-session HTML trace reports saved by the backend
 - frontend trace capture and visible trace panels
 - automated tests for feedback, lifecycle, tracing, and replay export
+- a reusable real GPU-backed example-run generator for demos and teaching
 
 It does not yet include:
 
@@ -103,6 +106,12 @@ Run the standalone real-model smoke test:
 
 ```bash
 python scripts/smoke_real_diffusers.py
+```
+
+Generate the full example walkthrough bundle:
+
+```bash
+python scripts/create_real_e2e_example.py
 ```
 
 Open:
@@ -283,6 +292,12 @@ The current API quality contract is:
 - replay exports include explicit schema and app versions
 - long-running session actions are exposed as async jobs with pollable status
 - session trace reports are backend-owned artifacts, not frontend-only console output
+
+The current roadmap also includes expanding steering support beyond prompt-only generation into:
+
+- image-prompt or image-variation workflows
+- inpainting workflows
+- ControlNet-guided workflows
 
 ### 6.4 Evolve persistence
 

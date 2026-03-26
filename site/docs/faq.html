@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -22,6 +22,7 @@
         <h1 id="faq">FAQ</h1>
 <h2 id="what-is-stablesteering">What is StableSteering?</h2>
 <p>StableSteering is a research prototype for studying interactive prompt-embedding steering in text-to-image systems.</p>
+<p>If you want the easiest conceptual introduction, start with <a href="student_tutorial.html">student_tutorial.md</a>.</p>
 <h2 id="does-it-generate-real-ai-images-yet">Does it generate real AI images yet?</h2>
 <p>Yes, if you install the inference dependencies, prepare a local model snapshot, and run with the Diffusers backend enabled.</p>
 <p>The real Diffusers path is GPU-only and explicitly requires CUDA. If a GPU is
@@ -39,6 +40,9 @@ mock automatically, and the mock generator is reserved for tests only.</p>
 <p>without requiring real image generation in every automated test.</p>
 <h2 id="what-is-the-normal-runtime-path">What is the normal runtime path?</h2>
 <p>The normal app runtime uses the real Diffusers backend on GPU. The mock generator exists only for explicit test harnesses.</p>
+<h2 id="does-the-user-flow-start-from-a-text-prompt">Does the user flow start from a text prompt?</h2>
+<p>Yes.</p>
+<p>The normal workflow begins on <code>/setup</code>, where the user enters a text prompt and then starts a session from that prompt.</p>
 <h2 id="is-there-a-setup-script-for-hugging-face-models">Is there a setup script for Hugging Face models?</h2>
 <p>Yes.</p>
 <p>Run:</p>
@@ -85,6 +89,7 @@ mock automatically, and the mock generator is reserved for tests only.</p>
 <p>This creates a real GPU-backed example bundle under:</p>
 <pre><code class="language-text">output/examples/real_e2e_example_run/
 </code></pre>
+<p>That bundle includes generated images, a manifest, a standalone walkthrough HTML file, and the session trace report.</p>
 <h2 id="what-feedback-modes-are-supported">What feedback modes are supported?</h2>
 <p>The schema supports:</p>
 <ul>
@@ -93,6 +98,14 @@ mock automatically, and the mock generator is reserved for tests only.</p>
 <li>top-k ranking</li>
 </ul>
 <p>The current UI uses rating inputs for all supported modes and derives the final payload from the selected feedback mode.</p>
+<h2 id="are-other-diffusion-workflows-in-scope">Are other diffusion workflows in scope?</h2>
+<p>Yes, on the roadmap.</p>
+<p>The current implementation focuses on prompt-first text-to-image steering, but the roadmaps now also include:</p>
+<ul>
+<li>image-prompt or image-variation steering</li>
+<li>inpainting steering</li>
+<li>ControlNet-guided steering</li>
+</ul>
 <h2 id="what-samplers-are-implemented">What samplers are implemented?</h2>
 <p>The current MVP includes:</p>
 <ul>

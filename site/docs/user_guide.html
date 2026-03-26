@@ -13,7 +13,7 @@
         <p class="tagline">Project documentation site</p>
         <nav>
           <ul>
-            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
           </ul>
         </nav>
       </aside>
@@ -25,11 +25,12 @@
 <p>The current version runs with a real Diffusers backend by default. The mock
 generator exists only inside explicit test harnesses.</p>
 <p>The app also records backend and frontend trace events so session behavior is easier to inspect while you work.</p>
+<p>If you are learning the system for the first time, start with <a href="student_tutorial.html">student_tutorial.md</a>.</p>
 <h2 id="2-main-workflow">2. Main Workflow</h2>
 <p>The basic flow is:</p>
 <ol>
-<li>create an experiment</li>
-<li>start a session with a prompt</li>
+<li>enter a text prompt</li>
+<li>start a session around that prompt</li>
 <li>generate a round of candidate images</li>
 <li>rate the candidates</li>
 <li>submit feedback</li>
@@ -48,10 +49,10 @@ generator exists only inside explicit test harnesses.</p>
 <h3 id="setup">Setup</h3>
 <p>The setup page lets you choose:</p>
 <ul>
-<li>experiment name</li>
-<li>experiment description</li>
 <li>prompt</li>
 <li>negative prompt</li>
+<li>experiment name</li>
+<li>experiment description</li>
 <li>sampler</li>
 <li>updater</li>
 <li>feedback mode</li>
@@ -81,8 +82,8 @@ generator exists only inside explicit test harnesses.</p>
 <p>Recommended usage:</p>
 <ol>
 <li>open the setup page</li>
+<li>start from a prompt you can easily recognize</li>
 <li>keep the default settings for your first run</li>
-<li>enter a prompt you can easily recognize</li>
 <li>generate the first round</li>
 <li>give the strongest candidate the highest rating</li>
 <li>submit feedback</li>
@@ -136,6 +137,10 @@ generator exists only inside explicit test harnesses.</p>
 <li>runtime backend and device diagnostics</li>
 </ul>
 <p>You can open it from the session page, or directly at <code>/sessions/{session_id}/trace-report</code>.</p>
+<p>For a full worked example, generate the sample bundle with:</p>
+<pre><code class="language-bash">python scripts/create_real_e2e_example.py
+</code></pre>
+<p>That writes a complete example run under <code>output/examples/real_e2e_example_run/</code>.</p>
 <h2 id="8-current-limitations">8. Current Limitations</h2>
 <p>This prototype currently:</p>
 <ul>
@@ -154,6 +159,7 @@ Per-session reports are persisted under <code>data/traces/sessions/&lt;session_i
 <li>use replay after each session to understand what changed</li>
 <li>use the trace report when you want one readable record of images, actions, and preferences</li>
 <li>treat this as a research tool, not a production image editor</li>
+<li>use the diagnostics page when you want to confirm the app is actually running on GPU</li>
 </ul>
       </main>
     </div>

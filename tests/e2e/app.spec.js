@@ -2,15 +2,24 @@ const { test, expect } = require("@playwright/test");
 
 async function createSessionViaBrowser(page, options = {}) {
   await page.goto("/setup");
-  await expect(page.getByRole("heading", { name: "Create an experiment and start a session" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Start from your text prompt" })).toBeVisible();
 
   await page.locator('[name="experiment_name"]').fill(options.experimentName || "Playwright experiment");
   await page.locator('[name="description"]').fill(options.description || "Browser click and see flow");
   await page.locator('[name="prompt"]').fill(options.prompt || "A bright orange concept car in a glass studio");
   await page.locator('[name="negative_prompt"]').fill(options.negativePrompt || "blurry");
-  await page.locator('[name="sampler"]').selectOption(options.sampler || "exploit_orthogonal");
-  await page.locator('[name="updater"]').selectOption(options.updater || "winner_average");
-  await page.locator('[name="feedback_mode"]').selectOption(options.feedbackMode || "scalar_rating");
+  await page.locator('[name="config_yaml"]').fill(
+    options.configYaml || `sampler: ${options.sampler || "exploit_orthogonal"}
+updater: ${options.updater || "winner_average"}
+feedback_mode: ${options.feedbackMode || "scalar_rating"}
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: ${options.candidateCount || 4}
+image_size: 512x512
+trust_radius: 0.35
+anchor_strength: 0.15
+model_name: runwayml/stable-diffusion-v1-5`
+  );
   await page.getByRole("button", { name: "Create and open session" }).click();
 
   await expect(page).toHaveURL(/\/sessions\/.+\/view$/);

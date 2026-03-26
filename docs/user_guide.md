@@ -9,12 +9,14 @@ generator exists only inside explicit test harnesses.
 
 The app also records backend and frontend trace events so session behavior is easier to inspect while you work.
 
+If you are learning the system for the first time, start with [student_tutorial.md](E:\Projects\StableSteering\docs\student_tutorial.md).
+
 ## 2. Main Workflow
 
 The basic flow is:
 
-1. create an experiment
-2. start a session with a prompt
+1. enter a text prompt
+2. start a session around that prompt
 3. generate a round of candidate images
 4. rate the candidates
 5. submit feedback
@@ -37,10 +39,10 @@ The home page shows:
 
 The setup page lets you choose:
 
-- experiment name
-- experiment description
 - prompt
 - negative prompt
+- experiment name
+- experiment description
 - sampler
 - updater
 - feedback mode
@@ -73,8 +75,8 @@ The replay page shows:
 Recommended usage:
 
 1. open the setup page
-2. keep the default settings for your first run
-3. enter a prompt you can easily recognize
+2. start from a prompt you can easily recognize
+3. keep the default settings for your first run
 4. generate the first round
 5. give the strongest candidate the highest rating
 6. submit feedback
@@ -134,6 +136,14 @@ Each session also produces a backend-saved HTML trace report. It combines:
 
 You can open it from the session page, or directly at `/sessions/{session_id}/trace-report`.
 
+For a full worked example, generate the sample bundle with:
+
+```bash
+python scripts/create_real_e2e_example.py
+```
+
+That writes a complete example run under `output/examples/real_e2e_example_run/`.
+
 ## 8. Current Limitations
 
 This prototype currently:
@@ -154,3 +164,4 @@ Per-session reports are persisted under `data/traces/sessions/<session_id>/repor
 - use replay after each session to understand what changed
 - use the trace report when you want one readable record of images, actions, and preferences
 - treat this as a research tool, not a production image editor
+- use the diagnostics page when you want to confirm the app is actually running on GPU
