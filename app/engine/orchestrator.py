@@ -98,7 +98,9 @@ class Orchestrator:
             "session.created",
             {"session_id": session.id, "experiment_id": session.experiment_id, "prompt": session.prompt},
         )
-        return self.repository.save_session(session)
+        saved_session = self.repository.save_session(session)
+        self.generate_trace_report(saved_session.id)
+        return saved_session
 
     def get_session(self, session_id: str) -> Session | None:
         """Load one session by identifier."""
@@ -154,8 +156,10 @@ class Orchestrator:
                 "round_id": round_obj.id,
                 "round_index": round_index,
                 "candidate_count": len(round_obj.candidates),
+                "candidates": [self._candidate_trace_payload(candidate) for candidate in round_obj.candidates],
             },
         )
+        self.generate_trace_report(session.id)
         return RoundResponse(
             round_id=round_obj.id,
             candidate_metadata=round_obj.candidates,
@@ -197,9 +201,14 @@ class Orchestrator:
                 "session_id": session.id,
                 "round_id": round_obj.id,
                 "feedback_type": request.feedback_type,
+                "raw_feedback_payload": request.payload,
+                "normalized_feedback_payload": feedback.normalized_payload,
+                "critique_text": request.critique_text,
                 "winner_candidate_id": update_summary["winner_candidate_id"],
+                "next_incumbent_state": next_z,
             },
         )
+        self.generate_trace_report(session.id)
         return FeedbackResponse(update_summary=update_summary, next_incumbent_state=next_z)
 
     def export_replay(self, session_id: str) -> dict:
@@ -215,6 +224,21 @@ class Orchestrator:
             rounds=rounds,
         )
         return replay.model_dump(mode="json")
+
+    def generate_trace_report(self, session_id: str):
+        """Regenerate the saved HTML trace report for one session."""
+
+        session = self._require_session(session_id)
+        experiment = self.repository.get_experiment(session.experiment_id)
+        rounds = self.repository.list_rounds_for_session(session.id)
+        return self.trace_recorder.write_session_report(
+            session=session.model_dump(mode="json"),
+            experiment=experiment.model_dump(mode="json") if experiment else None,
+            rounds=[round_obj.model_dump(mode="json") for round_obj in rounds],
+            backend_events=self.trace_recorder.load_session_backend_events(session.id),
+            frontend_events=self.trace_recorder.load_session_frontend_events(session.id),
+            diagnostics=self.generator.diagnostics(),
+        )
 
     def _require_session(self, session_id: str) -> Session:
         """Load a session or raise a lookup error."""
@@ -240,3 +264,18 @@ class Orchestrator:
         unknown_ranked = [candidate_id for candidate_id in ranking if candidate_id not in candidate_ids]
         if unknown_ranked:
             raise ValueError(f"Feedback ranking references unknown candidates: {', '.join(unknown_ranked)}")
+
+    @staticmethod
+    def _candidate_trace_payload(candidate) -> dict:
+        """Return a compact trace payload for one proposed image candidate."""
+
+        return {
+            "candidate_id": candidate.id,
+            "candidate_index": candidate.candidate_index,
+            "sampler_role": candidate.sampler_role,
+            "seed": candidate.seed,
+            "image_path": candidate.image_path,
+            "z": candidate.z,
+            "predicted_score": candidate.predicted_score,
+            "predicted_uncertainty": candidate.predicted_uncertainty,
+        }

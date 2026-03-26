@@ -9,6 +9,14 @@ The current repository also includes a runnable prototype. The most implementati
 - [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
 - [faq.md](/E:/Projects/StableSteering/docs/faq.md)
 
+Current implementation highlights reflected in these guides:
+
+- GPU-only real Diffusers runtime by default
+- async round-generation and feedback jobs with visible progress
+- SQLite-backed local persistence
+- backend-saved per-session HTML trace reports
+- real GPU-backed end-to-end example bundle under `output/examples/real_e2e_example_run/`
+
 ## Core Documents
 
 - [motivation.md](/E:/Projects/StableSteering/docs/motivation.md)

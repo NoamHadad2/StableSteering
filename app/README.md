@@ -5,7 +5,7 @@ This folder contains the running StableSteering application.
 ## Structure
 
 - `main.py`
-  FastAPI entry point. Builds app state, exposes HTML pages and JSON APIs, accepts frontend trace events, and serves runtime diagnostics.
+  FastAPI entry point. Builds app state, exposes HTML pages and JSON APIs, accepts frontend trace events, serves runtime diagnostics, and renders saved session trace reports.
 
 - `frontend_trace.py`
   Shared schema for browser-submitted trace events.
@@ -40,4 +40,4 @@ This folder contains the running StableSteering application.
 2. `engine/orchestrator.py` coordinates experiment, session, round, and feedback lifecycle.
 3. `engine/generation.py` resolves the active generation backend.
 4. `storage/repository.py` persists experiments, sessions, rounds, artifacts, and trace data references.
-5. `frontend/` renders the UI and posts browser events back to the backend.
+5. `frontend/` renders the UI, submits async jobs, shows progress, and posts browser events back to the backend.

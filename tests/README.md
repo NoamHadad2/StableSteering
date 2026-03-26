@@ -20,10 +20,10 @@ This folder contains automated verification for backend behavior and browser flo
   Runtime startup policy tests, including GPU-only enforcement.
 
 - `test_session_lifecycle.py`
-  Integration tests for experiment/session lifecycle, feedback flow, replay export, and diagnostics.
+  Integration tests for experiment/session lifecycle, async job flow, replay export, diagnostics, and trace-report generation.
 
 - `test_tracing.py`
-  Trace persistence tests for backend and frontend events.
+  Trace persistence tests for backend and frontend events, including per-session HTML report output.
 
 - `e2e/`
   Playwright browser tests.

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>document_audit | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/document_audit.md">View source Markdown</a></p>
+        <h1 id="documentation-audit-ledger">Documentation Audit Ledger</h1>
+<p>This file records the top 30 improvements identified and applied for each core document.</p>
+<h2 id="2026-03-26-sync-update">2026-03-26 Sync Update</h2>
+<p>This documentation set was re-audited and synchronized with the current implementation after the following system changes:</p>
+<ul>
+<li>GPU-only real Diffusers runtime became the default app path</li>
+<li>mock generation was restricted to explicit test harnesses</li>
+<li>backend and frontend tracing were added and persisted under <code>data/traces/</code></li>
+<li>per-session HTML trace reports were added under <code>data/traces/sessions/&lt;session_id&gt;/report.html</code></li>
+<li>async round generation and feedback submission were exposed through job endpoints with visible progress</li>
+<li>a real GPU-backed end-to-end example bundle was added under <code>output/examples/real_e2e_example_run/</code></li>
+<li>lifecycle guards were added for duplicate feedback and premature next-round generation</li>
+<li>browser coverage was expanded with headed debug support and replay export API smoke coverage</li>
+</ul>
+<p>The most heavily updated documents in this sync were:</p>
+<ul>
+<li><a href="../index.html">README.md</a></li>
+<li><a href="quick_start.html">quick_start.md</a></li>
+<li><a href="user_guide.html">user_guide.md</a></li>
+<li><a href="developer_guide.html">developer_guide.md</a></li>
+<li><a href="faq.html">faq.md</a></li>
+<li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint.md</a></li>
+<li><a href="system_specification.html">system_specification.md</a></li>
+<li><a href="system_test_specification.html">system_test_specification.md</a></li>
+</ul>
+<h2 id="1-motivation-top-30-improvements-applied">1. Motivation: Top 30 Improvements Applied</h2>
+<ol>
+<li>Added a document-role section so readers know when to use this file.</li>
+<li>Added links to the related documents for navigation across the spec set.</li>
+<li>Reframed the introduction around the research problem rather than only system purpose.</li>
+<li>Made the core problem statement more explicit and concrete.</li>
+<li>Expanded the list of generation variables that create steering instability.</li>
+<li>Clarified that the issue is not only prompt sensitivity but also user-control mismatch.</li>
+<li>Added a crisp central research claim.</li>
+<li>Separated the central claim from the iterative loop description.</li>
+<li>Clarified that the goal is to study controllability, not only image quality.</li>
+<li>Added a section explaining why the project matters beyond curiosity.</li>
+<li>Split value into research value and practical value.</li>
+<li>Expanded the research questions into a more useful study agenda.</li>
+<li>Added a question about fatigue and inconsistency across rounds.</li>
+<li>Added a question about interface bias and interaction design.</li>
+<li>Added a section explaining why current interfaces are inadequate for research.</li>
+<li>Strengthened the rationale for exact reproducibility and replay.</li>
+<li>Added intended outcomes so the document points toward deliverables.</li>
+<li>Expanded the goals section to include replay and comparative analysis.</li>
+<li>Tightened non-goals to reduce scope ambiguity.</li>
+<li>Renamed the experimental matrix as a first comparison grid to better position it.</li>
+<li>Clarified that the matrix is intentionally manageable for early research.</li>
+<li>Added overfitting to one workflow as an explicit confound.</li>
+<li>Reworded risk statements so they are testable rather than purely descriptive.</li>
+<li>Added a requirement to log confounds instead of merely acknowledging them.</li>
+<li>Added explicit success criteria for deciding whether the project is worth continuing.</li>
+<li>Improved section ordering from problem to claim to value to goals to risks.</li>
+<li>Made wording more decisive and less repetitive.</li>
+<li>Improved cross-document consistency with the other spec files.</li>
+<li>Reduced ambiguity around the research purpose of the platform.</li>
+<li>Strengthened the summary so it reflects the document's main claim.</li>
+</ol>
+<h2 id="2-theoretical-background-top-30-improvements-applied">2. Theoretical Background: Top 30 Improvements Applied</h2>
+<ol>
+<li>Added a document-role section to define the purpose of the theory doc.</li>
+<li>Added links back to the motivation and system docs.</li>
+<li>Clarified that the document is scoped to the minimum theory needed for design.</li>
+<li>Simplified the diffusion overview without losing technical meaning.</li>
+<li>Made the consequence of embedding-based conditioning more explicit.</li>
+<li>Added a dedicated section on why prompt rewriting is hard.</li>
+<li>Clarified the discrete-text versus continuous-control mismatch.</li>
+<li>Added explicit mention that prompt rewriting is still useful but limited.</li>
+<li>Expanded the embedding discussion beyond full-tensor control.</li>
+<li>Added the notion of tradeoffs among steering representations.</li>
+<li>Reframed low-dimensional steering as a controllable search space.</li>
+<li>Added a section explaining why local search is a reasonable framing.</li>
+<li>Clarified that the system is not solving global optimization.</li>
+<li>Connected low-dimensional search to interpretability and replay.</li>
+<li>Strengthened the preference-learning framing.</li>
+<li>Expanded the list of feedback types to match later system design.</li>
+<li>Clarified that the latent reward is noisy and only partially observed.</li>
+<li>Tightened the explanation of exploration versus exploitation.</li>
+<li>Linked the exploration problem directly to real human attention constraints.</li>
+<li>Expanded the seed-sensitivity explanation into an identification problem.</li>
+<li>Made seed-control implications explicit for system design.</li>
+<li>Added a stronger explanation of trust regions and anchoring.</li>
+<li>Added a comparison section for multiple representation and update choices.</li>
+<li>Connected theory choices to concrete engineering consequences.</li>
+<li>Added a section on the limits of the theory so the document is not overstated.</li>
+<li>Named entanglement and instability as theoretical limits.</li>
+<li>Improved continuity between sections by making each one motivate the next.</li>
+<li>Increased consistency with the terminology used in the system spec.</li>
+<li>Improved the summary so it restates the practical theoretical justification.</li>
+<li>Reduced the chance that readers interpret the theory as a claim of guaranteed smoothness.</li>
+</ol>
+<h2 id="3-system-specification-top-30-improvements-applied">3. System Specification: Top 30 Improvements Applied</h2>
+<ol>
+<li>Added a document-role section to clarify that this is the main functional contract.</li>
+<li>Added links to related documents for navigation and alignment.</li>
+<li>Added an explicit scope section stating what the document does and does not cover.</li>
+<li>Added a short system-goals section before architecture details.</li>
+<li>Added a canonical user workflow to anchor the rest of the spec.</li>
+<li>Added core system invariants that implementation must preserve.</li>
+<li>Strengthened experiment fields to include steering and control parameters.</li>
+<li>Strengthened session fields with incumbent reference and status.</li>
+<li>Strengthened round fields with render status and update summary.</li>
+<li>Strengthened candidate fields with render status and metadata expectations.</li>
+<li>Strengthened feedback-event fields with normalized payload requirements.</li>
+<li>Added lifecycle states for experiments.</li>
+<li>Added lifecycle states for sessions.</li>
+<li>Added lifecycle states for candidate rendering.</li>
+<li>Expanded frontend requirements to include failure behavior.</li>
+<li>Clarified required dashboard actions and elements.</li>
+<li>Clarified session-setup inputs and actions.</li>
+<li>Clarified interactive-page behavior and stable candidate ordering.</li>
+<li>Tightened accessibility requirements with focus visibility and hover independence.</li>
+<li>Expanded backend modules to include storage-layer responsibilities.</li>
+<li>Improved the data model with <code>updated_at</code>, <code>status</code>, and normalized payload fields.</li>
+<li>Added API conventions in addition to endpoint lists.</li>
+<li>Added <code>GET /experiments/{experiment_id}</code> for complete experiment retrieval.</li>
+<li>Clarified response requirements for write endpoints.</li>
+<li>Tightened the steering-representation section with a default equation explanation.</li>
+<li>Separated required versus optional samplers and updaters more clearly.</li>
+<li>Tightened the unified feedback schema language.</li>
+<li>Added operational constraints for the v1 environment.</li>
+<li>Updated the suggested project structure to point at <code>system_specification.md</code>.</li>
+<li>Strengthened the summary around architectural priorities and research use.</li>
+</ol>
+<h2 id="4-system-test-specification-top-30-improvements-applied">4. System Test Specification: Top 30 Improvements Applied</h2>
+<ol>
+<li>Added a document-role section explaining why tests are part of the research method.</li>
+<li>Added links to the implementation-facing specs.</li>
+<li>Added explicit test objectives before listing categories.</li>
+<li>Added a test-environment strategy to reduce unnecessary dependence on real generation.</li>
+<li>Clarified the distinction between logic, service, and end-to-end tests.</li>
+<li>Expanded steering unit tests with invalid-dimension failures.</li>
+<li>Expanded sampler unit tests with role-tag verification.</li>
+<li>Expanded feedback tests with critique preservation.</li>
+<li>Expanded feedback tests with skip and uncertain actions.</li>
+<li>Expanded updater tests with trust-region checks.</li>
+<li>Expanded seed-policy tests with missing-metadata failure handling.</li>
+<li>Added persistence and schema unit-test coverage.</li>
+<li>Strengthened the generation integration test to cover partial success.</li>
+<li>Strengthened the replay integration test to include round-order stability.</li>
+<li>Split sampler and updater swap checks explicitly in plug-in tests.</li>
+<li>Added API contract integration tests.</li>
+<li>Expanded end-to-end coverage to require at least two feedback modes.</li>
+<li>Expanded end-to-end coverage to include replay opening.</li>
+<li>Added recoverable-error display checks to end-to-end tests.</li>
+<li>Strengthened deterministic replay checks with round summaries.</li>
+<li>Added a separate regression-test section.</li>
+<li>Added edge-case prompt regression coverage.</li>
+<li>Added edge-case feedback-payload regression coverage.</li>
+<li>Added replay-bug regression coverage.</li>
+<li>Added an explicit failure-mode test section.</li>
+<li>Added export-failure testing.</li>
+<li>Added database interruption and resume testing.</li>
+<li>Expanded fixtures with schema snapshots.</li>
+<li>Strengthened acceptance criteria with failure-mode coverage.</li>
+<li>Added test-reporting expectations so failures are easier to interpret.</li>
+</ol>
+<h2 id="5-pre-implementation-blueprint-top-30-improvements-applied">5. Pre-Implementation Blueprint: Top 30 Improvements Applied</h2>
+<ol>
+<li>Added a document-role section to frame this as an implementation handoff.</li>
+<li>Added links to the related research and test docs.</li>
+<li>Added implementation principles before scope details.</li>
+<li>Reframed v1 scope as a concrete engineering boundary.</li>
+<li>Tightened out-of-scope items to reduce future drift.</li>
+<li>Added a clear assumptions section to lock environment defaults.</li>
+<li>Added a requirement for mock generation during testing.</li>
+<li>Reworked open decisions into decisions that should be fixed before coding.</li>
+<li>Kept default-model choice explicit and actionable.</li>
+<li>Kept default-basis choice explicit and actionable.</li>
+<li>Kept default-feedback choice explicit and actionable.</li>
+<li>Kept default-updater choice explicit and actionable.</li>
+<li>Clarified frontend responsibilities versus non-responsibilities.</li>
+<li>Clarified backend responsibilities versus non-responsibilities.</li>
+<li>Clarified storage responsibilities and exclusions.</li>
+<li>Strengthened the session contract before implementation.</li>
+<li>Strengthened the candidate contract before implementation.</li>
+<li>Strengthened the feedback contract before implementation.</li>
+<li>Strengthened the replay contract before implementation.</li>
+<li>Renamed implementation order to delivery order for clearer project planning.</li>
+<li>Tightened minimal API decisions as pre-coding agreements.</li>
+<li>Expanded non-functional requirements for reproducibility.</li>
+<li>Expanded non-functional requirements for debuggability.</li>
+<li>Expanded non-functional requirements for modularity.</li>
+<li>Reworked risk sections into explicit risk-and-mitigation pairs.</li>
+<li>Added a clearer definition of implementation readiness.</li>
+<li>Added delivery milestones to make the blueprint easier to execute.</li>
+<li>Improved consistency of terminology with the system spec.</li>
+<li>Reduced ambiguity around what must be decided before coding starts.</li>
+<li>Strengthened the summary so the document reads as an actual handoff artifact.</li>
+</ol>
+      </main>
+    </div>
+  </body>
+</html>

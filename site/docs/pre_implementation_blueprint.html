@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>pre_implementation_blueprint | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/pre_implementation_blueprint.md">View source Markdown</a></p>
+        <h1 id="pre-implementation-blueprint">Pre-Implementation Blueprint</h1>
+<h2 id="1-document-role">1. Document Role</h2>
+<p>This document translates the research-oriented specification into an implementation-ready build plan. It exists to reduce ambiguity before coding begins.</p>
+<p>Implementation note:</p>
+<ul>
+<li>the repository now includes a working MVP</li>
+<li>this blueprint remains useful as the intended design baseline and gap-analysis reference</li>
+</ul>
+<p>It focuses on:</p>
+<ul>
+<li>what must be fixed before implementation</li>
+<li>what v1 should contain</li>
+<li>what boundaries must remain clean</li>
+<li>what delivery order will reduce rework</li>
+</ul>
+<p>Related documents:</p>
+<ul>
+<li><a href="motivation.html">motivation.md</a></li>
+<li><a href="system_specification.html">system_specification.md</a></li>
+<li><a href="system_test_specification.html">system_test_specification.md</a></li>
+</ul>
+<h2 id="2-implementation-principles">2. Implementation Principles</h2>
+<p>The first implementation should optimize for:</p>
+<ul>
+<li>research usefulness over production polish</li>
+<li>reproducibility over raw throughput</li>
+<li>modularity over premature abstraction</li>
+<li>debuggability over hidden automation</li>
+<li>clear data contracts over convenience shortcuts</li>
+</ul>
+<h2 id="3-v1-scope">3. v1 Scope</h2>
+<h3 id="31-in-scope">3.1 In scope</h3>
+<ul>
+<li>one local-user research workflow</li>
+<li>one FastAPI backend</li>
+<li>one simple HTML frontend</li>
+<li>one Stable Diffusion or SDXL wrapper via Diffusers</li>
+<li>one persistent store for experiments, sessions, rounds, and feedback</li>
+<li>one replay and export workflow</li>
+<li>low-dimensional steering mode</li>
+<li>fixed-per-round seed mode</li>
+<li>three samplers</li>
+<li>three feedback modes</li>
+<li>three updaters</li>
+</ul>
+<h3 id="32-out-of-scope">3.2 Out of scope</h3>
+<ul>
+<li>multi-user collaboration</li>
+<li>cloud-scale operations</li>
+<li>production authentication</li>
+<li>distributed job scheduling</li>
+<li>model fine-tuning</li>
+<li>advanced GPU optimization</li>
+<li>enterprise security controls</li>
+</ul>
+<h2 id="4-assumptions-to-lock-early">4. Assumptions to Lock Early</h2>
+<p>The project should proceed with these default assumptions unless deliberately changed:</p>
+<ul>
+<li>single-machine execution</li>
+<li>one active interactive session at a time in v1</li>
+<li>SQLite-backed local persistence for the current MVP, with PostgreSQL still a plausible next step</li>
+<li>filesystem storage for images and exports</li>
+<li>replay correctness is higher priority than generation speed</li>
+<li>prompts and critique text are stored as research data</li>
+<li>mock generation is available for tests</li>
+<li>the normal app runtime uses real GPU-backed Diffusers inference</li>
+<li>trace logging is a first-class debugging and auditability feature</li>
+</ul>
+<h2 id="5-decisions-that-should-be-fixed-before-coding">5. Decisions That Should Be Fixed Before Coding</h2>
+<h3 id="51-default-model-baseline">5.1 Default model baseline</h3>
+<p>Options:</p>
+<ul>
+<li>Stable Diffusion 1.5 or similar lightweight baseline</li>
+<li>SDXL baseline</li>
+</ul>
+<p>Recommendation:</p>
+<ul>
+<li>start with the lighter baseline to reduce development and test friction</li>
+</ul>
+<h3 id="52-default-steering-basis">5.2 Default steering basis</h3>
+<p>Options:</p>
+<ul>
+<li>random orthonormal basis</li>
+<li>PCA basis</li>
+<li>prompt-difference basis</li>
+</ul>
+<p>Recommendation:</p>
+<ul>
+<li>start with random orthonormal basis for simplicity and deterministic validation</li>
+</ul>
+<h3 id="53-default-feedback-mode">5.3 Default feedback mode</h3>
+<p>Options:</p>
+<ul>
+<li>scalar rating</li>
+<li>pairwise comparison</li>
+<li>top-k ranking</li>
+</ul>
+<p>Recommendation:</p>
+<ul>
+<li>start with scalar rating for the simplest complete end-to-end flow</li>
+</ul>
+<h3 id="54-default-updater">5.4 Default updater</h3>
+<p>Options:</p>
+<ul>
+<li>winner-copy</li>
+<li>winner-average</li>
+<li>linear preference updater</li>
+</ul>
+<p>Recommendation:</p>
+<ul>
+<li>start with winner-average as the reference behavior</li>
+</ul>
+<h2 id="6-system-boundaries">6. System Boundaries</h2>
+<h3 id="61-frontend-boundary">6.1 Frontend boundary</h3>
+<p>Frontend responsibilities:</p>
+<ul>
+<li>collect prompt and configuration</li>
+<li>request round generation</li>
+<li>display candidates and metadata</li>
+<li>collect feedback</li>
+<li>show session progress and errors</li>
+</ul>
+<p>Frontend non-responsibilities:</p>
+<ul>
+<li>preference inference</li>
+<li>steering calculations</li>
+<li>persistence rules</li>
+<li>replay reconstruction logic</li>
+</ul>
+<h3 id="62-backend-boundary">6.2 Backend boundary</h3>
+<p>Backend responsibilities:</p>
+<ul>
+<li>prompt encoding</li>
+<li>steering state management</li>
+<li>candidate generation</li>
+<li>image rendering</li>
+<li>feedback normalization</li>
+<li>preference update logic</li>
+<li>persistence</li>
+<li>replay and export</li>
+</ul>
+<h3 id="63-storage-boundary">6.3 Storage boundary</h3>
+<p>Storage must persist:</p>
+<ul>
+<li>experiment configs</li>
+<li>session state</li>
+<li>rounds</li>
+<li>candidates</li>
+<li>feedback events</li>
+<li>generated image paths</li>
+<li>trace event logs</li>
+<li>exports and manifests</li>
+</ul>
+<p>Storage should avoid:</p>
+<ul>
+<li>arbitrary temporary tensors unless they are explicitly required for replay</li>
+</ul>
+<h2 id="7-stable-contracts-to-define-before-coding">7. Stable Contracts to Define Before Coding</h2>
+<h3 id="71-session-contract">7.1 Session contract</h3>
+<p>Every session state should contain:</p>
+<ul>
+<li>session ID</li>
+<li>experiment configuration snapshot</li>
+<li>prompt and negative prompt</li>
+<li>basis configuration</li>
+<li>current steering state</li>
+<li>current round index</li>
+<li>incumbent reference</li>
+<li>status</li>
+</ul>
+<h3 id="72-candidate-contract">7.2 Candidate contract</h3>
+<p>Every candidate should contain:</p>
+<ul>
+<li>candidate ID</li>
+<li>round ID</li>
+<li>steering vector</li>
+<li>seed</li>
+<li>sampler role</li>
+<li>generation parameters</li>
+<li>image location</li>
+<li>predicted score if available</li>
+<li>predicted uncertainty if available</li>
+<li>render status</li>
+</ul>
+<h3 id="73-feedback-contract">7.3 Feedback contract</h3>
+<p>Every normalized feedback object should contain:</p>
+<ul>
+<li>feedback type</li>
+<li>involved candidate IDs</li>
+<li>ordered preference information if derivable</li>
+<li>raw payload</li>
+<li>optional critique text</li>
+<li>timestamp</li>
+</ul>
+<h3 id="74-replay-contract">7.4 Replay contract</h3>
+<p>Every replay export should contain enough information to reconstruct:</p>
+<ul>
+<li>experiment configuration</li>
+<li>session setup</li>
+<li>round order</li>
+<li>candidate metadata</li>
+<li>image references</li>
+<li>feedback events</li>
+<li>updater outputs</li>
+</ul>
+<h2 id="8-delivery-order">8. Delivery Order</h2>
+<p>Implementation should proceed in this order:</p>
+<ol>
+<li>define schemas and configuration models</li>
+<li>implement persistence and repositories</li>
+<li>implement prompt encoding and steering basis logic</li>
+<li>implement sampler interface and one baseline sampler</li>
+<li>implement generation wrapper</li>
+<li>implement orchestration</li>
+<li>implement feedback normalization</li>
+<li>implement updater interface and one baseline updater</li>
+<li>expose API endpoints</li>
+<li>build the minimal frontend</li>
+<li>add replay and export</li>
+<li>add remaining strategies</li>
+<li>harden deterministic replay</li>
+</ol>
+<h2 id="9-minimal-api-decisions">9. Minimal API Decisions</h2>
+<p>These rules should be fixed before coding:</p>
+<ul>
+<li>all write endpoints return persisted identifiers</li>
+<li>round-generation responses include candidate metadata and image references</li>
+<li>feedback submission returns updated incumbent state and summary</li>
+<li>errors return structured codes and readable messages</li>
+<li>session configuration snapshots are immutable after creation</li>
+</ul>
+<h2 id="10-non-functional-requirements">10. Non-Functional Requirements</h2>
+<h3 id="101-reproducibility">10.1 Reproducibility</h3>
+<p>The system must:</p>
+<ul>
+<li>persist full config snapshots</li>
+<li>persist seeds for all candidates</li>
+<li>version strategy implementations</li>
+<li>support deterministic replay with a controlled backend</li>
+</ul>
+<h3 id="102-debuggability">10.2 Debuggability</h3>
+<p>The system must:</p>
+<ul>
+<li>log round lifecycle events</li>
+<li>log request-level backend traces</li>
+<li>capture frontend interaction traces</li>
+<li>log per-candidate generation failures</li>
+<li>preserve raw feedback payloads</li>
+<li>allow inspection of session state from storage</li>
+</ul>
+<h3 id="103-modularity">10.3 Modularity</h3>
+<p>The system must:</p>
+<ul>
+<li>allow sampler swapping by configuration</li>
+<li>allow updater swapping by configuration</li>
+<li>keep generation logic separate from orchestration logic</li>
+</ul>
+<h2 id="11-design-risks-to-address-early">11. Design Risks to Address Early</h2>
+<h3 id="111-hidden-coupling">11.1 Hidden coupling</h3>
+<p>Risk:</p>
+<ul>
+<li>sampler, updater, and persistence logic become entangled</li>
+</ul>
+<p>Mitigation:</p>
+<ul>
+<li>define interfaces early and centralize orchestration</li>
+</ul>
+<h3 id="112-replay-drift">11.2 Replay drift</h3>
+<p>Risk:</p>
+<ul>
+<li>missing config or seed data breaks replay trust</li>
+</ul>
+<p>Mitigation:</p>
+<ul>
+<li>treat replay metadata as first-class persisted state</li>
+</ul>
+<h3 id="113-generation-cost">11.3 Generation cost</h3>
+<p>Risk:</p>
+<ul>
+<li>development slows dramatically if every test requires real generation</li>
+</ul>
+<p>Mitigation:</p>
+<ul>
+<li>define a mock generator from day one</li>
+</ul>
+<h3 id="114-ui-overreach">11.4 UI overreach</h3>
+<p>Risk:</p>
+<ul>
+<li>supporting every mode too early makes the frontend brittle</li>
+</ul>
+<p>Mitigation:</p>
+<ul>
+<li>build one simple, switchable feedback component first</li>
+</ul>
+<h2 id="12-definition-of-implementation-readiness">12. Definition of Implementation Readiness</h2>
+<p>The project is ready to implement when:</p>
+<ul>
+<li>the baseline model is fixed</li>
+<li>the baseline steering basis is fixed</li>
+<li>the baseline sampler, feedback, and updater set is fixed</li>
+<li>the API payload schemas are agreed</li>
+<li>the persistence model is agreed</li>
+<li>replay requirements are agreed</li>
+<li>acceptance criteria are accepted from the test specification</li>
+</ul>
+<h2 id="13-delivery-milestones">13. Delivery Milestones</h2>
+<p>Recommended milestones:</p>
+<ol>
+<li>schema and storage foundation</li>
+<li>single-round generation path</li>
+<li>full session lifecycle</li>
+<li>replay and export</li>
+<li>logging, tracing, and diagnostics hardening</li>
+<li>strategy plug-in expansion</li>
+<li>test hardening and polish</li>
+</ol>
+<h2 id="14-summary">14. Summary</h2>
+<p>This blueprint is the engineering handoff document. It exists to ensure that implementation starts from fixed assumptions, explicit contracts, and a realistic v1 boundary rather than from a broad but underspecified research description.</p>
+      </main>
+    </div>
+  </body>
+</html>

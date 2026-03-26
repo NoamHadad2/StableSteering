@@ -7,6 +7,12 @@ This folder contains generated reports and optional release artifacts.
 - Playwright HTML reports
 - Playwright traces, screenshots, and videos
 - packaged release zip files under `output/releases/`
+- real example bundles under `output/examples/`
+
+Example:
+
+- `output/examples/real_e2e_example_run/`
+  Contains a real GPU-backed walkthrough with generated images, manifest, and HTML reports.
 
 ## Safe cleanup
 

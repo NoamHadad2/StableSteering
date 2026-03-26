@@ -42,7 +42,13 @@ This prepares a local model snapshot directory and writes a manifest describing 
 
 ## Where is the session data stored?
 
-The current MVP stores data locally in JSON files under the `data/` directory.
+The current MVP stores structured state in a local SQLite database:
+
+```text
+data/stablesteering.db
+```
+
+Generated images, trace logs, and per-session reports are stored alongside it under `data/`.
 
 ## Where are the generated artifacts stored?
 
@@ -58,6 +64,47 @@ Trace files are stored under:
 
 ```text
 data/traces/
+```
+
+Per-session trace bundles are stored under:
+
+```text
+data/traces/sessions/<session_id>/
+```
+
+Each session bundle contains:
+
+- `backend-events.jsonl`
+- `frontend-events.jsonl`
+- `report.html`
+
+## How do async actions work?
+
+Round generation and feedback submission run as async jobs.
+
+In the browser, you will see:
+
+- a progress bar
+- a status label
+- automatic refresh after success
+- inline error text if the job fails
+
+Behind the scenes, the UI submits async requests and polls a job-status endpoint until the work completes.
+
+## Is there a real end-to-end example run?
+
+Yes.
+
+Run:
+
+```bash
+python scripts/create_real_e2e_example.py
+```
+
+This creates a real GPU-backed example bundle under:
+
+```text
+output/examples/real_e2e_example_run/
 ```
 
 ## What feedback modes are supported?

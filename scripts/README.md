@@ -13,6 +13,9 @@ This folder contains developer-facing helper scripts.
 - `smoke_real_diffusers.py`
   Runs a real-model smoke test through the orchestration path and writes output artifacts.
 
+- `create_real_e2e_example.py`
+  Executes a real multi-round steering session on GPU and writes a standalone HTML walkthrough plus a trace bundle under `output/examples/real_e2e_example_run/`.
+
 - `run_e2e_debug.ps1`
   Launches the Playwright suite headed in Chrome for interactive debugging.
 
@@ -21,6 +24,9 @@ This folder contains developer-facing helper scripts.
 
 - `build_release_zip.ps1`
   Builds an optional source release zip from tracked repository files into `output/releases/`.
+
+- `build_pages_site.py`
+  Converts the repository Markdown set into a static HTML site under `site/` with rewritten inter-document links for GitHub Pages.
 
 ## Usage
 

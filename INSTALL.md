@@ -85,6 +85,7 @@ Useful runtime pages:
 
 - `http://127.0.0.1:8000/`
 - `http://127.0.0.1:8000/diagnostics/view`
+- `http://127.0.0.1:8000/sessions/{session_id}/trace-report`
 
 ## Run the Tests
 
@@ -117,4 +118,7 @@ npm run test:e2e:real
 
 - The normal app runtime is GPU-only and uses the real Diffusers backend.
 - The mock generator is reserved for tests and explicit test harnesses only.
+- Round generation and feedback submission run as async jobs with visible progress in the UI.
 - Trace logs are written under `data/traces/`.
+- Per-session trace bundles and readable `report.html` files are written under `data/traces/sessions/<session_id>/`.
+- You can generate a complete real GPU example bundle with `python scripts/create_real_e2e_example.py`.

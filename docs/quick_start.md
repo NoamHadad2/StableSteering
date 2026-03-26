@@ -34,13 +34,22 @@ http://127.0.0.1:8000
 ## 4. Run One Steering Cycle
 
 1. click `Generate next round`
-2. rate the candidates
-3. click `Submit feedback`
-4. click `Generate next round` again
+2. watch the progress bar while the async generation job runs
+3. rate the candidates
+4. click `Submit feedback`
+5. watch the status message while the async feedback job runs
+6. click `Generate next round` again
 
 ## 5. Review Replay
 
 Open the replay page from the session view to inspect the stored rounds and update summaries.
+
+You can also open the session trace report from the session or replay page to inspect:
+
+- proposed images
+- frontend actions
+- normalized preferences
+- backend diagnostics
 
 ## 6. Run the Tests
 
@@ -92,6 +101,18 @@ Tracing is enabled by default. Backend and frontend trace events are persisted u
 
 ```text
 data/traces/
+```
+
+Per-session bundles are persisted under:
+
+```text
+data/traces/sessions/<session_id>/
+```
+
+Create a real GPU-backed example bundle with images and HTML walkthrough:
+
+```bash
+python scripts/create_real_e2e_example.py
 ```
 
 ## 8. Where to Read Next

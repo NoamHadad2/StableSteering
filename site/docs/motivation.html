@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>motivation | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/motivation.md">View source Markdown</a></p>
+        <h1 id="motivation">Motivation</h1>
+<h2 id="1-document-role">1. Document Role</h2>
+<p>This document explains why the project exists, what research gap it addresses, and what outcomes make the effort worthwhile.</p>
+<p>It is the entry point for:</p>
+<ul>
+<li>researchers evaluating whether the problem is meaningful</li>
+<li>engineers needing context before implementation</li>
+<li>reviewers checking whether later design decisions stay aligned with research intent</li>
+</ul>
+<p>Related documents:</p>
+<ul>
+<li><a href="theoretical_background.html">theoretical_background.md</a></li>
+<li><a href="system_specification.html">system_specification.md</a></li>
+<li><a href="system_test_specification.html">system_test_specification.md</a></li>
+<li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint.md</a></li>
+</ul>
+<h2 id="2-problem-statement">2. Problem Statement</h2>
+<p>Text-to-image diffusion systems are powerful but difficult to steer reliably. A user may know what they want to improve after seeing a result, yet still be unable to express that change as a clean prompt rewrite.</p>
+<p>Small prompt edits can cause disproportionately large output changes because generation also depends on:</p>
+<ul>
+<li>prompt wording</li>
+<li>negative prompt wording</li>
+<li>seed</li>
+<li>guidance scale</li>
+<li>scheduler choice</li>
+<li>inference step count</li>
+<li>image resolution</li>
+</ul>
+<p>This creates five core usability failures:</p>
+<ul>
+<li>prompt editing is discrete rather than continuous</li>
+<li>useful changes are often hard to verbalize</li>
+<li>user intent evolves after inspecting outputs</li>
+<li>seed variation obscures whether a prompt change helped</li>
+<li>repeated trial and error wastes time and attention</li>
+</ul>
+<h2 id="3-central-research-claim">3. Central Research Claim</h2>
+<p>The project is based on one central claim:</p>
+<blockquote>
+<p>User preference may be learned more effectively by steering prompt-conditioning embeddings than by repeatedly rewriting visible prompt text.</p>
+</blockquote>
+<p>Instead of treating the prompt string as the only editable control, the system treats the prompt-conditioned embedding as a controllable search object.</p>
+<p>The core loop is:</p>
+<ol>
+<li>encode the initial prompt</li>
+<li>generate candidate embedding variations</li>
+<li>render images from those candidates</li>
+<li>collect user feedback</li>
+<li>estimate a preferred direction in steering space</li>
+<li>update the steering state</li>
+<li>repeat</li>
+</ol>
+<p>The goal is not merely to produce nicer images. The goal is to study whether this interaction pattern is measurably more controllable, learnable, and reproducible than direct prompt rewriting alone.</p>
+<h2 id="4-why-this-matters">4. Why This Matters</h2>
+<p>If the central claim holds, the project could improve both research and practical image-generation workflows.</p>
+<p>Potential research value:</p>
+<ul>
+<li>clearer measurement of local controllability in text conditioning</li>
+<li>more rigorous comparison of preference-learning strategies</li>
+<li>cleaner isolation of seed effects versus semantic steering effects</li>
+<li>reusable infrastructure for interactive generative-model experiments</li>
+</ul>
+<p>Potential practical value:</p>
+<ul>
+<li>faster personalization for repeated users</li>
+<li>less dependence on perfect prompt-writing skill</li>
+<li>more stable iteration on composition, realism, and style</li>
+<li>better support for evolving intent during exploration</li>
+</ul>
+<h2 id="5-research-questions">5. Research Questions</h2>
+<p>The platform should make it possible to answer questions such as:</p>
+<ul>
+<li>Does local exploration in embedding space produce meaningful and interpretable visual changes?</li>
+<li>Which feedback type is most informative under limited user attention?</li>
+<li>Which sampling policy best balances exploration and exploitation?</li>
+<li>How strongly do random seeds confound preference learning?</li>
+<li>Do users prefer one shared steering space or semantically separated subspaces?</li>
+<li>Can a lightweight preference model adapt faster than manual prompt rewriting?</li>
+<li>How much user fatigue appears across repeated steering rounds?</li>
+<li>Which interaction design choices reduce inconsistency and bias?</li>
+</ul>
+<h2 id="6-why-existing-interfaces-are-not-enough">6. Why Existing Interfaces Are Not Enough</h2>
+<p>Most image-generation products optimize for convenience, speed, and visual polish. They are not designed for controlled research.</p>
+<p>A research platform must instead prioritize:</p>
+<ul>
+<li>exact reproducibility</li>
+<li>pluggable exploration policies</li>
+<li>pluggable feedback modes</li>
+<li>pluggable update mechanisms</li>
+<li>strong logging</li>
+<li>deterministic replay</li>
+<li>experiment export</li>
+<li>traceable configuration</li>
+</ul>
+<p>Without those properties, promising results are difficult to reproduce and negative results are difficult to interpret.</p>
+<h2 id="7-intended-outcomes">7. Intended Outcomes</h2>
+<p>This project should produce:</p>
+<ul>
+<li>a controlled environment for studying interactive embedding steering</li>
+<li>a repeatable way to compare candidate-generation policies</li>
+<li>a repeatable way to compare feedback mechanisms</li>
+<li>a repeatable way to compare preference-update rules</li>
+<li>enough trace data to analyze confounds after the fact</li>
+</ul>
+<p>The project is successful if it enables trustworthy experiments, even if some steering strategies ultimately fail.</p>
+<h2 id="8-research-goals">8. Research Goals</h2>
+<p>The system must support controlled experiments on:</p>
+<ul>
+<li>embedding-space candidate generation</li>
+<li>user feedback collection</li>
+<li>user-preference inference</li>
+<li>iterative update policies</li>
+<li>robustness to randomness</li>
+<li>reproducibility and traceability</li>
+<li>session replay and comparative analysis</li>
+</ul>
+<h2 id="9-non-goals">9. Non-Goals</h2>
+<p>The first version is not intended to:</p>
+<ul>
+<li>deliver state-of-the-art image quality</li>
+<li>support production traffic</li>
+<li>handle large multi-user concurrency</li>
+<li>perform full model fine-tuning</li>
+<li>support every diffusion family</li>
+<li>optimize hardware throughput aggressively</li>
+<li>solve identity, billing, or enterprise security requirements</li>
+</ul>
+<h2 id="10-first-experimental-matrix">10. First Experimental Matrix</h2>
+<p>A useful first comparison grid is:</p>
+<h3 id="axis-1-sampling">Axis 1: Sampling</h3>
+<ul>
+<li>random local</li>
+<li>exploit-plus-orthogonal</li>
+<li>uncertainty-guided</li>
+</ul>
+<h3 id="axis-2-feedback">Axis 2: Feedback</h3>
+<ul>
+<li>scalar rating</li>
+<li>pairwise comparison</li>
+<li>top-3 ranking</li>
+</ul>
+<h3 id="axis-3-update">Axis 3: Update</h3>
+<ul>
+<li>winner-average</li>
+<li>linear preference update</li>
+<li>pairwise logistic update</li>
+</ul>
+<h3 id="axis-4-seed-policy">Axis 4: Seed policy</h3>
+<ul>
+<li>fixed-per-round</li>
+<li>fixed-per-round with periodic validation seeds</li>
+</ul>
+<p>This matrix is large enough to reveal meaningful differences while still being manageable for a first study.</p>
+<h2 id="11-main-risks-and-confounds">11. Main Risks and Confounds</h2>
+<p>The specification must explicitly acknowledge the major sources of ambiguity.</p>
+<h3 id="111-seed-confounding">11.1 Seed confounding</h3>
+<p>A candidate may appear better due to random seed luck rather than steering quality.</p>
+<h3 id="112-human-inconsistency">11.2 Human inconsistency</h3>
+<p>Users may change their preference criteria over time or answer inconsistently under fatigue.</p>
+<h3 id="113-entangled-directions">11.3 Entangled directions</h3>
+<p>A single movement in steering space may alter style, composition, and realism simultaneously.</p>
+<h3 id="114-interface-bias">11.4 Interface bias</h3>
+<p>Layout, labeling order, or visual emphasis may bias selection independently of image quality.</p>
+<h3 id="115-fatigue-effects">11.5 Fatigue effects</h3>
+<p>Long sessions can reduce decision quality and increase noisy feedback.</p>
+<h3 id="116-overfitting-to-one-user-workflow">11.6 Overfitting to one user workflow</h3>
+<p>A strategy that works well for one interaction style may fail under a different feedback mode or prompt type.</p>
+<p>The system must log enough metadata to study these confounds rather than hiding them.</p>
+<h2 id="12-success-criteria">12. Success Criteria</h2>
+<p>The project is worth continuing if it can demonstrate:</p>
+<ul>
+<li>reproducible experiment runs</li>
+<li>replayable session traces</li>
+<li>meaningful comparison between at least several sampler and updater combinations</li>
+<li>measurable user preference improvement across rounds in at least some settings</li>
+<li>clear analysis of when steering succeeds and when it fails</li>
+</ul>
+<h2 id="13-summary">13. Summary</h2>
+<p>This project matters because it creates a disciplined environment for studying whether prompt-embedding steering can make interactive image generation more controllable than prompt rewriting alone.</p>
+<p>Its value comes from the quality of the experiment environment, not from assuming in advance that one steering method will win.</p>
+      </main>
+    </div>
+  </body>
+</html>

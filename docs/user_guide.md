@@ -21,6 +21,8 @@ The basic flow is:
 6. generate the next round
 7. review the session replay
 
+Generation and feedback run asynchronously. That means the page stays responsive while the backend job is in progress.
+
 ## 3. Pages
 
 ### Home
@@ -54,6 +56,7 @@ The session page lets you:
 - assign ratings to candidates
 - submit feedback
 - open the replay page
+- open the trace report
 - inspect the live frontend trace panel
 
 ### Replay
@@ -76,6 +79,22 @@ Recommended usage:
 5. give the strongest candidate the highest rating
 6. submit feedback
 7. generate another round and compare how the state evolves
+
+## 4.1 Progress and Status
+
+When you generate a round or submit feedback, the session page shows:
+
+- a progress bar
+- a status label such as queueing, running, completed, or failed
+- inline error text if something goes wrong
+
+While work is running:
+
+- the relevant button is disabled
+- the current page remains usable
+- the page refreshes automatically after success so you see the next state
+
+This is especially helpful with the real Diffusers backend, where image generation can take a noticeable amount of time.
 
 ## 5. Understanding the Candidate Cards
 
@@ -103,7 +122,19 @@ Replay is useful for:
 - comparing session progression over time
 - confirming what feedback was stored for a round
 
-## 7. Current Limitations
+## 7. Understanding Trace Reports
+
+Each session also produces a backend-saved HTML trace report. It combines:
+
+- proposed images for each round
+- backend events for generation and feedback
+- frontend actions captured during the run
+- normalized user preference outcomes
+- runtime backend and device diagnostics
+
+You can open it from the session page, or directly at `/sessions/{session_id}/trace-report`.
+
+## 8. Current Limitations
 
 This prototype currently:
 
@@ -114,10 +145,12 @@ This prototype currently:
 - is meant for one local user workflow
 
 Trace data is persisted locally under `data/traces/`.
+Per-session reports are persisted under `data/traces/sessions/<session_id>/report.html`.
 
-## 8. Best Practices
+## 9. Best Practices
 
 - start with short, concrete prompts
 - keep candidate count small while learning the workflow
 - use replay after each session to understand what changed
+- use the trace report when you want one readable record of images, actions, and preferences
 - treat this as a research tool, not a production image editor

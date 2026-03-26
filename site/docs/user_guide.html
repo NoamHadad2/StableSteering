@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>user_guide | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/user_guide.md">View source Markdown</a></p>
+        <h1 id="user-guide">User Guide</h1>
+<h2 id="1-what-this-app-does">1. What This App Does</h2>
+<p>StableSteering is a research prototype for interactive image-generation steering. Instead of only rewriting prompts, it lets you evaluate candidate image variations across multiple rounds and provide feedback so the system can update its steering state.</p>
+<p>The current version runs with a real Diffusers backend by default. The mock
+generator exists only inside explicit test harnesses.</p>
+<p>The app also records backend and frontend trace events so session behavior is easier to inspect while you work.</p>
+<h2 id="2-main-workflow">2. Main Workflow</h2>
+<p>The basic flow is:</p>
+<ol>
+<li>create an experiment</li>
+<li>start a session with a prompt</li>
+<li>generate a round of candidate images</li>
+<li>rate the candidates</li>
+<li>submit feedback</li>
+<li>generate the next round</li>
+<li>review the session replay</li>
+</ol>
+<p>Generation and feedback run asynchronously. That means the page stays responsive while the backend job is in progress.</p>
+<h2 id="3-pages">3. Pages</h2>
+<h3 id="home">Home</h3>
+<p>The home page shows:</p>
+<ul>
+<li>the project overview</li>
+<li>the current experiment list</li>
+<li>a link to start a new session</li>
+</ul>
+<h3 id="setup">Setup</h3>
+<p>The setup page lets you choose:</p>
+<ul>
+<li>experiment name</li>
+<li>experiment description</li>
+<li>prompt</li>
+<li>negative prompt</li>
+<li>sampler</li>
+<li>updater</li>
+<li>feedback mode</li>
+<li>number of candidates per round</li>
+</ul>
+<h3 id="session">Session</h3>
+<p>The session page lets you:</p>
+<ul>
+<li>generate the next round</li>
+<li>review current steering state</li>
+<li>inspect candidate images</li>
+<li>assign ratings to candidates</li>
+<li>submit feedback</li>
+<li>open the replay page</li>
+<li>open the trace report</li>
+<li>inspect the live frontend trace panel</li>
+</ul>
+<h3 id="replay">Replay</h3>
+<p>The replay page shows:</p>
+<ul>
+<li>all completed rounds</li>
+<li>each round's candidates</li>
+<li>the stored update summary</li>
+<li>the persisted outcome of submitted feedback</li>
+</ul>
+<h2 id="4-how-to-use-the-current-mvp">4. How to Use the Current MVP</h2>
+<p>Recommended usage:</p>
+<ol>
+<li>open the setup page</li>
+<li>keep the default settings for your first run</li>
+<li>enter a prompt you can easily recognize</li>
+<li>generate the first round</li>
+<li>give the strongest candidate the highest rating</li>
+<li>submit feedback</li>
+<li>generate another round and compare how the state evolves</li>
+</ol>
+<h2 id="41-progress-and-status">4.1 Progress and Status</h2>
+<p>When you generate a round or submit feedback, the session page shows:</p>
+<ul>
+<li>a progress bar</li>
+<li>a status label such as queueing, running, completed, or failed</li>
+<li>inline error text if something goes wrong</li>
+</ul>
+<p>While work is running:</p>
+<ul>
+<li>the relevant button is disabled</li>
+<li>the current page remains usable</li>
+<li>the page refreshes automatically after success so you see the next state</li>
+</ul>
+<p>This is especially helpful with the real Diffusers backend, where image generation can take a noticeable amount of time.</p>
+<h2 id="5-understanding-the-candidate-cards">5. Understanding the Candidate Cards</h2>
+<p>Each card shows:</p>
+<ul>
+<li>a generated candidate image</li>
+<li>the candidate identifier</li>
+<li>the sampler role</li>
+<li>the steering vector <code>z</code></li>
+<li>a rating input</li>
+</ul>
+<p>The rating inputs currently drive all three supported feedback modes:</p>
+<ul>
+<li><code>scalar_rating</code> sends the ratings directly</li>
+<li><code>pairwise</code> chooses the highest-rated candidate over the lowest-rated candidate</li>
+<li><code>top_k</code> converts the ratings into a ranked list</li>
+</ul>
+<h2 id="6-understanding-replay">6. Understanding Replay</h2>
+<p>Replay is useful for:</p>
+<ul>
+<li>reviewing how many rounds were run</li>
+<li>seeing which candidates were shown</li>
+<li>checking which candidate won each update</li>
+<li>comparing session progression over time</li>
+<li>confirming what feedback was stored for a round</li>
+</ul>
+<h2 id="7-understanding-trace-reports">7. Understanding Trace Reports</h2>
+<p>Each session also produces a backend-saved HTML trace report. It combines:</p>
+<ul>
+<li>proposed images for each round</li>
+<li>backend events for generation and feedback</li>
+<li>frontend actions captured during the run</li>
+<li>normalized user preference outcomes</li>
+<li>runtime backend and device diagnostics</li>
+</ul>
+<p>You can open it from the session page, or directly at <code>/sessions/{session_id}/trace-report</code>.</p>
+<h2 id="8-current-limitations">8. Current Limitations</h2>
+<p>This prototype currently:</p>
+<ul>
+<li>requires the real Diffusers backend and a CUDA-capable GPU for normal app startup</li>
+<li>supports only a minimal set of interaction flows</li>
+<li>does not yet expose advanced controls from the full specification</li>
+<li>stores data locally</li>
+<li>is meant for one local user workflow</li>
+</ul>
+<p>Trace data is persisted locally under <code>data/traces/</code>.
+Per-session reports are persisted under <code>data/traces/sessions/&lt;session_id&gt;/report.html</code>.</p>
+<h2 id="9-best-practices">9. Best Practices</h2>
+<ul>
+<li>start with short, concrete prompts</li>
+<li>keep candidate count small while learning the workflow</li>
+<li>use replay after each session to understand what changed</li>
+<li>use the trace report when you want one readable record of images, actions, and preferences</li>
+<li>treat this as a research tool, not a production image editor</li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

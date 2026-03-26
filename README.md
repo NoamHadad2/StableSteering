@@ -49,6 +49,7 @@ This repository now contains:
 - a real GPU-backed Diffusers generation workflow
 - a deterministic mock generation path reserved for tests
 - rich backend logging and persisted trace events
+- per-session HTML trace reports that capture proposed images, user actions, and preference outcomes
 - frontend trace capture and visible trace panels
 - automated API, lifecycle, and browser tests including replay export smoke coverage
 
@@ -125,6 +126,7 @@ back to mock automatically. The mock generator is reserved for explicit test
 harnesses only.
 
 Trace logs are persisted under `data/traces/`.
+Per-session reports are written under `data/traces/sessions/<session_id>/report.html` and are also available in the app at `/sessions/{session_id}/trace-report`.
 
 Run a one-off real-model smoke test:
 
@@ -132,10 +134,22 @@ Run a one-off real-model smoke test:
 python scripts/smoke_real_diffusers.py
 ```
 
+Create a full real GPU-backed example run with a readable HTML walkthrough:
+
+```bash
+python scripts/create_real_e2e_example.py
+```
+
 Build an optional release zip:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0
+```
+
+Build the static HTML documentation site locally:
+
+```bash
+python scripts/build_pages_site.py
 ```
 
 ## Legacy Source
@@ -146,7 +160,7 @@ The original combined specification is preserved as:
 
 ## Next Suggested Steps
 
-- add a diagnostics endpoint for backend, CUDA, and model readiness
-- introduce a database-backed repository
 - expand browser coverage for pairwise and top-k feedback flows
-- add release packaging and bootstrap/install scripts
+- add export packaging for session trace bundles
+- surface richer GPU diagnostics like adapter name and VRAM in the UI
+- add CI automation for the release packaging flow

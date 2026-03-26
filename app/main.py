@@ -200,6 +200,17 @@ def replay_page(request: Request, session_id: str) -> HTMLResponse:
     return templates.TemplateResponse("replay.html", {"request": request, "session": session, "rounds": rounds})
 
 
+@app.get("/sessions/{session_id}/trace-report", response_class=HTMLResponse)
+def trace_report_page(request: Request, session_id: str) -> HTMLResponse:
+    """Render the saved HTML trace report for one session."""
+
+    try:
+        report_path = request.app.state.orchestrator.generate_trace_report(session_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return HTMLResponse(report_path.read_text(encoding="utf-8"))
+
+
 @app.post("/experiments")
 def create_experiment(request: ExperimentCreate):
     """Create one experiment via the JSON API."""
@@ -334,4 +345,8 @@ def frontend_events(request: FrontendTraceEvent):
             "details": request.details,
         },
     )
-    return {"ok": True}
+    report_url = None
+    if request.session_id and app.state.orchestrator.get_session(request.session_id) is not None:
+        app.state.orchestrator.generate_trace_report(request.session_id)
+        report_url = f"/sessions/{request.session_id}/trace-report"
+    return {"ok": True, "report_url": report_url}

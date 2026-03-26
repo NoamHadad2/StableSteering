@@ -86,6 +86,44 @@ def test_replay_export_contains_rounds(client) -> None:
     assert replay_payload["rounds"][0]["feedback_events"][0]["normalized_payload"]["winner_candidate_id"] in ratings
 
 
+def test_trace_report_contains_images_and_preferences(client, tmp_path) -> None:
+    experiment = client.post(
+        "/experiments",
+        json={"name": "Trace report", "description": "Trace report test", "config": {"candidate_count": 3}},
+    ).json()
+    session = client.post(
+        "/sessions",
+        json={"experiment_id": experiment["id"], "prompt": "A readable trace report", "negative_prompt": "blurry"},
+    ).json()
+    round_payload = client.post(f"/sessions/{session['id']}/rounds/next").json()
+    ratings = {candidate["id"]: 5 - index for index, candidate in enumerate(round_payload["candidate_metadata"])}
+    client.post(
+        "/frontend-events",
+        json={
+            "event": "feedback.reviewed",
+            "page": f"/sessions/{session['id']}/view",
+            "session_id": session["id"],
+            "round_id": round_payload["round_id"],
+            "details": {"ratings_count": len(ratings)},
+        },
+    )
+    client.post(
+        f"/rounds/{round_payload['round_id']}/feedback",
+        json={"feedback_type": "scalar_rating", "payload": {"ratings": ratings}, "critique_text": "Prefer the sharper image."},
+    )
+
+    report = client.get(f"/sessions/{session['id']}/trace-report")
+    assert report.status_code == 200
+    assert "StableSteering Run Trace Report" in report.text
+    assert "User Preferences" in report.text
+    assert "Prefer the sharper image." in report.text
+    assert round_payload["candidate_metadata"][0]["id"] in report.text
+
+    report_path = tmp_path / "data" / "traces" / "sessions" / session["id"] / "report.html"
+    assert report_path.exists()
+    assert round_payload["candidate_metadata"][0]["image_path"] in report_path.read_text(encoding="utf-8")
+
+
 def test_pairwise_feedback_mode_submits_successfully(client) -> None:
     experiment = client.post(
         "/experiments",

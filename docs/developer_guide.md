@@ -24,12 +24,13 @@ The current implementation is a minimal research MVP with:
 - basic replay export
 - asynchronous round-generation and feedback jobs with visible progress status
 - rich backend logging and persisted trace events
+- per-session HTML trace reports saved by the backend
 - frontend trace capture and visible trace panels
 - automated tests for feedback, lifecycle, tracing, and replay export
 
 It does not yet include:
 
-- database-backed persistence
+- shared multi-user persistence beyond the local SQLite repository
 - authentication
 - multi-user coordination
 
@@ -141,6 +142,18 @@ Inspect persisted trace files:
 data/traces/
 ```
 
+Per-session run bundles live under:
+
+```text
+data/traces/sessions/<session_id>/
+```
+
+That bundle includes:
+
+- `backend-events.jsonl`
+- `frontend-events.jsonl`
+- `report.html`
+
 ## 5. Runtime Flow
 
 The current runtime flow is:
@@ -157,11 +170,62 @@ The current runtime flow is:
 10. feedback is normalized and validated against the round
 11. updater computes the next incumbent state
 12. replay export exposes the persisted trajectory
+13. the backend refreshes the saved HTML trace report for the session
 
 When a prepared local model is available and the backend is set to `diffusers`,
 the generation step uses a real Stable Diffusion pipeline, pins inference to
 GPU, and applies a deterministic steering offset to `prompt_embeds` before
 rendering. If the model or GPU requirements are not satisfied, startup fails.
+
+## 5.1 Async API Endpoints
+
+Long-running session actions are exposed as asynchronous job endpoints:
+
+- `POST /sessions/{session_id}/rounds/next/async`
+  Queues next-round generation and returns a job handle.
+
+- `POST /rounds/{round_id}/feedback/async`
+  Queues feedback application and returns a job handle.
+
+- `GET /jobs/{job_id}`
+  Returns the current job snapshot.
+
+The async `POST` routes return:
+
+- `job_id`
+- `status_url`
+- initial `state`
+
+The job status payload includes:
+
+- `state`
+- `progress`
+- `status_message`
+- `result` when complete
+- `error` when failed
+
+Current job states are:
+
+- `queued`
+- `running`
+- `succeeded`
+- `failed`
+
+## 5.2 Progress Behavior
+
+The browser session view uses the async endpoints by default.
+
+During round generation and feedback submission:
+
+- the clicked action button is disabled
+- a visible progress panel is shown
+- the page polls `GET /jobs/{job_id}`
+- `status_message` is rendered as human-readable progress text
+- `progress` updates the progress bar
+- the page refreshes automatically after success
+- errors are shown inline if the job fails
+
+This keeps the UI responsive while the real GPU-backed backend works in the background.
 
 ## 6. Core Extension Points
 
@@ -218,6 +282,7 @@ The current API quality contract is:
 - JSON API errors use the structured `ApiError` payload shape
 - replay exports include explicit schema and app versions
 - long-running session actions are exposed as async jobs with pollable status
+- session trace reports are backend-owned artifacts, not frontend-only console output
 
 ### 6.4 Evolve persistence
 
@@ -249,6 +314,7 @@ Before merging meaningful behavior changes:
 - preserve replay export compatibility where possible
 - keep the explicitly injected mock test path working even if the runtime stays GPU-only
 - keep tracing outputs stable enough for debugging and auditability
+- keep `report.html` readable when changing trace payload shapes
 
 ## 9. Common Development Tasks
 
@@ -270,6 +336,12 @@ data/artifacts/
 data/traces/
 ```
 
+Open the readable report for one session:
+
+```text
+/sessions/{session_id}/trace-report
+```
+
 ### Validate the browser flow
 
 Minimal manual smoke test:
@@ -283,5 +355,5 @@ Minimal manual smoke test:
 
 ## 10. Recommended Next Engineering Steps
 
-- introduce a database-backed repository
+- add export packaging for session trace bundles
 - add richer end-to-end browser tests

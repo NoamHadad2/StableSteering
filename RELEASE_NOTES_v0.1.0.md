@@ -10,9 +10,11 @@ Initial runnable MVP release of StableSteering.
 - browser UI for setup, interactive sessions, replay, diagnostics, and trace visibility
 - rich backend logging and persisted frontend/backend trace events
 - async round generation and feedback submission with visible progress indicators
+- per-session HTML trace reports saved by the backend
 - replay exports with schema and app version metadata
 - Playwright browser coverage, including replay export smoke and diagnostics checks
 - opt-in real-backend browser smoke path for CUDA-capable environments
+- reusable real GPU-backed end-to-end example bundle generation
 
 ## Included Documentation
 

@@ -13,6 +13,9 @@ This folder contains runtime-generated local state.
 - `traces/`
   Persisted backend and frontend trace logs.
 
+- `traces/sessions/<session_id>/`
+  Per-session trace bundle containing backend events, frontend events, and a readable `report.html`.
+
 ## Safe cleanup
 
 You can delete this folder when you want a fresh local environment.

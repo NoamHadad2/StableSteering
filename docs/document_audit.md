@@ -9,6 +9,9 @@ This documentation set was re-audited and synchronized with the current implemen
 - GPU-only real Diffusers runtime became the default app path
 - mock generation was restricted to explicit test harnesses
 - backend and frontend tracing were added and persisted under `data/traces/`
+- per-session HTML trace reports were added under `data/traces/sessions/<session_id>/report.html`
+- async round generation and feedback submission were exposed through job endpoints with visible progress
+- a real GPU-backed end-to-end example bundle was added under `output/examples/real_e2e_example_run/`
 - lifecycle guards were added for duplicate feedback and premature next-round generation
 - browser coverage was expanded with headed debug support and replay export API smoke coverage
 

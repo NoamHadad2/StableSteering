@@ -10,6 +10,7 @@ A release should include:
 - release notes
 - installation instructions
 - optional packaged zip artifact
+- updated user/developer docs for async jobs, trace reports, and example bundles
 
 Current release notes:
 
@@ -24,14 +25,16 @@ Current release notes:
    `npm run test:e2e:chrome`
 4. If releasing from a CUDA-capable machine, optionally run:
    `python scripts/smoke_real_diffusers.py`
-5. Review:
+5. If releasing from a CUDA-capable machine, optionally refresh the real example bundle:
+   `python scripts/create_real_e2e_example.py`
+6. Review:
    - [INSTALL.md](E:\Projects\StableSteering\INSTALL.md)
    - [README.md](E:\Projects\StableSteering\README.md)
    - [RELEASE_NOTES_v0.1.0.md](E:\Projects\StableSteering\RELEASE_NOTES_v0.1.0.md)
-6. Build a source zip if needed:
+7. Build a source zip if needed:
    `powershell -ExecutionPolicy Bypass -File scripts/build_release_zip.ps1 -Version v0.1.0`
-7. Create the Git tag.
-8. Push the tag and upload the zip if desired.
+8. Create the Git tag.
+9. Push the tag and upload the zip if desired.
 
 ## Suggested Tagging Flow
 
