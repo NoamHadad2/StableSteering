@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session Setup</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page narrow">
+      <section class="hero compact">
+        <p class="eyebrow">Setup</p>
+        <h1>Create an experiment and start a session</h1>
+      </section>
+      <section class="card">
+        <form id="setup-form" class="form-grid">
+          <label>Experiment name<input name="experiment_name" value="Baseline experiment" required></label>
+          <label>Description<input name="description" value="Initial mock generation workflow"></label>
+          <label>Prompt<textarea name="prompt" required>A cinematic mountain road at sunrise</textarea></label>
+          <label>Negative prompt<textarea name="negative_prompt">blurry, distorted</textarea></label>
+          <label>Sampler
+            <select name="sampler">
+              <option value="random_local">random_local</option>
+              <option value="exploit_orthogonal">exploit_orthogonal</option>
+              <option value="uncertainty_guided">uncertainty_guided</option>
+            </select>
+          </label>
+          <label>Updater
+            <select name="updater">
+              <option value="winner_average">winner_average</option>
+              <option value="winner_copy">winner_copy</option>
+              <option value="linear_preference">linear_preference</option>
+            </select>
+          </label>
+          <label>Feedback mode
+            <select name="feedback_mode">
+              <option value="scalar_rating">scalar_rating</option>
+              <option value="pairwise">pairwise</option>
+              <option value="top_k">top_k</option>
+            </select>
+          </label>
+          <label>Candidates per round<input type="number" name="candidate_count" value="4" min="2" max="8"></label>
+          <div class="actions">
+            <button class="button" type="submit">Create and open session</button>
+            <a class="button secondary" href="/">Back</a>
+          </div>
+        </form>
+      </section>
+      <section class="card trace-card">
+        <div class="section-head">
+          <h2>Frontend Trace</h2>
+          <span>browser + server</span>
+        </div>
+        <ul id="trace-log" class="trace-log"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

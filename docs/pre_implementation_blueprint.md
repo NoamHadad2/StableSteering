@@ -4,6 +4,11 @@
 
 This document translates the research-oriented specification into an implementation-ready build plan. It exists to reduce ambiguity before coding begins.
 
+Implementation note:
+
+- the repository now includes a working MVP
+- this blueprint remains useful as the intended design baseline and gap-analysis reference
+
 It focuses on:
 
 - what must be fixed before implementation
@@ -59,11 +64,13 @@ The project should proceed with these default assumptions unless deliberately ch
 
 - single-machine execution
 - one active interactive session at a time in v1
-- SQLite as the default database
+- JSON-backed local persistence for the current MVP, with SQLite or PostgreSQL still a plausible next step
 - filesystem storage for images and exports
 - replay correctness is higher priority than generation speed
 - prompts and critique text are stored as research data
 - mock generation is available for tests
+- the normal app runtime uses real GPU-backed Diffusers inference
+- trace logging is a first-class debugging and auditability feature
 
 ## 5. Decisions That Should Be Fixed Before Coding
 
@@ -156,6 +163,7 @@ Storage must persist:
 - candidates
 - feedback events
 - generated image paths
+- trace event logs
 - exports and manifests
 
 Storage should avoid:
@@ -259,6 +267,8 @@ The system must:
 The system must:
 
 - log round lifecycle events
+- log request-level backend traces
+- capture frontend interaction traces
 - log per-candidate generation failures
 - preserve raw feedback payloads
 - allow inspection of session state from storage
@@ -333,8 +343,9 @@ Recommended milestones:
 2. single-round generation path
 3. full session lifecycle
 4. replay and export
-5. strategy plug-in expansion
-6. test hardening and polish
+5. logging, tracing, and diagnostics hardening
+6. strategy plug-in expansion
+7. test hardening and polish
 
 ## 14. Summary
 

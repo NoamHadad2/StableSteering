@@ -36,6 +36,7 @@ The suite should distinguish between:
 - pure logic tests with no model dependency
 - service tests with mocked generation
 - limited end-to-end runs with lightweight fixtures
+- explicit real-model smoke tests run separately from the default test suite
 
 Real image generation should not be required for most tests.
 
@@ -159,6 +160,7 @@ Using browser automation or HTTP-level testing, verify:
 - a user can provide at least two feedback modes
 - a user can proceed to the next round
 - a user can open replay for a completed session
+- replay export API returns the expected round and feedback history
 - recoverable errors are shown clearly
 
 ## 8. Deterministic Replay Tests
@@ -196,6 +198,7 @@ The test suite should verify controlled behavior for:
 
 - one-candidate render failure
 - duplicate feedback submission
+- premature next-round generation while feedback is still pending
 - invalid ranking payloads
 - export generation failure
 - database write interruption
@@ -211,6 +214,7 @@ Required fixtures:
 - mock image generator fixture
 - small replay log fixture
 - schema snapshot fixture
+- frontend/backend trace capture fixture where needed
 
 ## 12. Acceptance Criteria
 
@@ -222,6 +226,7 @@ The prototype is acceptable when:
 - one sampler and one updater can be swapped by configuration only
 - the UI supports at least two feedback modes
 - exports can be generated and replayed
+- browser smoke coverage includes replay export retrieval
 - failure-mode behavior is covered for the major recoverable errors
 
 ## 13. Test Reporting Expectations

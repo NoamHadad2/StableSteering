@@ -2,6 +2,27 @@
 
 This file records the top 30 improvements identified and applied for each core document.
 
+## 2026-03-26 Sync Update
+
+This documentation set was re-audited and synchronized with the current implementation after the following system changes:
+
+- GPU-only real Diffusers runtime became the default app path
+- mock generation was restricted to explicit test harnesses
+- backend and frontend tracing were added and persisted under `data/traces/`
+- lifecycle guards were added for duplicate feedback and premature next-round generation
+- browser coverage was expanded with headed debug support and replay export API smoke coverage
+
+The most heavily updated documents in this sync were:
+
+- [README.md](/E:/Projects/StableSteering/README.md)
+- [quick_start.md](/E:/Projects/StableSteering/docs/quick_start.md)
+- [user_guide.md](/E:/Projects/StableSteering/docs/user_guide.md)
+- [developer_guide.md](/E:/Projects/StableSteering/docs/developer_guide.md)
+- [faq.md](/E:/Projects/StableSteering/docs/faq.md)
+- [pre_implementation_blueprint.md](/E:/Projects/StableSteering/docs/pre_implementation_blueprint.md)
+- [system_specification.md](/E:/Projects/StableSteering/docs/system_specification.md)
+- [system_test_specification.md](/E:/Projects/StableSteering/docs/system_test_specification.md)
+
 ## 1. Motivation: Top 30 Improvements Applied
 
 1. Added a document-role section so readers know when to use this file.

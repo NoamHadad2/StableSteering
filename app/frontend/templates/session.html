@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session {{ session.id }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero compact">
+        <p class="eyebrow">Session</p>
+        <h1>{{ session.prompt }}</h1>
+        <p class="lede">Sampler: {{ session.config.sampler }} | Updater: {{ session.config.updater }} | Feedback: {{ session.config.feedback_mode }}</p>
+        <div class="actions">
+          <button class="button" data-session-id="{{ session.id }}" id="next-round-button">Generate next round</button>
+          <a class="button secondary" href="/sessions/{{ session.id }}/replay-view">Open replay</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Current state</h2>
+          <span>Round {{ session.current_round }}</span>
+        </div>
+        <p>Current steering vector: <code>{{ session.current_z }}</code></p>
+        <p>Status: <strong>{{ session.status }}</strong></p>
+        <p>Feedback mode: <strong>{{ session.config.feedback_mode }}</strong></p>
+      </section>
+
+      <section class="card" id="round-container">
+        {% if current_round %}
+          <div class="section-head">
+            <h2>Round {{ current_round.round_index }}</h2>
+            <span>{{ current_round.candidates|length }} candidates</span>
+          </div>
+          <div class="image-grid">
+            {% for candidate in current_round.candidates %}
+              <article class="image-card">
+                <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
+                <h3>{{ candidate.id }}</h3>
+                <p>Role: {{ candidate.sampler_role }}</p>
+                <p>z: {{ candidate.z }}</p>
+                <label>Rating
+                  <input type="number" min="1" max="5" value="3" class="rating-input" data-candidate-id="{{ candidate.id }}">
+                </label>
+              </article>
+            {% endfor %}
+          </div>
+          {% if not current_round.feedback_events %}
+            <p class="hint">Ratings are reused according to the selected feedback mode. For pairwise, the highest-rated candidate beats the lowest-rated one. For top-k, candidates are ranked by rating.</p>
+            <div class="actions">
+              <button class="button" id="submit-feedback-button" data-round-id="{{ current_round.id }}" data-feedback-mode="{{ session.config.feedback_mode }}">Submit feedback</button>
+            </div>
+          {% else %}
+            <p class="hint">Feedback has already been submitted for this round. Generate the next round to continue.</p>
+          {% endif %}
+        {% else %}
+          <p>No rounds yet. Generate the first round to begin.</p>
+        {% endif %}
+      </section>
+      <section class="card trace-card">
+        <div class="section-head">
+          <h2>Frontend Trace</h2>
+          <span>{{ session.id }}</span>
+        </div>
+        <ul id="trace-log" class="trace-log"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -31,6 +31,7 @@ It includes:
 - persistence and replay
 - strategy interfaces and constraints
 - logging and reproducibility
+- tracing and debugging surfaces
 
 It does not define:
 
@@ -82,9 +83,11 @@ The following must remain true:
 - each round belongs to exactly one session
 - each candidate belongs to exactly one round
 - feedback is attached to exactly one round
+- feedback for a round is accepted at most once
 - seed information is persisted for every rendered candidate
 - replay data is sufficient to reconstruct decision history
 - session state is durable after each completed round and feedback submission
+- a new round cannot be generated while the session is still awaiting feedback for the current round
 
 ## 7. Core Research Abstractions
 
@@ -224,6 +227,7 @@ The frontend should be intentionally simple:
 - easy DOM inspection and debugging
 - accessible controls
 - predictable interaction patterns across rounds
+- a visible trace surface during interactive use
 
 ### 9.2 Main pages
 
@@ -276,6 +280,7 @@ Required layout:
 - control panel
 - candidate image grid
 - state summary panel
+- trace panel
 
 Required actions:
 
@@ -298,9 +303,8 @@ Required grid behavior:
 Required feedback widgets:
 
 - scalar rating
-- ranking interaction
-- pairwise selection
-- top-k selection
+- rating-driven pairwise derivation
+- rating-driven top-k derivation
 - shortlist selection
 - text critique entry
 
@@ -343,6 +347,7 @@ The UI must:
 - preserve unsaved feedback where possible after recoverable errors
 - prevent double submission when a request is already in flight
 - show the current round status clearly
+- make trace and error information inspectable during debugging
 
 ## 10. Backend Specification
 
@@ -368,6 +373,7 @@ Responsibilities:
 - round generation
 - feedback submission
 - replay and export delivery
+- trace event intake for the frontend
 
 #### B. Orchestrator
 
@@ -518,7 +524,7 @@ Artifacts to store:
 - configuration snapshots
 - exported replay bundles
 - evaluation reports
-- CSV and JSON traces
+- JSON trace logs
 
 ## 12. API Specification
 
@@ -604,6 +610,10 @@ Response:
 #### GET `/sessions/{session_id}/replay`
 
 Return ordered rounds, artifacts, and summaries for replay.
+
+#### POST `/frontend-events`
+
+Persist browser-side trace events for debugging and auditability.
 
 #### GET `/sessions/{session_id}/export`
 
@@ -830,6 +840,8 @@ Every experiment must log:
 - hardware metadata
 - request and response manifests for each round
 - serialized feedback events
+- request-level backend traces
+- browser-submitted frontend trace events
 
 ### 19.2 Replay requirements
 
@@ -869,6 +881,7 @@ Behavioral requirements:
 - failures are visible in the UI
 - one failed candidate does not invalidate the whole round by default
 - durable state is written after each completed round and feedback submission
+- invalid lifecycle transitions return explicit conflict-style errors
 
 ## 21. Security and Privacy Notes
 
