@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trace Report ses_24cb3b74df10</title>
+  <style>
+    :root { color-scheme: light; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; background: #f5efe5; color: #1f1b16; }
+    main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .hero, .card { background: #fffdf8; border: 1px solid #d7cfc2; border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(56, 44, 22, 0.08); }
+    .hero { margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 16px 0 0; }
+    .metric { background: #f8f3ea; border-radius: 14px; padding: 14px; }
+    .metric h3 { margin: 0 0 8px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: #705a3d; }
+    .metric p { margin: 0; font-size: 1.05rem; font-weight: 700; }
+    .section { margin-top: 18px; }
+    .section h2 { margin: 0 0 12px; }
+    .round { margin-top: 16px; }
+    .candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .candidate { border: 1px solid #e6dccf; border-radius: 14px; background: #fff; overflow: hidden; }
+    .candidate img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #eee5d9; }
+    .candidate .body { padding: 12px; }
+    .kv { margin: 0; font-size: 0.92rem; line-height: 1.45; }
+    .pill { display: inline-block; margin-right: 8px; margin-bottom: 8px; padding: 6px 10px; border-radius: 999px; background: #efe4d2; color: #5e4b31; font-size: 0.85rem; }
+    .events { width: 100%; border-collapse: collapse; }
+    .events th, .events td { text-align: left; padding: 10px; border-top: 1px solid #e7ddcf; vertical-align: top; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; background: #f7f2ea; border-radius: 12px; padding: 12px; }
+    a { color: #7a3f13; }
+    details.card { padding: 0; overflow: hidden; }
+    details.card > summary { list-style: none; cursor: pointer; padding: 20px; font-weight: 700; }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary::after { content: '+'; float: right; color: #7a3f13; }
+    details.card[open] > summary::after { content: '−'; }
+    .card-body { padding: 0 20px 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p>StableSteering Run Trace Report</p>
+    <h1>A close-up black and white portrait of a bicolor cat with bright eyes against a dark background.</h1>
+    <p>Session <code>ses_24cb3b74df10</code> from experiment <strong>CLIP + novelty bonus method extension</strong>.</p>
+    <p>Generated at 2026-03-27T03:17:53.982126+00:00. Stored in <code>report.html</code>.</p>
+    <div class="grid">
+      <div class="metric"><h3>Status</h3><p>awaiting_feedback</p></div>
+      <div class="metric"><h3>Rounds</h3><p>5</p></div>
+      <div class="metric"><h3>Images Proposed</h3><p>20</p></div>
+      <div class="metric"><h3>Feedback Events</h3><p>4</p></div>
+      <div class="metric"><h3>Backend</h3><p>diffusers</p></div>
+      <div class="metric"><h3>Active Device</h3><p>cuda</p></div>
+    </div>
+  </section>
+  <details class="card section" open>
+    <summary>Artifacts</summary>
+    <div class="card-body">
+    <p>Backend event log: <code>backend-events.jsonl</code></p>
+    <p>Frontend event log: <code>frontend-events.jsonl</code></p>
+    </div>
+  </details>
+  <details class="card section" open>
+    <summary>Runtime Diagnostics</summary>
+    <div class="card-body">
+    <pre>{
+  &quot;active_device&quot;: &quot;cuda&quot;,
+  &quot;backend&quot;: &quot;diffusers&quot;,
+  &quot;configured_device&quot;: &quot;cuda&quot;,
+  &quot;cuda_available&quot;: true,
+  &quot;default_model_source&quot;: &quot;models\\runwayml--stable-diffusion-v1-5&quot;,
+  &quot;default_num_inference_steps&quot;: 15,
+  &quot;loaded_model_sources&quot;: [
+    &quot;models\\runwayml--stable-diffusion-v1-5&quot;
+  ],
+  &quot;local_files_only&quot;: true,
+  &quot;model_source&quot;: &quot;models\\runwayml--stable-diffusion-v1-5&quot;,
+  &quot;pipeline_loaded&quot;: true,
+  &quot;test_only_backend&quot;: false,
+  &quot;torch_available&quot;: true
+}</pre>
+    </div>
+  </details>
+  <details class="card section" open>
+    <summary>Run Summary</summary>
+    <div class="card-body">
+    <p><strong>Initial prompt:</strong> A close-up black and white portrait of a bicolor cat with bright eyes against a dark background.</p>
+    <p><strong>Negative prompt:</strong> low detail, blur, extra eyes, distorted face, text, watermark, cluttered background</p>
+    <p><strong>Model:</strong> <code>runwayml/stable-diffusion-v1-5</code></p>
+    <p><strong>Feedback mode:</strong> <code>scalar_rating</code></p>
+    <p><strong>Sampler:</strong> <code>annealed_shell</code></p>
+    <p><strong>Updater:</strong> <code>softmax_preference</code></p>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 1</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_5e5cc30a0960</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 60 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_69c42476a305.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_69c42476a305</strong></p>
+          <p class="kv">Role: baseline_prompt</p>
+          <p class="kv">Seed: 2339471612</p>
+          <p class="kv">z: <code>[0.0, 0.0, 0.0, 0.0, 0.0]</code></p>
+          <p class="kv">Predicted score: 0.0</p>
+          <p class="kv">Predicted uncertainty: 0.05</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_5b52e775ba41.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_5b52e775ba41</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 3638426717</p>
+          <p class="kv">z: <code>[0.5967243905622411, 0.34276655460476013, 0.17116546665330137, 0.12455799595424855, -0.004333523015141665]</code></p>
+          <p class="kv">Predicted score: 1.0585279032430996</p>
+          <p class="kv">Predicted uncertainty: 0.2</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_77e6a29e185a.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_77e6a29e185a</strong></p>
+          <p class="kv">Role: annealed_counterprobe</p>
+          <p class="kv">Seed: 3509334783</p>
+          <p class="kv">z: <code>[-0.002258957131425746, -0.5999448577999218, -0.3322346437230271, 0.1794807655026689, -0.12596769838700414]</code></p>
+          <p class="kv">Predicted score: -0.8077891569887177</p>
+          <p class="kv">Predicted uncertainty: 0.21000000000000002</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_6658edabd40d.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_6658edabd40d</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 588781453</p>
+          <p class="kv">z: <code>[0.13019018834245283, 0.00306648737022562, 0.5986892570414053, 0.3392699510741329, -0.16705743119038582]</code></p>
+          <p class="kv">Predicted score: 0.846772169738105</p>
+          <p class="kv">Predicted uncertainty: 0.22</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>scalar_rating</strong> at 2026-03-27T03:17:11.766916Z</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_5b52e775ba41&quot;: 4.037,
+    &quot;cand_6658edabd40d&quot;: 1.0,
+    &quot;cand_69c42476a305&quot;: 4.3879,
+    &quot;cand_77e6a29e185a&quot;: 5.0
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_77e6a29e185a&quot;
+}</pre>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;softmax_weighted_contrastive_centroid&quot;,
+  &quot;positive_weights&quot;: {
+    &quot;cand_5b52e775ba41&quot;: 0.0757,
+    &quot;cand_6658edabd40d&quot;: 0.0001,
+    &quot;cand_69c42476a305&quot;: 0.1746,
+    &quot;cand_77e6a29e185a&quot;: 0.7497
+  },
+  &quot;updater&quot;: &quot;softmax_preference&quot;,
+  &quot;weight_count&quot;: 4,
+  &quot;winner_candidate_id&quot;: &quot;cand_77e6a29e185a&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 2</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_1929d89b0f02</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 60 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_77e6a29e185a.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_2e1090200f81</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 3509334783</p>
+          <p class="kv">z: <code>[-0.002258957131425746, -0.5999448577999218, -0.3322346437230271, 0.1794807655026689, -0.12596769838700414]</code></p>
+          <p class="kv">Predicted score: -0.8077891569887177</p>
+          <p class="kv">Predicted uncertainty: 0.21000000000000002</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_58d83eeb4a00.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_58d83eeb4a00</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 1514614754</p>
+          <p class="kv">z: <code>[0.5337861349112272, -0.06431985448429689, -0.14063211313535146, 0.14621431729411422, -0.03972238729008855]</code></p>
+          <p class="kv">Predicted score: 0.4353260972956045</p>
+          <p class="kv">Predicted uncertainty: 0.19</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_5cdcd0d1aa8b.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_5cdcd0d1aa8b</strong></p>
+          <p class="kv">Role: annealed_counterprobe</p>
+          <p class="kv">Seed: 1593140245</p>
+          <p class="kv">z: <code>[-0.0013692603451795347, -0.5467528207695074, -0.365535235840853, 0.14436100958115733, -0.09488608105604905]</code></p>
+          <p class="kv">Predicted score: -0.8721823884304316</p>
+          <p class="kv">Predicted uncertainty: 0.2</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_b2808a6b1851.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_b2808a6b1851</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 90674280</p>
+          <p class="kv">z: <code>[0.06241303095452627, -0.33338270642520895, 0.22889160788395546, 0.3792685955491678, -0.17079705586925809]</code></p>
+          <p class="kv">Predicted score: 0.1503934720931825</p>
+          <p class="kv">Predicted uncertainty: 0.21</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>scalar_rating</strong> at 2026-03-27T03:17:22.116963Z</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_2e1090200f81&quot;: 1.0,
+    &quot;cand_58d83eeb4a00&quot;: 5.0,
+    &quot;cand_5cdcd0d1aa8b&quot;: 4.0277,
+    &quot;cand_b2808a6b1851&quot;: 3.0166
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_58d83eeb4a00&quot;
+}</pre>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;softmax_weighted_contrastive_centroid&quot;,
+  &quot;positive_weights&quot;: {
+    &quot;cand_2e1090200f81&quot;: 0.0001,
+    &quot;cand_58d83eeb4a00&quot;: 0.9027,
+    &quot;cand_5cdcd0d1aa8b&quot;: 0.0892,
+    &quot;cand_b2808a6b1851&quot;: 0.008
+  },
+  &quot;updater&quot;: &quot;softmax_preference&quot;,
+  &quot;weight_count&quot;: 4,
+  &quot;winner_candidate_id&quot;: &quot;cand_58d83eeb4a00&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 3</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_3a31b2fbe165</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 60 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_58d83eeb4a00.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_a67d8b75de9d</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 1514614754</p>
+          <p class="kv">z: <code>[0.5337861349112272, -0.06431985448429689, -0.14063211313535146, 0.14621431729411422, -0.03972238729008855]</code></p>
+          <p class="kv">Predicted score: 0.4353260972956045</p>
+          <p class="kv">Predicted uncertainty: 0.19</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_870dc95ab8d1.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_870dc95ab8d1</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 1876306568</p>
+          <p class="kv">z: <code>[0.6531881374242432, 0.09689581693344378, -0.03498907932276662, 0.15619232708435712, -0.02713262016774329]</code></p>
+          <p class="kv">Predicted score: 0.8441545819515341</p>
+          <p class="kv">Predicted uncertainty: 0.18000000000000002</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_46cd4646fc3b.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_46cd4646fc3b</strong></p>
+          <p class="kv">Role: annealed_counterprobe</p>
+          <p class="kv">Seed: 1242392473</p>
+          <p class="kv">z: <code>[0.28420532341854166, -0.4577867623232461, -0.35340056053243957, 0.20614394644358705, -0.06834713997076251]</code></p>
+          <p class="kv">Predicted score: -0.3971851929643195</p>
+          <p class="kv">Predicted uncertainty: 0.19000000000000003</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_d1cfdfce55cc.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_d1cfdfce55cc</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 1585628238</p>
+          <p class="kv">z: <code>[0.42074858400327847, -0.12512667091904953, 0.2758981639244914, 0.39874488377686834, -0.1860017905527209]</code></p>
+          <p class="kv">Predicted score: 0.7682631702328677</p>
+          <p class="kv">Predicted uncertainty: 0.2</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>scalar_rating</strong> at 2026-03-27T03:17:32.635366Z</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_46cd4646fc3b&quot;: 3.7929,
+    &quot;cand_870dc95ab8d1&quot;: 2.0632,
+    &quot;cand_a67d8b75de9d&quot;: 1.0,
+    &quot;cand_d1cfdfce55cc&quot;: 5.0
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_d1cfdfce55cc&quot;
+}</pre>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;softmax_weighted_contrastive_centroid&quot;,
+  &quot;positive_weights&quot;: {
+    &quot;cand_46cd4646fc3b&quot;: 0.0534,
+    &quot;cand_870dc95ab8d1&quot;: 0.0009,
+    &quot;cand_a67d8b75de9d&quot;: 0.0001,
+    &quot;cand_d1cfdfce55cc&quot;: 0.9457
+  },
+  &quot;updater&quot;: &quot;softmax_preference&quot;,
+  &quot;weight_count&quot;: 4,
+  &quot;winner_candidate_id&quot;: &quot;cand_d1cfdfce55cc&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 4</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_0633123bd0fd</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 60 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_d1cfdfce55cc.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_f83b12127ce6</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 1585628238</p>
+          <p class="kv">z: <code>[0.42074858400327847, -0.12512667091904953, 0.2758981639244914, 0.39874488377686834, -0.1860017905527209]</code></p>
+          <p class="kv">Predicted score: 0.7682631702328677</p>
+          <p class="kv">Predicted uncertainty: 0.2</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_a6843e92f5b9.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_a6843e92f5b9</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 3064280250</p>
+          <p class="kv">z: <code>[0.5789667313804266, 0.08835167112273562, 0.1871146389607731, 0.2716191845390005, -0.10296910527645119]</code></p>
+          <p class="kv">Predicted score: 1.0230831207264848</p>
+          <p class="kv">Predicted uncertainty: 0.17</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_c9ca12b0cd69.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_c9ca12b0cd69</strong></p>
+          <p class="kv">Role: annealed_counterprobe</p>
+          <p class="kv">Seed: 3938961470</p>
+          <p class="kv">z: <code>[0.3241798504832076, -0.45184416672801847, -0.07644216539040176, 0.34645921950709413, -0.16512685458007592]</code></p>
+          <p class="kv">Predicted score: -0.030774116708194445</p>
+          <p class="kv">Predicted uncertainty: 0.18000000000000002</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_f5292bb54b24.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_f5292bb54b24</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 2200053800</p>
+          <p class="kv">z: <code>[0.30486538938251995, -0.10889853503975692, 0.38942309513956347, 0.418458270147243, -0.17561472757186086]</code></p>
+          <p class="kv">Predicted score: 0.8122334920577087</p>
+          <p class="kv">Predicted uncertainty: 0.19</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>scalar_rating</strong> at 2026-03-27T03:17:43.281856Z</p>
+    <pre>{
+  &quot;ratings&quot;: {
+    &quot;cand_a6843e92f5b9&quot;: 5.0,
+    &quot;cand_c9ca12b0cd69&quot;: 2.6914,
+    &quot;cand_f5292bb54b24&quot;: 1.859,
+    &quot;cand_f83b12127ce6&quot;: 1.0
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_a6843e92f5b9&quot;
+}</pre>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;softmax_weighted_contrastive_centroid&quot;,
+  &quot;positive_weights&quot;: {
+    &quot;cand_a6843e92f5b9&quot;: 0.9953,
+    &quot;cand_c9ca12b0cd69&quot;: 0.0041,
+    &quot;cand_f5292bb54b24&quot;: 0.0006,
+    &quot;cand_f83b12127ce6&quot;: 0.0001
+  },
+  &quot;updater&quot;: &quot;softmax_preference&quot;,
+  &quot;weight_count&quot;: 4,
+  &quot;winner_candidate_id&quot;: &quot;cand_a6843e92f5b9&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 5</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_1c60015892d1</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 60 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_a6843e92f5b9.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_46d2ac0e59c5</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 3064280250</p>
+          <p class="kv">z: <code>[0.5789667313804266, 0.08835167112273562, 0.1871146389607731, 0.2716191845390005, -0.10296910527645119]</code></p>
+          <p class="kv">Predicted score: 1.0230831207264848</p>
+          <p class="kv">Predicted uncertainty: 0.17</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_792a98f9ab12.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_792a98f9ab12</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 1482856537</p>
+          <p class="kv">z: <code>[0.6066170224623122, 0.16014410635852247, 0.1511101243775927, 0.20599422706285156, -0.05917568744810481]</code></p>
+          <p class="kv">Predicted score: 1.0646897928131742</p>
+          <p class="kv">Predicted uncertainty: 0.16</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_cd1dd78fc47a.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_cd1dd78fc47a</strong></p>
+          <p class="kv">Role: annealed_counterprobe</p>
+          <p class="kv">Seed: 1813143721</p>
+          <p class="kv">z: <code>[0.46221038479168836, -0.3346383751166743, -0.04484139578917507, 0.34101641441737945, -0.1359256135229267]</code></p>
+          <p class="kv">Predicted score: 0.2798214147802917</p>
+          <p class="kv">Predicted uncertainty: 0.17</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_36e3aaab86c8.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_36e3aaab86c8</strong></p>
+          <p class="kv">Role: annealed_probe</p>
+          <p class="kv">Seed: 1546206754</p>
+          <p class="kv">z: <code>[0.4024918311749872, 0.03198998021291541, 0.3962595657059587, 0.3400059808969958, -0.16355811366049577]</code></p>
+          <p class="kv">Predicted score: 0.9911892443303614</p>
+          <p class="kv">Predicted uncertainty: 0.18</p>
+        </div>
+      </article>
+    </div>
+    </div>
+  </details>
+  <details class="card section">
+    <summary>Event Timeline</summary>
+    <div class="card-body">
+    <table class="events">
+      <thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>2026-03-27T03:16:55.559004+00:00</td>
+          <td>backend</td>
+          <td><code>session.created</code></td>
+          <td><pre>{
+  &quot;experiment_id&quot;: &quot;exp_59a6dda5e16e&quot;,
+  &quot;prompt&quot;: &quot;A close-up black and white portrait of a bicolor cat with bright eyes against a dark background.&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:16:55.577064+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 1,
+  &quot;sampler&quot;: &quot;annealed_shell&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:11.388318+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 4,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_69c42476a305&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_69c42476a305.png&quot;,
+      &quot;predicted_score&quot;: 0.0,
+      &quot;predicted_uncertainty&quot;: 0.05,
+      &quot;sampler_role&quot;: &quot;baseline_prompt&quot;,
+      &quot;seed&quot;: 2339471612,
+      &quot;seed_group&quot;: &quot;candidate:0&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_5b52e775ba41&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_5b52e775ba41.png&quot;,
+      &quot;predicted_score&quot;: 1.0585279032430996,
+      &quot;predicted_uncertainty&quot;: 0.2,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 3638426717,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5967243905622411,
+        0.34276655460476013,
+        0.17116546665330137,
+        0.12455799595424855,
+        -0.004333523015141665
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_77e6a29e185a&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_77e6a29e185a.png&quot;,
+      &quot;predicted_score&quot;: -0.8077891569887177,
+      &quot;predicted_uncertainty&quot;: 0.21000000000000002,
+      &quot;sampler_role&quot;: &quot;annealed_counterprobe&quot;,
+      &quot;seed&quot;: 3509334783,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.002258957131425746,
+        -0.5999448577999218,
+        -0.3322346437230271,
+        0.1794807655026689,
+        -0.12596769838700414
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_6658edabd40d&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_6658edabd40d.png&quot;,
+      &quot;predicted_score&quot;: 0.846772169738105,
+      &quot;predicted_uncertainty&quot;: 0.22,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 588781453,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.13019018834245283,
+        0.00306648737022562,
+        0.5986892570414053,
+        0.3392699510741329,
+        -0.16705743119038582
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_5e5cc30a0960&quot;,
+  &quot;round_index&quot;: 1,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:11.774001+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: null,
+  &quot;feedback_type&quot;: &quot;scalar_rating&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.008958,
+    -0.354315,
+    -0.267983,
+    0.075387,
+    -0.057761
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_5b52e775ba41&quot;: 4.037,
+      &quot;cand_6658edabd40d&quot;: 1.0,
+      &quot;cand_69c42476a305&quot;: 4.3879,
+      &quot;cand_77e6a29e185a&quot;: 5.0
+    },
+    &quot;winner_candidate_id&quot;: &quot;cand_77e6a29e185a&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_5b52e775ba41&quot;: 4.037,
+      &quot;cand_6658edabd40d&quot;: 1.0,
+      &quot;cand_69c42476a305&quot;: 4.3879,
+      &quot;cand_77e6a29e185a&quot;: 5.0
+    }
+  },
+  &quot;round_id&quot;: &quot;rnd_5e5cc30a0960&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_77e6a29e185a&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:11.794617+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 2,
+  &quot;sampler&quot;: &quot;annealed_shell&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:21.735105+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 4,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_2e1090200f81&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_77e6a29e185a.png&quot;,
+      &quot;predicted_score&quot;: -0.8077891569887177,
+      &quot;predicted_uncertainty&quot;: 0.21000000000000002,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 3509334783,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.002258957131425746,
+        -0.5999448577999218,
+        -0.3322346437230271,
+        0.1794807655026689,
+        -0.12596769838700414
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_58d83eeb4a00&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_58d83eeb4a00.png&quot;,
+      &quot;predicted_score&quot;: 0.4353260972956045,
+      &quot;predicted_uncertainty&quot;: 0.19,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 1514614754,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5337861349112272,
+        -0.06431985448429689,
+        -0.14063211313535146,
+        0.14621431729411422,
+        -0.03972238729008855
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_5cdcd0d1aa8b&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_5cdcd0d1aa8b.png&quot;,
+      &quot;predicted_score&quot;: -0.8721823884304316,
+      &quot;predicted_uncertainty&quot;: 0.2,
+      &quot;sampler_role&quot;: &quot;annealed_counterprobe&quot;,
+      &quot;seed&quot;: 1593140245,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.0013692603451795347,
+        -0.5467528207695074,
+        -0.365535235840853,
+        0.14436100958115733,
+        -0.09488608105604905
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_b2808a6b1851&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_b2808a6b1851.png&quot;,
+      &quot;predicted_score&quot;: 0.1503934720931825,
+      &quot;predicted_uncertainty&quot;: 0.21,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 90674280,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.06241303095452627,
+        -0.33338270642520895,
+        0.22889160788395546,
+        0.3792685955491678,
+        -0.17079705586925809
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_1929d89b0f02&quot;,
+  &quot;round_index&quot;: 2,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:22.126857+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: null,
+  &quot;feedback_type&quot;: &quot;scalar_rating&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.378989,
+    -0.131714,
+    -0.175411,
+    0.117027,
+    -0.039202
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_2e1090200f81&quot;: 1.0,
+      &quot;cand_58d83eeb4a00&quot;: 5.0,
+      &quot;cand_5cdcd0d1aa8b&quot;: 4.0277,
+      &quot;cand_b2808a6b1851&quot;: 3.0166
+    },
+    &quot;winner_candidate_id&quot;: &quot;cand_58d83eeb4a00&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_2e1090200f81&quot;: 1.0,
+      &quot;cand_58d83eeb4a00&quot;: 5.0,
+      &quot;cand_5cdcd0d1aa8b&quot;: 4.0277,
+      &quot;cand_b2808a6b1851&quot;: 3.0166
+    }
+  },
+  &quot;round_id&quot;: &quot;rnd_1929d89b0f02&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_58d83eeb4a00&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:22.144932+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 3,
+  &quot;sampler&quot;: &quot;annealed_shell&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:32.240555+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 4,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_a67d8b75de9d&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_58d83eeb4a00.png&quot;,
+      &quot;predicted_score&quot;: 0.4353260972956045,
+      &quot;predicted_uncertainty&quot;: 0.19,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 1514614754,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5337861349112272,
+        -0.06431985448429689,
+        -0.14063211313535146,
+        0.14621431729411422,
+        -0.03972238729008855
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_870dc95ab8d1&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_870dc95ab8d1.png&quot;,
+      &quot;predicted_score&quot;: 0.8441545819515341,
+      &quot;predicted_uncertainty&quot;: 0.18000000000000002,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 1876306568,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.6531881374242432,
+        0.09689581693344378,
+        -0.03498907932276662,
+        0.15619232708435712,
+        -0.02713262016774329
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_46cd4646fc3b&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_46cd4646fc3b.png&quot;,
+      &quot;predicted_score&quot;: -0.3971851929643195,
+      &quot;predicted_uncertainty&quot;: 0.19000000000000003,
+      &quot;sampler_role&quot;: &quot;annealed_counterprobe&quot;,
+      &quot;seed&quot;: 1242392473,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.28420532341854166,
+        -0.4577867623232461,
+        -0.35340056053243957,
+        0.20614394644358705,
+        -0.06834713997076251
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_d1cfdfce55cc&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_d1cfdfce55cc.png&quot;,
+      &quot;predicted_score&quot;: 0.7682631702328677,
+      &quot;predicted_uncertainty&quot;: 0.2,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 1585628238,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.42074858400327847,
+        -0.12512667091904953,
+        0.2758981639244914,
+        0.39874488377686834,
+        -0.1860017905527209
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_3a31b2fbe165&quot;,
+  &quot;round_index&quot;: 3,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:32.643518+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: null,
+  &quot;feedback_type&quot;: &quot;scalar_rating&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.386303,
+    -0.147297,
+    0.142146,
+    0.321292,
+    -0.147145
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_46cd4646fc3b&quot;: 3.7929,
+      &quot;cand_870dc95ab8d1&quot;: 2.0632,
+      &quot;cand_a67d8b75de9d&quot;: 1.0,
+      &quot;cand_d1cfdfce55cc&quot;: 5.0
+    },
+    &quot;winner_candidate_id&quot;: &quot;cand_d1cfdfce55cc&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_46cd4646fc3b&quot;: 3.7929,
+      &quot;cand_870dc95ab8d1&quot;: 2.0632,
+      &quot;cand_a67d8b75de9d&quot;: 1.0,
+      &quot;cand_d1cfdfce55cc&quot;: 5.0
+    }
+  },
+  &quot;round_id&quot;: &quot;rnd_3a31b2fbe165&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_d1cfdfce55cc&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:32.664413+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 4,
+  &quot;sampler&quot;: &quot;annealed_shell&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:42.898035+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 4,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_f83b12127ce6&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_d1cfdfce55cc.png&quot;,
+      &quot;predicted_score&quot;: 0.7682631702328677,
+      &quot;predicted_uncertainty&quot;: 0.2,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 1585628238,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.42074858400327847,
+        -0.12512667091904953,
+        0.2758981639244914,
+        0.39874488377686834,
+        -0.1860017905527209
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_a6843e92f5b9&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_a6843e92f5b9.png&quot;,
+      &quot;predicted_score&quot;: 1.0230831207264848,
+      &quot;predicted_uncertainty&quot;: 0.17,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 3064280250,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5789667313804266,
+        0.08835167112273562,
+        0.1871146389607731,
+        0.2716191845390005,
+        -0.10296910527645119
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_c9ca12b0cd69&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_c9ca12b0cd69.png&quot;,
+      &quot;predicted_score&quot;: -0.030774116708194445,
+      &quot;predicted_uncertainty&quot;: 0.18000000000000002,
+      &quot;sampler_role&quot;: &quot;annealed_counterprobe&quot;,
+      &quot;seed&quot;: 3938961470,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.3241798504832076,
+        -0.45184416672801847,
+        -0.07644216539040176,
+        0.34645921950709413,
+        -0.16512685458007592
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_f5292bb54b24&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_f5292bb54b24.png&quot;,
+      &quot;predicted_score&quot;: 0.8122334920577087,
+      &quot;predicted_uncertainty&quot;: 0.19,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 2200053800,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.30486538938251995,
+        -0.10889853503975692,
+        0.38942309513956347,
+        0.418458270147243,
+        -0.17561472757186086
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_0633123bd0fd&quot;,
+  &quot;round_index&quot;: 4,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:43.289045+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: null,
+  &quot;feedback_type&quot;: &quot;scalar_rating&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.530835,
+    0.029073,
+    0.159096,
+    0.274334,
+    -0.109417
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_a6843e92f5b9&quot;: 5.0,
+      &quot;cand_c9ca12b0cd69&quot;: 2.6914,
+      &quot;cand_f5292bb54b24&quot;: 1.859,
+      &quot;cand_f83b12127ce6&quot;: 1.0
+    },
+    &quot;winner_candidate_id&quot;: &quot;cand_a6843e92f5b9&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ratings&quot;: {
+      &quot;cand_a6843e92f5b9&quot;: 5.0,
+      &quot;cand_c9ca12b0cd69&quot;: 2.6914,
+      &quot;cand_f5292bb54b24&quot;: 1.859,
+      &quot;cand_f83b12127ce6&quot;: 1.0
+    }
+  },
+  &quot;round_id&quot;: &quot;rnd_0633123bd0fd&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_a6843e92f5b9&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:43.310860+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 5,
+  &quot;sampler&quot;: &quot;annealed_shell&quot;,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T03:17:53.584310+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 4,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_46d2ac0e59c5&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_a6843e92f5b9.png&quot;,
+      &quot;predicted_score&quot;: 1.0230831207264848,
+      &quot;predicted_uncertainty&quot;: 0.17,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 3064280250,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5789667313804266,
+        0.08835167112273562,
+        0.1871146389607731,
+        0.2716191845390005,
+        -0.10296910527645119
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_792a98f9ab12&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_792a98f9ab12.png&quot;,
+      &quot;predicted_score&quot;: 1.0646897928131742,
+      &quot;predicted_uncertainty&quot;: 0.16,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 1482856537,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.6066170224623122,
+        0.16014410635852247,
+        0.1511101243775927,
+        0.20599422706285156,
+        -0.05917568744810481
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_cd1dd78fc47a&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_cd1dd78fc47a.png&quot;,
+      &quot;predicted_score&quot;: 0.2798214147802917,
+      &quot;predicted_uncertainty&quot;: 0.17,
+      &quot;sampler_role&quot;: &quot;annealed_counterprobe&quot;,
+      &quot;seed&quot;: 1813143721,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.46221038479168836,
+        -0.3346383751166743,
+        -0.04484139578917507,
+        0.34101641441737945,
+        -0.1359256135229267
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_36e3aaab86c8&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_36e3aaab86c8.png&quot;,
+      &quot;predicted_score&quot;: 0.9911892443303614,
+      &quot;predicted_uncertainty&quot;: 0.18,
+      &quot;sampler_role&quot;: &quot;annealed_probe&quot;,
+      &quot;seed&quot;: 1546206754,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.4024918311749872,
+        0.03198998021291541,
+        0.3962595657059587,
+        0.3400059808969958,
+        -0.16355811366049577
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_1c60015892d1&quot;,
+  &quot;round_index&quot;: 5,
+  &quot;session_id&quot;: &quot;ses_24cb3b74df10&quot;
+}</pre></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </details>
+</main>
+</body>
+</html>

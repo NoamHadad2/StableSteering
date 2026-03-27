@@ -26,13 +26,23 @@ from app.core.logging import logger
 from app.core.tracing import TraceRecorder
 from app.feedback.normalization import normalize_feedback
 from app.samplers.axis_sweep import AxisSweepSampler
+from app.samplers.annealed_shell import AnnealedShellSampler
 from app.samplers.base import clamp_vector
+from app.samplers.diversity_shell import DiversityShellSampler
 from app.samplers.exploit_orthogonal import ExploitOrthogonalSampler
 from app.samplers.incumbent_mix import IncumbentMixSampler
+from app.samplers.line_search import LineSearchSampler
+from app.samplers.plateau_escape import PlateauEscapeSampler
 from app.samplers.random_local import RandomLocalSampler
+from app.samplers.spherical_cover import SphericalCoverSampler
 from app.samplers.uncertainty import UncertaintyGuidedSampler
 from app.storage.repository import JsonRepository
+from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
+from app.updaters.borda_pref import BordaPreferenceUpdater
+from app.updaters.bradley_terry_pref import BradleyTerryPreferenceUpdater
 from app.updaters.linear_pref import LinearPreferenceUpdater
+from app.updaters.softmax_pref import SoftmaxPreferenceUpdater
+from app.updaters.score_weighted import ScoreWeightedPreferenceUpdater
 from app.updaters.winner_average import WinnerAverageUpdater
 from app.updaters.winner_copy import WinnerCopyUpdater
 from app.engine.generation import GenerationEngine, build_generation_engine
@@ -56,11 +66,21 @@ class Orchestrator:
             "uncertainty_guided": UncertaintyGuidedSampler(),
             "axis_sweep": AxisSweepSampler(),
             "incumbent_mix": IncumbentMixSampler(),
+            "diversity_shell": DiversityShellSampler(),
+            "line_search": LineSearchSampler(),
+            "plateau_escape": PlateauEscapeSampler(),
+            "annealed_shell": AnnealedShellSampler(),
+            "spherical_cover": SphericalCoverSampler(),
         }
         self.updaters = {
             "winner_copy": WinnerCopyUpdater(),
             "winner_average": WinnerAverageUpdater(),
             "linear_preference": LinearPreferenceUpdater(),
+            "score_weighted_preference": ScoreWeightedPreferenceUpdater(),
+            "contrastive_preference": ContrastivePreferenceUpdater(),
+            "softmax_preference": SoftmaxPreferenceUpdater(),
+            "borda_preference": BordaPreferenceUpdater(),
+            "bradley_terry_preference": BradleyTerryPreferenceUpdater(),
         }
 
     @staticmethod
@@ -164,8 +184,14 @@ class Orchestrator:
         carried_forward = self._build_carried_forward_candidate(session)
         baseline_candidate = self._build_baseline_prompt_candidate(session)
         sampler_seed = self._seed_token(session.id, round_index, "sampler")
+        sampler_session, stagnation_streak, boosted_radius = self._sampler_session_for_round(session)
         self._report_progress(progress_callback, 36, f"Sampling {session.config.candidate_count} candidate directions")
-        proposed_candidates = sampler.propose(session, sampler_seed)
+        proposed_candidates = sampler.propose(sampler_session, sampler_seed)
+        if boosted_radius is not None:
+            for candidate in proposed_candidates:
+                candidate.generation_params["stagnation_escape_active"] = True
+                candidate.generation_params["stagnation_streak"] = stagnation_streak
+                candidate.generation_params["stagnation_boosted_trust_radius"] = round(boosted_radius, 4)
         proposed_candidates = self._widen_first_round_candidates(session, proposed_candidates)
         candidates = self._compose_round_candidates(
             pinned_candidate=carried_forward or baseline_candidate,
@@ -572,6 +598,51 @@ class Orchestrator:
             candidate.generation_params["seed_policy"] = policy.value
             candidate.generation_params["seed_group"] = seed_group
             candidate.generation_params["round_seed"] = round_seed
+
+    def _sampler_session_for_round(self, session: Session) -> tuple[Session, int, float | None]:
+        """Return the sampling view of the session, optionally widened after repeated no-change wins."""
+
+        patience = int(session.config.stagnation_patience)
+        if patience <= 0 or session.current_round <= 0:
+            return session, 0, None
+
+        streak = self._trailing_selected_image_streak(session)
+        if streak < patience:
+            return session, streak, None
+
+        boosted_radius = min(1.0, session.config.trust_radius * session.config.stagnation_trust_radius_scale)
+        if boosted_radius <= session.config.trust_radius + 1e-9:
+            return session, streak, None
+
+        boosted_config = session.config.model_copy(update={"trust_radius": boosted_radius})
+        boosted_session = session.model_copy(deep=True)
+        boosted_session.config = boosted_config
+        return boosted_session, streak, boosted_radius
+
+    def _trailing_selected_image_streak(self, session: Session) -> int:
+        """Count trailing completed rounds that ended with the same selected image artifact."""
+
+        rounds = self.repository.list_rounds_for_session(session.id)
+        streak = 0
+        image_key: str | None = None
+        for round_obj in reversed(rounds):
+            if not round_obj.update_summary:
+                break
+            winner_id = round_obj.update_summary.get("winner_candidate_id")
+            if not winner_id:
+                break
+            winner = next((candidate for candidate in round_obj.candidates if candidate.id == winner_id), None)
+            if winner is None:
+                break
+            current_key = winner.image_path or repr([round(value, 6) for value in winner.z])
+            if image_key is None:
+                image_key = current_key
+                streak = 1
+                continue
+            if current_key != image_key:
+                break
+            streak += 1
+        return streak
 
     @staticmethod
     def _seed_token(*parts: object) -> int:

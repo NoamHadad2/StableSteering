@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Incumbent-Policy Oracle Slice</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Incumbent-Policy Oracle Slice</h1>
+<p>This budget-matched oracle slice compares three incumbent-handling policies under one fixed proposal and update family.</p>
+<h2>Scope</h2>
+<ul>
+<li>policies: <code>3</code></li>
+<li>runs: <code>9</code></li>
+<li>rounds: <code>54</code></li>
+<li>targets: <code>3</code></li>
+</ul>
+<h2>Policy summary</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">runs</th>
+<th style="text-align: right;">final CLIP (mean ± sd)</th>
+<th style="text-align: right;">final DINOv2 (mean ± sd)</th>
+<th style="text-align: right;">improves after round 4</th>
+<th style="text-align: right;">last-3 identical-image plateaus</th>
+<th style="text-align: right;">mean unique selected-image ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>carry-forward baseline</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.884 ± 0.037</td>
+<td style="text-align: right;">0.583 ± 0.134</td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">0.556</td>
+</tr>
+<tr>
+<td>soft incumbent penalty</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.891 ± 0.033</td>
+<td style="text-align: right;">0.636 ± 0.112</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">0.389</td>
+</tr>
+<tr>
+<td>hard incumbent cooldown</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.856 ± 0.034</td>
+<td style="text-align: right;">0.568 ± 0.132</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">0.556</td>
+</tr>
+</tbody>
+</table>
+<h2>Interpretation boundary</h2>
+<ul>
+<li>all policies use the same targets, model family, candidate budget, and metric pair</li>
+<li>CLIP still drives oracle selection, while DINOv2 remains a secondary evaluator</li>
+<li>this slice compares incumbent-handling tradeoffs, not general image quality</li>
+<li>later-round movement and final proxy recovery should be read together, not separately</li>
+</ul>
+<h2>Figure</h2>
+<p><img alt="Budget-matched incumbent-policy oracle slice" src="oracle_incumbent_policy_slice.svg"></p></article></main>
+  </body>
+</html>

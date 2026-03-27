@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Design axes of StableSteering</title>
+  <desc id="desc">A conceptual diagram showing proposal model, elicitation model, update model, and rendering model as the main design axes of StableSteering.</desc>
+  <style>
+    .bg { fill: #fbfaf6; }
+    .box { fill: #fffdfa; stroke: #334155; stroke-width: 2.3; rx: 18; ry: 18; }
+    .proposal { fill: #e8f1ff; }
+    .elicitation { fill: #fff3df; }
+    .update { fill: #fbe7e5; }
+    .render { fill: #eaf7ee; }
+    .hub { fill: #f7efe5; }
+    .title { font: 700 28px Georgia, 'Times New Roman', serif; fill: #1d2430; }
+    .label { font: 700 18px Georgia, 'Times New Roman', serif; fill: #1d2430; }
+    .body { font: 15px Georgia, 'Times New Roman', serif; fill: #344054; }
+    .small { font: italic 14px Georgia, 'Times New Roman', serif; fill: #475467; }
+    .arrow { stroke: #4c6284; stroke-width: 3.2; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#4c6284"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1200" height="620"/>
+  <text class="title" x="60" y="56">StableSteering Design Axes</text>
+
+  <rect class="box hub" x="440" y="210" width="320" height="180"/>
+  <text class="label" x="474" y="252">One Steering Round</text>
+  <text class="body" x="474" y="288">current state z<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+  <text class="body" x="474" y="314">candidate set C<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+  <text class="body" x="474" y="340">preference event f<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+  <text class="body" x="474" y="366">updated state z<tspan baseline-shift="sub" font-size="12">t+1</tspan></text>
+
+  <rect class="box proposal" x="70" y="90" width="270" height="180"/>
+  <text class="label" x="98" y="128">Proposal Model S<tspan baseline-shift="sub" font-size="12">m</tspan></text>
+  <text class="body" x="98" y="164">How should the next batch explore</text>
+  <text class="body" x="98" y="190">the neighborhood around z<tspan baseline-shift="sub" font-size="12">t</tspan>?</text>
+  <text class="small" x="98" y="226">random_local, axis_sweep,</text>
+  <text class="small" x="98" y="248">exploit_orthogonal, incumbent_mix</text>
+
+  <rect class="box elicitation" x="70" y="350" width="270" height="180"/>
+  <text class="label" x="98" y="388">Elicitation Model E</text>
+  <text class="body" x="98" y="424">How much information is collected</text>
+  <text class="body" x="98" y="450">from the user each round?</text>
+  <text class="small" x="98" y="486">winner, pairwise, rating,</text>
+  <text class="small" x="98" y="508">ranking, approve/reject</text>
+
+  <rect class="box update" x="860" y="90" width="270" height="180"/>
+  <text class="label" x="888" y="128">Update Model U<tspan baseline-shift="sub" font-size="12">u</tspan></text>
+  <text class="body" x="888" y="164">How aggressively should preference</text>
+  <text class="body" x="888" y="190">move the steering state?</text>
+  <text class="small" x="888" y="226">winner_copy, winner_average,</text>
+  <text class="small" x="888" y="248">linear_preference</text>
+
+  <rect class="box render" x="860" y="350" width="270" height="180"/>
+  <text class="label" x="888" y="388">Rendering Model G</text>
+  <text class="body" x="888" y="424">How do prompt p and state z<tspan baseline-shift="sub" font-size="12">t</tspan></text>
+  <text class="body" x="888" y="450">produce visible images?</text>
+  <text class="small" x="888" y="486">prompt-embedding perturbation</text>
+  <text class="small" x="888" y="508">and future richer conditioning paths</text>
+
+  <path class="arrow" d="M340 180 L440 260"/>
+  <path class="arrow" d="M340 440 L440 340"/>
+  <path class="arrow" d="M860 180 L760 260"/>
+  <path class="arrow" d="M860 440 L760 340"/>
+
+  <text class="small" x="430" y="170">search geometry</text>
+  <text class="small" x="772" y="170">state motion</text>
+  <text class="small" x="418" y="430">supervision burden</text>
+  <text class="small" x="780" y="430">image formation</text>
+</svg>

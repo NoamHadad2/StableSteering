@@ -1,0 +1,44 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Seed Robustness</title><style>
+body{margin:0;background:#f5efe5;color:#241d18;font-family:Georgia,"Times New Roman",serif;}
+main{max-width:900px;margin:0 auto;padding:32px 20px 56px;}
+article{background:#fffdf8;border:1px solid #d8cdbf;border-radius:18px;padding:28px 30px;box-shadow:0 16px 36px rgba(73,51,25,.08);}
+a{color:#8a4f14} table{width:100%;border-collapse:collapse;margin:16px 0} th,td{border-top:1px solid #d8cdbf;padding:10px;text-align:left;vertical-align:top} code,pre{font-family:Consolas,"Courier New",monospace} code{background:#f7f1e9;padding:.1rem .3rem;border-radius:6px} pre{background:#f7f1e9;border:1px solid #d8cdbf;border-radius:12px;padding:12px;overflow:auto}
+</style></head><body><main><article><h1>Seed Repeatability Note</h1>
+<p>This note summarizes the narrow repeatability signal supported by the repeated minimal baseline matrix.</p>
+<h2>Scope</h2>
+<ul>
+<li>prompts: <code>3</code></li>
+<li>policies: <code>3</code></li>
+<li>independent repeats per prompt-policy cell: <code>3</code></li>
+<li>total runs: <code>27</code></li>
+</ul>
+<p>Source table:</p>
+<ul>
+<li><a href="E:\Projects\StableSteering\paper\results\baseline_matrix\tables\repeat_summary.csv">tables/repeat_summary.csv</a></li>
+</ul>
+<h2>Safe observations</h2>
+<ul>
+<li>every prompt-only manual cell completed exactly <code>1</code> round per run with <code>0</code> feedback events</li>
+<li>every no-update random sampling cell completed exactly <code>1</code> round per run with <code>0</code> feedback events</li>
+<li>every StableSteering default cell completed exactly <code>2</code> rounds per run with <code>1</code> feedback event</li>
+<li>the observed standard deviation for <code>rounds per run</code> is <code>0.0</code> in every prompt-policy cell</li>
+<li>the observed standard deviation for <code>feedback events per run</code> is <code>0.0</code> in every prompt-policy cell</li>
+</ul>
+<h2>What this supports</h2>
+<ul>
+<li>a narrow claim that the bounded pilot is stable at the workflow-count level across three independent repeats</li>
+<li>stronger confidence that the pilot bundle is reproducible as an executed artifact package</li>
+</ul>
+<h2>What this does not support</h2>
+<ul>
+<li>any statistical-significance claim</li>
+<li>any claim that StableSteering produces better final images than the controls</li>
+<li>any claim that image quality is stable across seeds in a human-evaluated sense</li>
+<li>any claim that the portrait-prompt artifact flags reflect meaningful quality differences</li>
+</ul>
+<h2>Visual-check note</h2>
+<ul>
+<li>the lightweight flags remain concentrated in the portrait prompt</li>
+<li>those flags come from weak artifact-screening heuristics, not human judgments</li>
+<li>for aggregate counts, see <a href="E:\Projects\StableSteering\paper\results\baseline_matrix\pilot_summary.md">pilot_summary.md</a></li>
+</ul></article></main></body></html>

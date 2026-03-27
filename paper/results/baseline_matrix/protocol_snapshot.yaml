@@ -1,0 +1,73 @@
+version: 1
+name: minimal_baseline_prompt_suite
+purpose: Compare prompt-only iteration, no-update sampling, and the StableSteering
+  default loop on a tightly controlled prompt suite.
+fixed_conditions:
+  backend: diffusers
+  model_name: runwayml/stable-diffusion-v1-5
+  image_size:
+  - 512
+  - 512
+  guidance_scale: 7.0
+  num_inference_steps: 20
+  candidate_count: 5
+  feedback_mode: scalar_rating
+  seed_policy: fixed-per-round
+  stopping_rule: five_rounds
+baseline_overrides:
+  prompt_only_manual:
+    candidate_count: 1
+    sampler: random_local
+    updater: winner_copy
+    seed_policy: fixed-per-round
+  no_update_random_sampling:
+    candidate_count: 5
+    sampler: random_local
+    updater: winner_copy
+    seed_policy: fixed-per-round
+  stablesteering_default:
+    candidate_count: 5
+    sampler: exploit_orthogonal
+    updater: winner_average
+    seed_policy: fixed-per-candidate
+baselines:
+- id: prompt_only_manual
+  label: Prompt-only manual iteration
+  description: The user refines the prompt between rounds, but the steering state
+    is not updated. In the bounded runner, this is represented as a one-round prompt-render
+    proxy.
+- id: no_update_random_sampling
+  label: No-update random sampling
+  description: Candidates are sampled, but user feedback does not update the steering
+    state.
+- id: stablesteering_default
+  label: StableSteering default steering loop
+  description: Prompt-first multi-round iteration with feedback-driven steering-state
+    updates.
+prompts:
+- id: product_hero_shot
+  label: Product hero shot
+  prompt: A premium cinematic product hero photo of an expedition-ready electric explorer
+    motorcycle parked at sunrise in a dramatic desert pass
+  negative_prompt: blur, flat lighting, distorted wheels, text, watermark, clutter
+- id: portrait_character
+  label: Portrait / character
+  prompt: A cinematic studio portrait of a robotics researcher holding a small hand-built
+    prototype, with soft rim light and a dark background
+  negative_prompt: blur, flat lighting, distorted hands, extra fingers, text, watermark,
+    clutter
+- id: landscape_environment
+  label: Landscape / environment
+  prompt: A wide cinematic landscape of a weathered coastal observatory at dusk with
+    strong atmosphere and layered depth
+  negative_prompt: blur, flat lighting, crooked horizon, text, watermark, clutter
+expected_artifacts:
+  root: paper/results/baseline_matrix/
+  files:
+  - manifest.json
+  - README.md
+  - protocol_snapshot.yaml
+  directories:
+  - runs/
+  - tables/
+  - figures/

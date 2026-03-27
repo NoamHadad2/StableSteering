@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StableSteering Analysis Summary</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4efe6;
+        --panel: #fffdf8;
+        --border: #d9cdbf;
+        --text: #241d18;
+        --muted: #6f5b48;
+        --accent: #8a4f14;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: linear-gradient(180deg, #efe6d7, #faf7f1); color: var(--text); font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 1180px; margin: 0 auto; padding: 28px 18px 48px; }
+      .panel { background: rgba(255, 252, 247, 0.97); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 16px 36px rgba(73, 51, 25, 0.08); padding: 28px 28px 36px; }
+      h1, h2, h3 { font-family: "Segoe UI", system-ui, sans-serif; line-height: 1.2; }
+      p, li { line-height: 1.55; }
+      .meta { color: var(--muted); font-family: "Segoe UI", system-ui, sans-serif; }
+      a { color: var(--accent); }
+      .table-wrap { overflow-x: auto; margin: 12px 0 24px; }
+      table { border-collapse: collapse; width: 100%; min-width: 860px; }
+      th, td { border-top: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+      th { position: sticky; top: 0; background: #fcf8f0; }
+      code { background: #f7f1e9; padding: 0.12rem 0.3rem; border-radius: 6px; }
+      @media (max-width: 760px) {
+        main { padding: 18px 12px 36px; }
+        .panel { padding: 20px 16px 28px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="panel">
+        <p class="meta">Derived from the repeated bundle in <code>paper/results/updater_ablation/tables/</code>.</p>
+        <h1>StableSteering Analysis Summary</h1>
+        <p>This page is a conservative, workflow-focused summary. It deliberately avoids superiority language and treats candidate-budget differences as structural, not comparative.</p>
+        <h2>Interpretation</h2>
+        <ul>
+          <li><code>updater_linear_preference</code> stays at 2.0 rounds/run and 1.0 feedback events/run.</li><li><code>updater_winner_average</code> stays at 2.0 rounds/run and 1.0 feedback events/run.</li><li><code>updater_winner_copy</code> stays at 2.0 rounds/run and 1.0 feedback events/run.</li>
+          <li>This analysis is descriptive only and does not support image-quality or superiority claims.</li>
+        </ul>
+        <h2>Policy Summary</h2>
+        
+      <section>
+        <h2>policy_summary.csv</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>baseline_id</th><th>baseline_label</th><th>run_count</th><th>round_count</th><th>candidate_count</th><th>mean_rounds_per_run</th><th>mean_feedback_events_per_run</th><th>mean_candidates_per_run</th><th>mean_candidates_per_round</th><th>selected_candidates_per_run</th><th>selected_candidate_rate_per_candidate</th><th>failing_candidate_rate_per_candidate</th></tr></thead>
+            <tbody><tr><td>updater_linear_preference</td><td>Updater: linear preference</td><td>9</td><td>18</td><td>90</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.078</td></tr>
+<tr><td>updater_winner_average</td><td>Updater: winner average</td><td>9</td><td>18</td><td>90</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.089</td></tr>
+<tr><td>updater_winner_copy</td><td>Updater: winner copy</td><td>9</td><td>18</td><td>90</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.089</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    
+        <h2>Cell Summary</h2>
+        
+      <section>
+        <h2>cell_summary.csv</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>cell_id</th><th>prompt_id</th><th>baseline_id</th><th>run_count</th><th>round_count</th><th>candidate_count</th><th>mean_rounds_per_run</th><th>mean_feedback_events_per_run</th><th>mean_candidates_per_run</th><th>mean_candidates_per_round</th><th>selected_candidates_per_run</th><th>selected_candidate_rate_per_candidate</th><th>failing_candidate_rate_per_candidate</th></tr></thead>
+            <tbody><tr><td>landscape_environment__updater_linear_preference</td><td>landscape_environment</td><td>updater_linear_preference</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.033</td></tr>
+<tr><td>landscape_environment__updater_winner_average</td><td>landscape_environment</td><td>updater_winner_average</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.0</td></tr>
+<tr><td>landscape_environment__updater_winner_copy</td><td>landscape_environment</td><td>updater_winner_copy</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.067</td></tr>
+<tr><td>portrait_character__updater_linear_preference</td><td>portrait_character</td><td>updater_linear_preference</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.2</td></tr>
+<tr><td>portrait_character__updater_winner_average</td><td>portrait_character</td><td>updater_winner_average</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.267</td></tr>
+<tr><td>portrait_character__updater_winner_copy</td><td>portrait_character</td><td>updater_winner_copy</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.2</td></tr>
+<tr><td>product_hero_shot__updater_linear_preference</td><td>product_hero_shot</td><td>updater_linear_preference</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.0</td></tr>
+<tr><td>product_hero_shot__updater_winner_average</td><td>product_hero_shot</td><td>updater_winner_average</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.0</td></tr>
+<tr><td>product_hero_shot__updater_winner_copy</td><td>product_hero_shot</td><td>updater_winner_copy</td><td>3</td><td>6</td><td>30</td><td>2.0</td><td>1.0</td><td>10.0</td><td>5.0</td><td>1.0</td><td>0.1</td><td>0.0</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    
+      </div>
+    </main>
+  </body>
+</html>

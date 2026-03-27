@@ -1,0 +1,99 @@
+suite_name: method_extension_comparison
+description: >
+  Oracle-based comparison of new sampling methods, richer user-preference models,
+  and alternative oracle steering policies under a shared hidden-target recovery protocol.
+target_suite_path: paper/protocols/oracle_target_suite.yaml
+oracle_model: openai/clip-vit-base-patch32
+dino_model: facebook/dinov2-small
+max_rounds: 5
+shared_conditions:
+  seed_policy: fixed-per-candidate
+  steering_mode: low_dimensional
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.68
+  anchor_strength: 0.82
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+sampler_policies:
+  - id: diversity_shell
+    label: Diversity shell
+    sampler: diversity_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Wide high-radius shell search using the current best richer updater.
+  - id: line_search
+    label: Line search
+    sampler: line_search
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Directional forward-backtrack probing around the incumbent.
+  - id: annealed_shell
+    label: Annealed shell
+    sampler: annealed_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Broad early shell exploration that narrows over rounds.
+  - id: spherical_cover
+    label: Spherical cover
+    sampler: spherical_cover
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Greedy high-separation cover of the steering sphere.
+preference_policies:
+  - id: softmax_scalar
+    label: Softmax preference
+    sampler: diversity_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Softmax-weighted centroid from oracle scalar ratings.
+  - id: score_weighted_scalar
+    label: Score-weighted preference
+    sampler: diversity_shell
+    updater: score_weighted_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Weighted centroid from scalar ratings.
+  - id: borda_topk
+    label: Borda preference
+    sampler: diversity_shell
+    updater: borda_preference
+    feedback_mode: top_k
+    oracle_policy: clip_only
+    description: Ordinal Borda-style update from oracle ranking.
+  - id: bradley_terry_topk
+    label: Bradley-Terry preference
+    sampler: diversity_shell
+    updater: bradley_terry_preference
+    feedback_mode: top_k
+    oracle_policy: clip_only
+    description: Pairwise latent-utility update induced by oracle ranking.
+oracle_policies:
+  - id: clip_only
+    label: CLIP oracle
+    sampler: annealed_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+    description: Baseline oracle that selects by CLIP similarity only.
+  - id: clip_dino_ensemble
+    label: CLIP + DINO ensemble
+    sampler: annealed_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_dino_ensemble
+    description: Oracle that averages normalized CLIP and DINO target similarity.
+  - id: clip_novelty_bonus
+    label: CLIP + novelty bonus
+    sampler: annealed_shell
+    updater: softmax_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_novelty_bonus
+    description: Oracle that trades off target similarity and novelty versus the incumbent image.

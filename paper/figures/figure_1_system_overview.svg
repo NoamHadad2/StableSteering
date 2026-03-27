@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Conceptual view of StableSteering</title>
+  <desc id="desc">A concept-first diagram showing prompt initialization, latent steering state, candidate proposals, user preference, and iterative state updates.</desc>
+  <style>
+    .bg { fill: #fbfaf6; }
+    .panel { fill: #fffdfa; stroke: #31445e; stroke-width: 2.4; rx: 20; ry: 20; }
+    .prompt { fill: #efe8ff; }
+    .state { fill: #e8f1ff; }
+    .candidates { fill: #ecf8ee; }
+    .feedback { fill: #fff2de; }
+    .update { fill: #fbe8e6; }
+    .title { font: 700 28px Georgia, 'Times New Roman', serif; fill: #1d2430; }
+    .label { font: 700 20px Georgia, 'Times New Roman', serif; fill: #1d2430; }
+    .body { font: 16px Georgia, 'Times New Roman', serif; fill: #364152; }
+    .small { font: italic 15px Georgia, 'Times New Roman', serif; fill: #4b5565; }
+    .arrow { stroke: #4c6284; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
+    .loop { stroke-dasharray: 10 8; }
+    .orb { fill: #7b4411; opacity: 0.85; }
+    .candidate { fill: #6aa27c; opacity: 0.9; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#4c6284"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1200" height="700"/>
+  <text class="title" x="60" y="54">StableSteering as Iterative Preference-Guided Search</text>
+
+  <rect class="panel prompt" x="70" y="120" width="230" height="150"/>
+  <text class="label" x="95" y="158">Prompt Prior</text>
+  <text class="body" x="95" y="192">Text prompt sets</text>
+  <text class="body" x="95" y="218">coarse semantic intent</text>
+  <text class="body" x="95" y="244">and broad visual target</text>
+
+  <rect class="panel state" x="360" y="105" width="260" height="180"/>
+  <text class="label" x="388" y="145">Latent Steering State</text>
+  <text class="body" x="388" y="180">z<tspan baseline-shift="sub" font-size="13">t</tspan> is a compact control vector</text>
+  <text class="body" x="388" y="206">that carries directional refinement</text>
+  <text class="body" x="388" y="232">not captured by prompt text alone</text>
+  <circle class="orb" cx="490" cy="240" r="12"/>
+  <circle class="orb" cx="452" cy="212" r="10"/>
+  <circle class="orb" cx="530" cy="210" r="10"/>
+  <circle class="orb" cx="480" cy="192" r="7"/>
+  <text class="small" x="430" y="270">local search center</text>
+
+  <rect class="panel candidates" x="700" y="90" width="410" height="220"/>
+  <text class="label" x="728" y="128">Candidate Proposal Model</text>
+  <text class="body" x="728" y="162">Sampler generates a small set of local alternatives</text>
+  <text class="body" x="728" y="188">around the current steering state</text>
+  <text class="small" x="728" y="222">baseline / exploit / explore / challenger / axis probes</text>
+  <circle class="candidate" cx="820" cy="242" r="12"/>
+  <circle class="candidate" cx="870" cy="210" r="11"/>
+  <circle class="candidate" cx="922" cy="252" r="11"/>
+  <circle class="candidate" cx="980" cy="202" r="10"/>
+  <circle class="candidate" cx="1035" cy="238" r="12"/>
+  <circle class="orb" cx="930" cy="230" r="8"/>
+  <text class="small" x="885" y="286">candidate frontier around current state</text>
+
+  <rect class="panel feedback" x="700" y="390" width="220" height="160"/>
+  <text class="label" x="726" y="430">Preference Signal</text>
+  <text class="body" x="726" y="464">winner only</text>
+  <text class="body" x="726" y="490">pairwise</text>
+  <text class="body" x="726" y="516">ratings / ranking / approvals</text>
+
+  <rect class="panel update" x="980" y="380" width="190" height="180"/>
+  <text class="label" x="1008" y="420">Update Rule</text>
+  <text class="body" x="1008" y="454">move toward</text>
+  <text class="body" x="1008" y="480">preferred candidate</text>
+  <text class="body" x="1008" y="506">to obtain z<tspan baseline-shift="sub" font-size="13">t+1</tspan></text>
+
+  <rect class="panel state" x="280" y="430" width="300" height="150"/>
+  <text class="label" x="308" y="470">Next Steering State</text>
+  <text class="body" x="308" y="504">updated local search center</text>
+  <text class="body" x="308" y="530">for the next round of proposals</text>
+  <circle class="orb" cx="420" cy="520" r="12"/>
+  <circle class="orb" cx="390" cy="495" r="9"/>
+  <circle class="orb" cx="452" cy="490" r="9"/>
+
+  <path class="arrow" d="M300 195 L360 195"/>
+  <path class="arrow" d="M620 195 L700 195"/>
+  <path class="arrow" d="M860 310 L820 390"/>
+  <path class="arrow" d="M920 470 L980 470"/>
+  <path class="arrow" d="M980 535 L580 535"/>
+  <path class="arrow loop" d="M350 430 C240 360, 220 280, 250 220"/>
+
+  <text class="small" x="180" y="402">prompt gives coarse intent;</text>
+  <text class="small" x="180" y="424">steering state absorbs iterative refinement</text>
+</svg>

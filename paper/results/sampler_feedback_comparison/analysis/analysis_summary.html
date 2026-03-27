@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sampler and Feedback Comparison Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Sampler and Feedback Comparison Analysis</h1>
+<h2>Sampler slice</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">final best</th>
+<th style="text-align: right;">delta baseline -&gt; final</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diversity shell</td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+<tr>
+<td>Exploit orthogonal</td>
+<td style="text-align: right;">0.867</td>
+<td style="text-align: right;">0.038</td>
+</tr>
+<tr>
+<td>Line search</td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+<tr>
+<td>Random local</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0.032</td>
+</tr>
+</tbody>
+</table>
+<h2>Feedback-model slice</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th>updater</th>
+<th>feedback</th>
+<th style="text-align: right;">final best</th>
+<th style="text-align: right;">delta baseline -&gt; final</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contrastive + top-k ranking</td>
+<td><code>contrastive_preference</code></td>
+<td><code>top_k</code></td>
+<td style="text-align: right;">0.873</td>
+<td style="text-align: right;">0.045</td>
+</tr>
+<tr>
+<td>Linear preference + winner only</td>
+<td><code>linear_preference</code></td>
+<td><code>winner_only</code></td>
+<td style="text-align: right;">0.885</td>
+<td style="text-align: right;">0.046</td>
+</tr>
+<tr>
+<td>Score-weighted + scalar ratings</td>
+<td><code>score_weighted_preference</code></td>
+<td><code>scalar_rating</code></td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.038</td>
+</tr>
+<tr>
+<td>Winner average + winner only</td>
+<td><code>winner_average</code></td>
+<td><code>winner_only</code></td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+</tbody>
+</table>
+<h2>Figures</h2>
+<p><img alt="Sampler slice curve" src="sampler_slice_curve.svg"></p>
+<p><img alt="Feedback slice curve" src="feedback_slice_curve.svg"></p></article></main>
+  </body>
+</html>

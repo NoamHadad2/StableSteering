@@ -65,12 +65,22 @@ class SamplerType(str, Enum):
     uncertainty_guided = "uncertainty_guided"
     axis_sweep = "axis_sweep"
     incumbent_mix = "incumbent_mix"
+    diversity_shell = "diversity_shell"
+    line_search = "line_search"
+    plateau_escape = "plateau_escape"
+    annealed_shell = "annealed_shell"
+    spherical_cover = "spherical_cover"
 
 
 class UpdaterType(str, Enum):
     winner_average = "winner_average"
     winner_copy = "winner_copy"
     linear_preference = "linear_preference"
+    score_weighted_preference = "score_weighted_preference"
+    contrastive_preference = "contrastive_preference"
+    softmax_preference = "softmax_preference"
+    borda_preference = "borda_preference"
+    bradley_terry_preference = "bradley_terry_preference"
 
 
 class SteeringMode(str, Enum):
@@ -89,6 +99,8 @@ class StrategyConfig(BaseModel):
     candidate_count: int = Field(default=5, ge=1, le=12)
     image_size: str = "512x512"
     trust_radius: float = Field(default=0.55, gt=0.0, le=1.0)
+    stagnation_patience: int = Field(default=0, ge=0, le=10)
+    stagnation_trust_radius_scale: float = Field(default=1.0, ge=1.0, le=3.0)
     anchor_strength: float = Field(default=0.7, ge=0.0, le=2.0)
     guidance_scale: float = Field(default=7.5, gt=0.0, le=20.0)
     num_inference_steps: int = Field(default=15, ge=1, le=100)

@@ -1,0 +1,51 @@
+version: 1
+name: budget_normalized_seed_policy_slice
+purpose: Compare seed-policy effects under matched workflow budgets on a tightly controlled
+  steering-loop configuration.
+fixed_conditions:
+  backend: diffusers
+  model_name: runwayml/stable-diffusion-v1-5
+  image_size:
+  - 512
+  - 512
+  guidance_scale: 7.0
+  num_inference_steps: 20
+  candidate_count: 5
+  feedback_mode: scalar_rating
+  steering_dimension: 5
+  sampler: exploit_orthogonal
+  updater: winner_average
+  stopping_rule: two_rounds
+baseline_overrides:
+  seed_fixed_per_round:
+    seed_policy: fixed-per-round
+  seed_fixed_per_candidate:
+    seed_policy: fixed-per-candidate
+baselines:
+- id: seed_fixed_per_round
+  label: 'Seed policy: fixed per round'
+  mode: steering_loop
+  description: Steering loop with one shared seed for newly rendered candidates in
+    each round.
+- id: seed_fixed_per_candidate
+  label: 'Seed policy: fixed per candidate'
+  mode: steering_loop
+  description: Steering loop with deterministic per-candidate seeds under the same
+    sampler and updater.
+prompts:
+- id: product_hero_shot
+  label: Product hero shot
+  prompt: A premium cinematic product hero photo of an expedition-ready electric explorer
+    motorcycle parked at sunrise in a dramatic desert pass
+  negative_prompt: blur, flat lighting, distorted wheels, text, watermark, clutter
+- id: portrait_character
+  label: Portrait / character
+  prompt: A cinematic studio portrait of a robotics researcher holding a small hand-built
+    prototype, with soft rim light and a dark background
+  negative_prompt: blur, flat lighting, distorted hands, extra fingers, text, watermark,
+    clutter
+- id: landscape_environment
+  label: Landscape / environment
+  prompt: A wide cinematic landscape of a weathered coastal observatory at dusk with
+    strong atmosphere and layered depth
+  negative_prompt: blur, flat lighting, crooked horizon, text, watermark, clutter

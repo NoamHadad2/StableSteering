@@ -320,11 +320,43 @@ The current seed policy contract is:
 - `fixed-per-candidate-role` shares seeds across candidates with the same sampler role
 - carried-forward incumbents keep the original winning image and seed instead of being re-rendered
 
+The current sampler and updater surface also includes the newer research-facing modules:
+
+- samplers:
+  - `diversity_shell`
+  - `line_search`
+  - `plateau_escape`
+  - `annealed_shell`
+  - `spherical_cover`
+- updaters:
+  - `score_weighted_preference`
+  - `contrastive_preference`
+  - `softmax_preference`
+  - `borda_preference`
+  - `bradley_terry_preference`
+
+The current stagnation-control contract is:
+
+- `stagnation_patience` counts repeated selected-image carry-forward before search widening activates
+- `stagnation_trust_radius_scale` multiplies the effective trust radius for the next proposal step
+- widened challenger rounds are annotated in candidate generation metadata so trace and paper experiments can detect when escape logic was active
+
 The current roadmap also includes expanding steering support beyond prompt-only generation into:
 
 - image-prompt or image-variation workflows
 - inpainting workflows
 - ControlNet-guided workflows
+
+The current paper experiment surface now also includes oracle-policy comparisons that are not part of the session YAML UI:
+
+- `clip_only`
+- `clip_dino_ensemble`
+- `clip_novelty_bonus`
+
+These are experiment-layer oracle selectors used by the paper runners rather than interactive frontend configuration knobs. The current comparison runner for that layer is:
+
+- [run_paper_method_extension_comparison.py](../scripts/run_paper_method_extension_comparison.py)
+- [method_extension_comparison_suite.yaml](../paper/protocols/method_extension_comparison_suite.yaml)
 
 ### 6.4 Evolve persistence
 

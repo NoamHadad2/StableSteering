@@ -1,0 +1,66 @@
+suite_name: sampler_feedback_comparison
+description: Oracle-based comparison of sampler families and feedback-model variants under a shared target-recovery protocol.
+target_suite_path: paper/protocols/oracle_target_suite.yaml
+oracle_model: openai/clip-vit-base-patch32
+max_rounds: 5
+shared_conditions:
+  seed_policy: fixed-per-candidate
+  steering_mode: low_dimensional
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+sampler_policies:
+  - id: random_local
+    label: Random local
+    sampler: random_local
+    updater: linear_preference
+    feedback_mode: winner_only
+    description: Mixed exploit-explore local sampling around the current state.
+  - id: exploit_orthogonal
+    label: Exploit orthogonal
+    sampler: exploit_orthogonal
+    updater: linear_preference
+    feedback_mode: winner_only
+    description: Structured exploit-refine-orthogonal probing.
+  - id: diversity_shell
+    label: Diversity shell
+    sampler: diversity_shell
+    updater: linear_preference
+    feedback_mode: winner_only
+    description: High-radius shell probes that maximize within-round directional spread.
+  - id: line_search
+    label: Line search
+    sampler: line_search
+    updater: linear_preference
+    feedback_mode: winner_only
+    description: Forward, backward, and lateral probes around the current incumbent direction.
+feedback_policies:
+  - id: winner_average_winner_only
+    label: Winner average + winner only
+    sampler: exploit_orthogonal
+    updater: winner_average
+    feedback_mode: winner_only
+    description: Smooth winner-driven update with minimal feedback burden.
+  - id: linear_winner_only
+    label: Linear preference + winner only
+    sampler: exploit_orthogonal
+    updater: linear_preference
+    feedback_mode: winner_only
+    description: Stronger winner-driven move toward the selected candidate.
+  - id: score_weighted_scalar
+    label: Score-weighted + scalar ratings
+    sampler: exploit_orthogonal
+    updater: score_weighted_preference
+    feedback_mode: scalar_rating
+    description: Weighted centroid update derived from oracle scalar ratings.
+  - id: contrastive_top_k
+    label: Contrastive + top-k ranking
+    sampler: exploit_orthogonal
+    updater: contrastive_preference
+    feedback_mode: top_k
+    description: Positive-versus-negative update derived from the oracle ranking.

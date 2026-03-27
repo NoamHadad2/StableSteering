@@ -109,6 +109,8 @@ steering_dimension: 5
 candidate_count: 5
 image_size: 512x512
 trust_radius: 0.55
+stagnation_patience: 0
+stagnation_trust_radius_scale: 1.0
 anchor_strength: 0.7
 guidance_scale: 7.5
 num_inference_steps: 15
@@ -132,6 +134,11 @@ Supported values:
 - `uncertainty_guided`
 - `axis_sweep`
 - `incumbent_mix`
+- `diversity_shell`
+- `line_search`
+- `plateau_escape`
+- `annealed_shell`
+- `spherical_cover`
 
 Effect:
 
@@ -145,6 +152,11 @@ Related code:
 - [uncertainty.py](../app/samplers/uncertainty.py)
 - [axis_sweep.py](../app/samplers/axis_sweep.py)
 - [incumbent_mix.py](../app/samplers/incumbent_mix.py)
+- [diversity_shell.py](../app/samplers/diversity_shell.py)
+- [line_search.py](../app/samplers/line_search.py)
+- [plateau_escape.py](../app/samplers/plateau_escape.py)
+- [annealed_shell.py](../app/samplers/annealed_shell.py)
+- [spherical_cover.py](../app/samplers/spherical_cover.py)
 
 ### `updater`
 
@@ -155,16 +167,27 @@ Supported values:
 - `winner_average`
 - `winner_copy`
 - `linear_preference`
+- `score_weighted_preference`
+- `contrastive_preference`
+- `softmax_preference`
+- `borda_preference`
+- `bradley_terry_preference`
 
 Effect:
 
 - determines how aggressively the system moves toward the selected winner
+- determines whether feedback is treated as winner-only, score-like, or contrastive evidence
 
 Related code:
 
 - [winner_average.py](../app/updaters/winner_average.py)
 - [winner_copy.py](../app/updaters/winner_copy.py)
 - [linear_pref.py](../app/updaters/linear_pref.py)
+- [score_weighted.py](../app/updaters/score_weighted.py)
+- [contrastive_pref.py](../app/updaters/contrastive_pref.py)
+- [softmax_pref.py](../app/updaters/softmax_pref.py)
+- [borda_pref.py](../app/updaters/borda_pref.py)
+- [bradley_terry_pref.py](../app/updaters/bradley_terry_pref.py)
 
 ### `feedback_mode`
 
@@ -295,6 +318,37 @@ Effect:
 - larger values increase exploration
 - smaller values keep proposals closer to the incumbent direction
 
+### `stagnation_patience`
+
+Controls how many consecutive rounds may end with the same selected image before the sampler widens challenger search.
+
+Effect:
+
+- `0` disables stagnation-triggered widening
+- positive values activate a simple plateau detector based on repeated selected-image reuse across rounds
+- when the threshold is reached, the orchestrator temporarily passes a larger effective trust radius into the sampler for the next round
+
+Notes:
+
+- this is a generic session-level control and is not tied to one specific sampler
+- it is most useful with incumbent-carry-forward policies, where later rounds can otherwise freeze visibly
+- the widening event is recorded in candidate generation metadata for trace and replay analysis
+
+### `stagnation_trust_radius_scale`
+
+Controls how much the effective trust radius is multiplied when stagnation escape is active.
+
+Effect:
+
+- values above `1.0` widen challenger proposals after a plateau is detected
+- larger values encourage more aggressive escape from repeated incumbent reuse
+- values too large can reduce local refinement quality by over-exploring
+
+Notes:
+
+- only applies when `stagnation_patience` is greater than `0`
+- this setting affects sampling, not rendering directly
+
 ### `anchor_strength`
 
 Controls how strongly the latent steering vector perturbs the encoded prompt embedding.
@@ -372,13 +426,14 @@ Recommended beginner changes:
 
 - switch `sampler`
 - switch `updater`
-- change `candidate_count` from `4` to `3` or `5`
+- change `candidate_count` from `5` to `3` or `6`
 - increase or decrease `trust_radius`
 
 Changes to make carefully:
 
 - unusual `image_size`
 - very large `candidate_count`
+- nonzero stagnation widening with already aggressive samplers
 - combinations that make comparisons harder rather than easier
 
 ## Relationship To Runtime Settings
@@ -440,6 +495,52 @@ Use this when:
 - you want broader exploration around the current direction
 - you want stronger movement after feedback
 
+### Diversity-Forward Search Session
+
+```yaml
+sampler: diversity_shell
+updater: linear_preference
+feedback_mode: winner_only
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want the first few rounds to cover clearly separated alternatives
+- you want challenger candidates to probe farther from the incumbent
+
+### Directional Search Session
+
+```yaml
+sampler: line_search
+updater: linear_preference
+feedback_mode: winner_only
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want one batch to test forward, backtrack, and lateral moves explicitly
+- you want candidate roles to read more like a local search step than a random spread
+
 ### Pairwise Preference Session
 
 ```yaml
@@ -483,6 +584,170 @@ Use this when:
 
 - you want more interpretable positive/negative axis probes
 - you want to rank the full batch rather than select only one winner
+
+### Score-Weighted Rating Session
+
+```yaml
+sampler: exploit_orthogonal
+updater: score_weighted_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.55
+anchor_strength: 0.7
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want star ratings to influence the update more richly than winner-only selection
+- you want strong ratings to pull the next state toward a weighted centroid
+
+### Plateau-Escape Session
+
+```yaml
+sampler: plateau_escape
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.78
+stagnation_patience: 1
+stagnation_trust_radius_scale: 1.35
+anchor_strength: 0.9
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want later rounds to keep proposing serious challengers instead of drifting into incumbent-only repetition
+- you want score-rich feedback to update the next state with a softmax-weighted preference aggregation
+- you are running oracle-style or analyst-style sessions where visible plateau behavior matters as much as final best score
+
+### Annealed Shell Session
+
+```yaml
+sampler: annealed_shell
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.68
+anchor_strength: 0.82
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want early rounds to explore broadly and later rounds to refine automatically
+- you want a diversity-forward sampler that still becomes more local as the session progresses
+
+### Spherical Cover Session
+
+```yaml
+sampler: spherical_cover
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.68
+anchor_strength: 0.82
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want each round to cover more angularly separated challenger directions
+- you want the sampler to behave more like a geometric cover than a local line probe
+
+### Contrastive Ranking Session
+
+```yaml
+sampler: exploit_orthogonal
+updater: contrastive_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.55
+anchor_strength: 0.7
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want the update to move toward the top-ranked subset and away from the bottom-ranked subset
+- you want ranking information to matter more than a single winner
+
+### Borda Ranking Session
+
+```yaml
+sampler: diversity_shell
+updater: borda_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want a full batch ranking to matter, but in an ordinal rather than score-calibrated way
+- you want the update to reward the whole upper ranking rather than only the winner
+
+### Bradley-Terry Ranking Session
+
+```yaml
+sampler: diversity_shell
+updater: bradley_terry_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want ranking feedback to be interpreted as pairwise evidence over the whole candidate set
+- you want a more explicit latent-utility model than winner-only or centroid-only updates
 
 ### Approve / Reject Session
 

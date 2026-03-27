@@ -14,8 +14,8 @@ CONFIG_COMMENT_BLOCK = dedent(
     # Edit any of these values before creating a new session.
     # This YAML is reloaded fresh for each setup page visit or reset action.
     #
-    # sampler: random_local | exploit_orthogonal | uncertainty_guided | axis_sweep | incumbent_mix
-    # updater: winner_average | winner_copy | linear_preference
+    # sampler: random_local | exploit_orthogonal | uncertainty_guided | axis_sweep | incumbent_mix | diversity_shell | line_search | plateau_escape | annealed_shell | spherical_cover
+    # updater: winner_average | winner_copy | linear_preference | score_weighted_preference | contrastive_preference | softmax_preference | borda_preference | bradley_terry_preference
     # feedback_mode: scalar_rating | pairwise | top_k | winner_only | approve_reject
     # seed_policy: fixed-per-round | fixed-per-candidate | fixed-per-candidate-role
     # steering_mode: currently low_dimensional
@@ -23,6 +23,8 @@ CONFIG_COMMENT_BLOCK = dedent(
     # candidate_count: visible candidates per round
     # image_size: WIDTHxHEIGHT, for example 512x512
     # trust_radius: steering search radius around the current state
+    # stagnation_patience: rounds of identical selected image before challenger search widens
+    # stagnation_trust_radius_scale: multiplier applied to trust_radius during stagnation escape
     # anchor_strength: strength of the steering offset applied to prompt embeddings
     # guidance_scale: classifier-free guidance strength, for example 7.5
     # num_inference_steps: diffusion denoising steps, for example 15 or 30

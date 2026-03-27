@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StableSteering Appendix</title>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['\\[', '\\]'], ['$$', '$$']]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 960px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+      .equation { margin: 1rem 0; padding: 0.8rem 1rem; background: #f8f4ee; border: 1px solid #d9cdbc; border-radius: 14px; overflow-x: auto; }
+      mjx-container[jax="SVG"] { margin: 0.35rem 0 !important; text-align: center !important; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Appendix: Controlled Slices and Submission Package Notes</h1>
+<h2>Appendix A. Sampling, Feedback, and Update Modules</h2>
+<p>The main manuscript describes the steering loop at a systems level. This appendix records the concrete module behavior implemented in the repository snapshot used for the paper.</p>
+<h3>A.1 Implemented Sampler Families</h3>
+<table>
+<thead>
+<tr>
+<th>Sampler</th>
+<th>Operational behavior</th>
+<th>Typical roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>random_local</code></td>
+<td>Produces one near-incumbent exploit proposal and several farther exploratory proposals with deliberate directional separation inside the trust radius.</td>
+<td><code>exploit</code>, <code>explore</code></td>
+</tr>
+<tr>
+<td><code>exploit_orthogonal</code></td>
+<td>Uses a fixed directional pattern that mixes near-incumbent and cross-axis probes.</td>
+<td><code>exploit</code>, <code>refine</code>, <code>orthogonal</code>, <code>mirror</code></td>
+</tr>
+<tr>
+<td><code>axis_sweep</code></td>
+<td>Sweeps positive and negative moves along steering axes with small jitter.</td>
+<td><code>axis_positive</code>, <code>axis_negative</code></td>
+</tr>
+<tr>
+<td><code>uncertainty_guided</code></td>
+<td>Increases the perturbation span across the batch so later candidates are more exploratory.</td>
+<td><code>explore</code>, <code>validation</code></td>
+</tr>
+<tr>
+<td><code>incumbent_mix</code></td>
+<td>Mixes conservative refinements with one broader challenger proposal.</td>
+<td><code>refine</code>, <code>mix</code>, <code>challenger</code></td>
+</tr>
+<tr>
+<td><code>diversity_shell</code></td>
+<td>Places challengers on a wider shell around the incumbent with deliberate pairwise separation.</td>
+<td><code>shell_probe</code>, <code>shell_counterprobe</code></td>
+</tr>
+<tr>
+<td><code>line_search</code></td>
+<td>Probes forward, backtrack, and lateral moves around the current direction.</td>
+<td><code>forward_probe</code>, <code>far_forward</code>, <code>backtrack</code>, <code>lateral_probe</code>, <code>counter_lateral</code></td>
+</tr>
+<tr>
+<td><code>annealed_shell</code></td>
+<td>Starts with a wider shell around the incumbent and gradually narrows that shell as rounds progress, with paired probe and counter-probe directions plus controlled jitter.</td>
+<td><code>annealed_probe</code>, <code>annealed_counterprobe</code></td>
+</tr>
+<tr>
+<td><code>spherical_cover</code></td>
+<td>Greedily selects angularly separated challenger directions on the trust-region sphere to cover the available region more uniformly.</td>
+<td><code>cover_probe</code></td>
+</tr>
+<tr>
+<td><code>plateau_escape</code></td>
+<td>Proposes one carried-forward incumbent plus forward, lateral, and counter-probe challengers designed to escape visible late-round repetition.</td>
+<td><code>forward_escape</code>, <code>lateral_plus</code>, <code>lateral_minus</code>, <code>counter_probe</code></td>
+</tr>
+</tbody>
+</table>
+<p>All samplers are bounded by the configured trust radius. In round one, the system also inserts a pinned <code>baseline_prompt</code> candidate with zero steering. In later rounds, the previous winner is inserted as a carried-forward incumbent before the sampler fills the remaining candidate slots.</p>
+<p>Two stagnation-control parameters now modify this process. <code>stagnation_patience</code> counts repeated selected-image reuse across rounds, and <code>stagnation_trust_radius_scale</code> widens the effective trust radius once that plateau detector fires. The widened trust radius is recorded in candidate metadata so later analysis can tell when escape logic was active.</p>
+<h3>A.2 Implemented Feedback Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Feedback mode</th>
+<th>Raw payload</th>
+<th>Normalized winner signal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>scalar_rating</code></td>
+<td>mapping from candidate id to numeric rating</td>
+<td>highest-rated candidate after deterministic tie-breaking</td>
+</tr>
+<tr>
+<td><code>pairwise</code></td>
+<td>winner id and loser id</td>
+<td>winner id plus loser id</td>
+</tr>
+<tr>
+<td><code>winner_only</code></td>
+<td>winner id</td>
+<td>winner id</td>
+</tr>
+<tr>
+<td><code>approve_reject</code></td>
+<td>mapping from candidate id to boolean approval, optional preferred winner</td>
+<td>preferred approved winner plus approved and rejected sets</td>
+</tr>
+<tr>
+<td><code>top_k</code></td>
+<td>ranked list of candidate ids</td>
+<td>top-ranked candidate plus full ranking</td>
+</tr>
+</tbody>
+</table>
+<p>The current implementation validates that referenced candidates belong to the current round and rejects malformed pairwise, ranking, and approval structures before update.</p>
+<h3>A.3 Implemented Updaters</h3>
+<table>
+<thead>
+<tr>
+<th>Updater</th>
+<th>Update rule</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>winner_copy</code></td>
+<td><code>z_(t+1) = w_t</code></td>
+<td>exact replacement with the winning candidate state</td>
+</tr>
+<tr>
+<td><code>winner_average</code></td>
+<td><code>z_(t+1) = 0.5 z_t + 0.5 w_t</code></td>
+<td>smoothed movement toward the winner</td>
+</tr>
+<tr>
+<td><code>linear_preference</code></td>
+<td><code>z_(t+1) = 0.35 z_t + 0.65 w_t</code></td>
+<td>stronger heuristic move toward the winner</td>
+</tr>
+<tr>
+<td><code>score_weighted_preference</code></td>
+<td><code>z_(t+1) = (1-\alpha) z_t + \alpha \, \mu_t^{+}</code> with score-weighted centroid <code>\mu_t^{+}</code></td>
+<td>uses ratings, rankings, or approvals as positive evidence instead of only the top winner</td>
+</tr>
+<tr>
+<td><code>contrastive_preference</code></td>
+<td><code>z_(t+1) = z_t + \alpha (\mu_t^{+} - \mu_t^{-})</code></td>
+<td>moves toward preferred candidates and away from explicitly dispreferred candidates</td>
+</tr>
+<tr>
+<td><code>softmax_preference</code></td>
+<td><code>z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \pi_j z_t^{(j)}</code> with <code>\pi_j \propto \exp(\beta r_j)</code> over normalized scores</td>
+<td>uses a softmax-weighted preference mixture so highly rated challengers dominate the next state without discarding the rest of the batch</td>
+</tr>
+<tr>
+<td><code>borda_preference</code></td>
+<td><code>z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \omega_j z_t^{(j)}</code> with Borda-style ordinal weights <code>\omega_j</code> derived from ranking position</td>
+<td>treats the batch as an ordered list and moves toward a centroid that reflects the full ranking rather than only the winner</td>
+</tr>
+<tr>
+<td><code>bradley_terry_preference</code></td>
+<td><code>z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \rho_j z_t^{(j)}</code> where <code>\rho_j</code> is induced by lightweight Bradley-Terry latent utilities fit from pairwise comparisons implied by the batch</td>
+<td>approximates a probabilistic pairwise preference model and uses the inferred utilities to weight the next steering state</td>
+</tr>
+</tbody>
+</table>
+<p>These update rules are deliberately lightweight. They should be read as session-level control policies, not as full statistical preference estimators or learned reward models.</p>
+<h2>Appendix B. Budget-Normalized Seed-Policy Slice</h2>
+<p>The seed-policy slice fixes the prompt subset, sampler, updater, and two-round steering-loop budget while comparing <code>fixed-per-round</code> and <code>fixed-per-candidate</code> seeding. Its purpose is methodological control rather than outcome-quality comparison.</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th style="text-align: right;">Runs</th>
+<th style="text-align: right;">Completed runs</th>
+<th style="text-align: right;">Total rounds</th>
+<th style="text-align: right;">Mean rounds / run</th>
+<th style="text-align: right;">Mean feedback events / run</th>
+<th style="text-align: right;">Screening flags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fixed per candidate</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr>
+<td>Fixed per round</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">13</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation boundary: both policies preserve the same workflow structure under matched conditions. The differing screening-flag counts are retained as descriptive diagnostics only and should not be read as evidence of visual superiority.</p>
+<h2>Appendix C. Fixed-Sampler Updater Ablation</h2>
+<p>The updater ablation fixes the sampler, seed policy, prompt subset, and two-round budget while comparing <code>winner_copy</code>, <code>winner_average</code>, and <code>linear_preference</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Updater</th>
+<th style="text-align: right;">Runs</th>
+<th style="text-align: right;">Completed runs</th>
+<th style="text-align: right;">Total rounds</th>
+<th style="text-align: right;">Mean rounds / run</th>
+<th style="text-align: right;">Mean feedback events / run</th>
+<th style="text-align: right;">Screening flags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear preference</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr>
+<td>Winner average</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td>Winner copy</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: right;">1.0</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation boundary: the ablation demonstrates that the same controlled experiment scaffold can compare updater choices cleanly. It does not establish that one updater should be preferred scientifically.</p>
+<h2>Appendix D. Oracle Target-Recovery Proxy Study</h2>
+<p>The oracle target-recovery bundle introduces a more outcome-facing but still tightly bounded evaluation setting. Each task begins from a real target image paired with a manually written caption and negative prompt. The generator receives only the text inputs. The hidden target image is used exclusively by an oracle that scores each generated candidate by CLIP image-similarity and selects the highest-scoring candidate as the winner for the next steering update.</p>
+<p>This protocol preserves the conceptual framing of StableSteering. It still starts from language, still uses candidate proposals and winner-based updates, and still never exposes the target image directly to the generator. The hidden target is therefore an evaluation device and an oracle-feedback source, not a conditioning signal.</p>
+<h3>D.1 Protocol Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Targets</td>
+<td>3 held-out real images with manual captions</td>
+</tr>
+<tr>
+<td>Rounds per target</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Candidates per round</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Sampler</td>
+<td><code>exploit_orthogonal</code></td>
+</tr>
+<tr>
+<td>Updater</td>
+<td><code>linear_preference</code></td>
+</tr>
+<tr>
+<td>Feedback mode</td>
+<td><code>winner_only</code></td>
+</tr>
+<tr>
+<td>Seed policy</td>
+<td><code>fixed-per-candidate</code></td>
+</tr>
+<tr>
+<td>Steering dimension</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Oracle metric</td>
+<td>CLIP image-image cosine similarity</td>
+</tr>
+</tbody>
+</table>
+<h3>D.2 Aggregate Outcome</h3>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th style="text-align: right;">Mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline prompt-only similarity</td>
+<td style="text-align: right;">0.825</td>
+</tr>
+<tr>
+<td>Round-1 best-candidate similarity</td>
+<td style="text-align: right;">0.888</td>
+</tr>
+<tr>
+<td>Round-10 best-candidate similarity</td>
+<td style="text-align: right;">0.896</td>
+</tr>
+<tr>
+<td>Baseline to round-10 improvement</td>
+<td style="text-align: right;">0.071</td>
+</tr>
+</tbody>
+</table>
+<p>All three targets improve relative to the baseline prompt-only render. Two targets achieve their best score in the first round and then plateau, while one target continues improving until round four. This pattern suggests that the current steering loop often finds a strong target-facing direction early, with later rounds serving mostly to preserve rather than substantially extend that gain.</p>
+<h3>D.3 Interpretation Boundary</h3>
+<p>The oracle bundle is intentionally narrow.</p>
+<ol>
+<li>It is a proxy target-recovery study, not a human-preference study.</li>
+<li>The same embedding family is used for oracle selection and evaluation.</li>
+<li>Improvement in CLIP space should therefore be interpreted as movement toward the hidden target under that proxy metric, not as general visual superiority.</li>
+</ol>
+<p>Despite these caveats, the bundle matters because it demonstrates that StableSteering can support a round-by-round measurable alignment study in addition to workflow-level protocol slices.</p>
+<h2>Appendix E. Repeated-Seed Multi-Metric Oracle Extension</h2>
+<p>The repeated oracle extension strengthens the proxy-evaluation story without changing the core target-recovery protocol. Each of the three held-out targets is run three times under different deterministic seed assignments, yielding 9 runs, 90 rounds, and 360 candidate rows. CLIP image-image cosine similarity still serves as the oracle metric used to choose winners, but final evaluation is reported under both CLIP and DINOv2 image embeddings.</p>
+<h3>E.1 Protocol Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Targets</td>
+<td>3 held-out real images with manual captions</td>
+</tr>
+<tr>
+<td>Repeats per target</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Total runs</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Rounds per run</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Candidates per round</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Sampler</td>
+<td><code>exploit_orthogonal</code></td>
+</tr>
+<tr>
+<td>Updater</td>
+<td><code>linear_preference</code></td>
+</tr>
+<tr>
+<td>Feedback mode</td>
+<td><code>winner_only</code></td>
+</tr>
+<tr>
+<td>Seed policy</td>
+<td><code>fixed-per-candidate</code></td>
+</tr>
+<tr>
+<td>Steering dimension</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Oracle metric</td>
+<td>CLIP image-image cosine similarity</td>
+</tr>
+<tr>
+<td>Auxiliary evaluation metric</td>
+<td>DINOv2 image-image cosine similarity</td>
+</tr>
+</tbody>
+</table>
+<h3>E.2 Aggregate Outcome</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th style="text-align: right;">Baseline mean</th>
+<th style="text-align: right;">Final mean</th>
+<th style="text-align: right;">Mean improvement</th>
+<th style="text-align: right;">Run-level sd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLIP cosine</td>
+<td style="text-align: right;">0.828</td>
+<td style="text-align: right;">0.881</td>
+<td style="text-align: right;">0.053</td>
+<td style="text-align: right;">0.035</td>
+</tr>
+<tr>
+<td>DINOv2 cosine</td>
+<td style="text-align: right;">0.452</td>
+<td style="text-align: right;">0.595</td>
+<td style="text-align: right;">0.142</td>
+<td style="text-align: right;">0.179</td>
+</tr>
+</tbody>
+</table>
+<h3>E.3 Target-Level Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th style="text-align: right;">Repeats</th>
+<th style="text-align: right;">CLIP final (mean ± sd)</th>
+<th style="text-align: right;">DINOv2 final (mean ± sd)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Black-and-white cat portrait</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.883 ± 0.016</td>
+<td style="text-align: right;">0.565 ± 0.047</td>
+</tr>
+<tr>
+<td>Mountain lake landscape</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.844 ± 0.005</td>
+<td style="text-align: right;">0.505 ± 0.067</td>
+</tr>
+<tr>
+<td>Red bicycle street photo</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.916 ± 0.011</td>
+<td style="text-align: right;">0.715 ± 0.035</td>
+</tr>
+</tbody>
+</table>
+<h3>E.4 Interpretation Boundary</h3>
+<ol>
+<li>CLIP still acts as the oracle that chooses winners.</li>
+<li>DINOv2 is an independent evaluator, not a second oracle.</li>
+<li>The extension reduces single-seed and single-metric risk but remains a proxy target-recovery study rather than a human-perception study.</li>
+</ol>
+<h3>E.5 Plateau and Stagnation-Control Follow-ons</h3>
+<p>The repeated oracle extension also exposed a qualitative failure mode: visible later-round freezing. In the original repeated-seed oracle bundle, all <code>9/9</code> runs reused a previously selected image at some point and <code>8/9</code> runs ended with the same selected image in the last three rounds.</p>
+<p>Three follow-on bundles were therefore run. The first replaced the older oracle policy with the new <code>plateau_escape</code> sampler and <code>softmax_preference</code> updater while keeping the same target family and repeated-seed protocol. The second added two stronger anti-stagnation controls on top of that bundle: temporary trust-radius widening after stagnation and oracle-side incumbent cooldown, which excludes the carried-forward incumbent from winner selection after repeated same-image reuse. The third kept the same compact <code>plateau_escape + softmax_preference</code> family but compared three incumbent-handling policies directly under a matched budget: carry-forward baseline, soft incumbent penalty, and hard incumbent cooldown.</p>
+<h4>E.5.1 Plateau-Escape Bundle</h4>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runs</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td>Last-three-round identical-image plateaus</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td>Runs still improving after round 4</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr>
+<td>Mean final CLIP cosine</td>
+<td style="text-align: right;">0.886</td>
+</tr>
+<tr>
+<td>Mean final DINOv2 cosine</td>
+<td style="text-align: right;">0.554</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: <code>plateau_escape</code> and <code>softmax_preference</code> improved late-round movement relative to the earlier repeated oracle bundle, but visible incumbent freezing was still common.</p>
+<h4>E.5.2 Stagnation-Control Bundle</h4>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runs</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td>Last-three-round identical-image plateaus</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Runs still improving after round 4</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td>Mean final CLIP cosine</td>
+<td style="text-align: right;">0.869</td>
+</tr>
+<tr>
+<td>Mean final DINOv2 cosine</td>
+<td style="text-align: right;">0.598</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: the stagnation-control policy solved the visible freezing problem almost completely, but it reduced final CLIP recovery relative to the softer plateau-escape bundle. The most plausible explanation is over-exploration: hard incumbent suppression keeps the session moving, but sometimes away from the current best proxy solution.</p>
+<h4>E.5.3 Budget-Matched Incumbent-Policy Slice</h4>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th style="text-align: right;">Runs</th>
+<th style="text-align: right;">Final CLIP (mean ± sd)</th>
+<th style="text-align: right;">Final DINOv2 (mean ± sd)</th>
+<th style="text-align: right;">Improves after round 4</th>
+<th style="text-align: right;">Last-three-round plateaus</th>
+<th style="text-align: right;">Mean unique selected-image ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Carry-forward baseline</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.884 ± 0.037</td>
+<td style="text-align: right;">0.583 ± 0.134</td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">0.556</td>
+</tr>
+<tr>
+<td>Soft incumbent penalty</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.891 ± 0.033</td>
+<td style="text-align: right;">0.636 ± 0.112</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">0.389</td>
+</tr>
+<tr>
+<td>Hard incumbent cooldown</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.856 ± 0.034</td>
+<td style="text-align: right;">0.568 ± 0.132</td>
+<td style="text-align: right;">1/3</td>
+<td style="text-align: right;">0/3</td>
+<td style="text-align: right;">0.556</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: the compact matched-budget slice sharpens the anti-stagnation story. Soft incumbent penalty achieves the strongest final proxy recovery on this small comparison, suggesting that milder incumbent discouragement can be helpful. Hard cooldown still removes end-of-run sticking most reliably, but again appears too aggressive for final alignment. The problem therefore looks less like a binary “freeze or move” issue and more like a tradeoff between retaining the best incumbent and preserving useful challenger pressure.</p>
+<h2>Appendix F. Human Pairwise Evaluation Layer</h2>
+<p>The paper package now includes a small direct-human evaluation layer meant for prompt-faithfulness and coherence judgments. The layer is intentionally modest: it curates six pairwise comparisons and packages them for browser-based inspection plus CSV-based annotation.</p>
+<h3>F.1 Package Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prompt families</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Pair types</td>
+<td>baseline vs StableSteering final; no-update vs StableSteering final</td>
+</tr>
+<tr>
+<td>Total curated pairs</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Annotation responses</td>
+<td><code>left</code>, <code>right</code>, <code>tie</code>, <code>invalid</code></td>
+</tr>
+<tr>
+<td>Browser preview</td>
+<td><code>pairwise_review.html</code></td>
+</tr>
+<tr>
+<td>Current annotations</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3>F.2 Collection Question</h3>
+<p>Judges are asked a single fixed question:</p>
+<blockquote>
+<p>Which image better satisfies the prompt while remaining visually coherent?</p>
+</blockquote>
+<p>This wording is intentionally narrower than “which image is better overall.” It targets the central interaction claim of the paper: the steering loop should help move from prompt-only initialization toward images that better satisfy the intended prompt while preserving coherence.</p>
+<h3>F.3 Interpretation Boundary</h3>
+<ol>
+<li>The current package is protocol-ready but contains no human judgments yet.</li>
+<li>It therefore supports submission completeness rather than outcome evidence.</li>
+<li>Once populated, the layer can support direct pairwise preference estimates with confidence intervals and agreement reporting.</li>
+</ol>
+<h2>Appendix G. Sampler and Feedback-Model Comparison Slice</h2>
+<p>The final controlled bundle asks whether the same oracle target-recovery scaffold can reveal meaningful differences among candidate-proposal strategies and richer preference models. The bundle is split into two slices. The sampler slice fixes the updater at <code>linear_preference</code> with <code>winner_only</code> feedback and compares <code>random_local</code>, <code>exploit_orthogonal</code>, <code>diversity_shell</code>, and <code>line_search</code>. The feedback-model slice fixes the sampler at <code>exploit_orthogonal</code> and compares four update-and-feedback pairings: <code>winner_average</code> with <code>winner_only</code>, <code>linear_preference</code> with <code>winner_only</code>, <code>score_weighted_preference</code> with <code>scalar_rating</code>, and <code>contrastive_preference</code> with <code>top_k</code> ranking.</p>
+<p>All runs use the same three real-image targets, the same manual captions, a five-round budget, <code>fixed-per-candidate</code> seeds, a five-dimensional steering state, and four candidates per round. The resulting bundle contains 24 runs, 120 rounds, and 480 candidate rows.</p>
+<h3>G.1 Sampler Slice Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Sampler</th>
+<th style="text-align: right;">Mean baseline score</th>
+<th style="text-align: right;">Mean final best score</th>
+<th style="text-align: right;">Mean improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>diversity_shell</code></td>
+<td style="text-align: right;">0.829</td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+<tr>
+<td><code>line_search</code></td>
+<td style="text-align: right;">0.829</td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+<tr>
+<td><code>exploit_orthogonal</code></td>
+<td style="text-align: right;">0.828</td>
+<td style="text-align: right;">0.867</td>
+<td style="text-align: right;">0.038</td>
+</tr>
+<tr>
+<td><code>random_local</code></td>
+<td style="text-align: right;">0.844</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0.032</td>
+</tr>
+</tbody>
+</table>
+<p>The main qualitative pattern is that the newly added broader search policies, <code>diversity_shell</code> and <code>line_search</code>, finish higher than the older local baselines under this oracle proxy. This suggests that proposal geometry remains a meaningful scientific axis even when the update rule is held fixed.</p>
+<h3>G.2 Feedback-Model Slice Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Updater / feedback pairing</th>
+<th style="text-align: right;">Mean baseline score</th>
+<th style="text-align: right;">Mean final best score</th>
+<th style="text-align: right;">Mean improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>winner_average</code> + <code>winner_only</code></td>
+<td style="text-align: right;">0.829</td>
+<td style="text-align: right;">0.882</td>
+<td style="text-align: right;">0.053</td>
+</tr>
+<tr>
+<td><code>linear_preference</code> + <code>winner_only</code></td>
+<td style="text-align: right;">0.839</td>
+<td style="text-align: right;">0.885</td>
+<td style="text-align: right;">0.046</td>
+</tr>
+<tr>
+<td><code>contrastive_preference</code> + <code>top_k</code></td>
+<td style="text-align: right;">0.827</td>
+<td style="text-align: right;">0.873</td>
+<td style="text-align: right;">0.045</td>
+</tr>
+<tr>
+<td><code>score_weighted_preference</code> + <code>scalar_rating</code></td>
+<td style="text-align: right;">0.845</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.038</td>
+</tr>
+</tbody>
+</table>
+<p>The richer preference models remain competitive, but this small proxy study does not yet show that they dominate winner-centric updates. The more defensible interpretation is methodological: StableSteering can host different preference models and compare them under the same steering scaffold.</p>
+<h3>G.3 Interpretation Boundary</h3>
+<p>This bundle should be read as an exploratory controlled slice rather than a definitive ranking.</p>
+<ol>
+<li>The same CLIP family is still used for oracle selection and evaluation.</li>
+<li>The target set is intentionally small.</li>
+<li>The sampler slice and the feedback slice answer different questions and should not be compared directly.</li>
+<li>The resulting ordering is therefore evidence of sensitivity to modeling choice, not proof of globally preferred policies.</li>
+</ol>
+<h2>Appendix H. Method-Extension Comparison for New Samplers, Preference Models, and Oracle Policies</h2>
+<p>The earlier sampler and feedback-model slice established that the steering loop is sensitive to modeling choice. The next question is whether the framework can absorb genuinely different method families without changing the surrounding session scaffold. The method-extension bundle answers that question with one larger but still controlled hidden-target recovery study. It introduces two new sampler families, two new ordinal preference updaters, and two alternative oracle-selection policies on top of the earlier CLIP-only oracle.</p>
+<p>All three slices share the same outer protocol: three held-out targets with manual captions, one repeat per target-policy cell, five rounds per run, four candidates per round, <code>fixed-per-candidate</code> seeds, a five-dimensional steering state, and a 512x512 Stable Diffusion v1.5 generation backend. The bundle contains 33 runs, 165 rounds, and 660 candidate rows in total.</p>
+<h3>H.1 Sampler Extension Slice</h3>
+<p>The sampler slice fixes the updater at <code>softmax_preference</code> and compares four broader search geometries: <code>diversity_shell</code>, <code>line_search</code>, <code>annealed_shell</code>, and <code>spherical_cover</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Sampler</th>
+<th style="text-align: right;">Final CLIP</th>
+<th style="text-align: right;">CLIP delta</th>
+<th style="text-align: right;">Final DINOv2</th>
+<th style="text-align: right;">DINOv2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>annealed_shell</code></td>
+<td style="text-align: right;">0.878</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">0.627</td>
+<td style="text-align: right;">0.110</td>
+</tr>
+<tr>
+<td><code>diversity_shell</code></td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">0.595</td>
+<td style="text-align: right;">0.127</td>
+</tr>
+<tr>
+<td><code>line_search</code></td>
+<td style="text-align: right;">0.878</td>
+<td style="text-align: right;">0.052</td>
+<td style="text-align: right;">0.660</td>
+<td style="text-align: right;">0.095</td>
+</tr>
+<tr>
+<td><code>spherical_cover</code></td>
+<td style="text-align: right;">0.881</td>
+<td style="text-align: right;">0.041</td>
+<td style="text-align: right;">0.668</td>
+<td style="text-align: right;">0.109</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: the sampler slice is competitive rather than decisive. <code>spherical_cover</code> finishes with the strongest final CLIP and DINOv2 scores, while <code>annealed_shell</code> remains competitive with both of the earlier diversity-forward baselines. The broader conclusion is that the proposal geometry remains a meaningful modeling choice: angular coverage and round-dependent shell narrowing both change the behavior of the same outer steering loop.</p>
+<h3>H.2 Preference-Model Extension Slice</h3>
+<p>The preference-model slice fixes the sampler at <code>diversity_shell</code> and compares four update rules: <code>softmax_preference</code>, <code>score_weighted_preference</code>, <code>borda_preference</code>, and <code>bradley_terry_preference</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Preference model</th>
+<th style="text-align: right;">Final CLIP</th>
+<th style="text-align: right;">CLIP delta</th>
+<th style="text-align: right;">Final DINOv2</th>
+<th style="text-align: right;">DINOv2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>borda_preference</code></td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.535</td>
+<td style="text-align: right;">-0.007</td>
+</tr>
+<tr>
+<td><code>bradley_terry_preference</code></td>
+<td style="text-align: right;">0.886</td>
+<td style="text-align: right;">0.088</td>
+<td style="text-align: right;">0.687</td>
+<td style="text-align: right;">0.150</td>
+</tr>
+<tr>
+<td><code>score_weighted_preference</code></td>
+<td style="text-align: right;">0.869</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.643</td>
+<td style="text-align: right;">0.180</td>
+</tr>
+<tr>
+<td><code>softmax_preference</code></td>
+<td style="text-align: right;">0.879</td>
+<td style="text-align: right;">0.033</td>
+<td style="text-align: right;">0.581</td>
+<td style="text-align: right;">0.026</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: the richer ordinal models do not all behave the same way. <code>bradley_terry_preference</code> is the strongest new updater in this small study, suggesting that a lightweight latent-utility fit can extract additional information from the ranked batch. <code>borda_preference</code> broadens the method family conceptually, but its weak DINOv2 result is an important warning that richer ordinal structure does not automatically imply stronger target recovery.</p>
+<h3>H.3 Oracle-Policy Extension Slice</h3>
+<p>The oracle slice fixes the steering loop at <code>annealed_shell + softmax_preference</code> and compares three hidden-target selection policies: CLIP-only, CLIP+DINO ensemble, and CLIP-plus-novelty bonus.</p>
+<table>
+<thead>
+<tr>
+<th>Oracle policy</th>
+<th style="text-align: right;">Final CLIP</th>
+<th style="text-align: right;">CLIP delta</th>
+<th style="text-align: right;">Final DINOv2</th>
+<th style="text-align: right;">DINOv2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLIP + DINO ensemble</td>
+<td style="text-align: right;">0.874</td>
+<td style="text-align: right;">0.063</td>
+<td style="text-align: right;">0.697</td>
+<td style="text-align: right;">0.267</td>
+</tr>
+<tr>
+<td>CLIP + novelty bonus</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.670</td>
+<td style="text-align: right;">0.113</td>
+</tr>
+<tr>
+<td>CLIP oracle</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.068</td>
+<td style="text-align: right;">0.659</td>
+<td style="text-align: right;">0.188</td>
+</tr>
+</tbody>
+</table>
+<p>Interpretation: the oracle itself is a modeling choice, not only evaluation plumbing. CLIP-only retains the strongest direct CLIP improvement, but the CLIP+DINO ensemble produces the strongest DINOv2 recovery by a wide margin. The novelty-bonus oracle keeps exploration pressure alive but does not dominate either metric here. The most defensible conclusion is therefore that hidden-target steering can be steered by different notions of similarity, and those choices materially change the convergence behavior observed by the same outer loop.</p>
+<h3>H.4 Interpretation Boundary</h3>
+<p>This bundle is intentionally exploratory.</p>
+<ol>
+<li>The target set is still very small.</li>
+<li>Each cell uses only one repeat per target.</li>
+<li>The oracle slice changes the hidden-target selection rule, not only the evaluation metric.</li>
+<li>The resulting comparisons should therefore be read as evidence that the framework can host richer method families and that those families matter, not as a final ranking of globally best policies.</li>
+</ol>
+<h2>Appendix I. Reproducibility and Artifact Notes</h2>
+<p>The submission package rests on repository-contained artifacts:</p>
+<ol>
+<li>A journal-style main manuscript.</li>
+<li>A preserved five-round qualitative case-study bundle with trace report and HTML walkthrough.</li>
+<li>A repeated minimal baseline matrix.</li>
+<li>A budget-normalized seed-policy slice.</li>
+<li>A fixed-sampler updater ablation.</li>
+<li>An oracle target-recovery bundle with preserved targets, runs, analysis, and derived figures.</li>
+<li>A repeated-seed multi-metric oracle bundle with preserved runs, tables, and derived figures.</li>
+<li>A human pairwise evaluation package with curated pairs and annotation materials.</li>
+<li>A sampler and feedback-model comparison slice with preserved runs, tables, and derived figures.</li>
+<li>Plateau-escape and stagnation-control oracle follow-ons with preserved runs and analysis summaries.</li>
+<li>A budget-matched incumbent-policy oracle slice with preserved summaries and a derived figure.</li>
+<li>Generated paper figures copied or built from repository-contained assets.</li>
+</ol>
+<p>The core reproducibility claim is artifact traceability. Each experimental bundle preserves runs, rounds, candidate rows, summaries, and derived analysis outputs under fixed protocols. The present appendix therefore supports the main text by documenting controlled evidence and submission packaging, not by introducing new scientific claims.</p></article></main>
+  </body>
+</html>
