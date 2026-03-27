@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import shutil
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -74,6 +75,15 @@ def _download(url: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
         return
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme == "file":
+        source_path = Path(urllib.request.url2pathname(parsed.path))
+        shutil.copy2(source_path, destination)
+        return
+    source_path = Path(url)
+    if source_path.exists():
+        shutil.copy2(source_path, destination)
+        return
     request = urllib.request.Request(
         url,
         headers={
@@ -84,8 +94,11 @@ def _download(url: str, destination: Path) -> None:
             )
         },
     )
-    with urllib.request.urlopen(request) as response, destination.open("wb") as handle:
-        shutil.copyfileobj(response, handle)
+    try:
+        with urllib.request.urlopen(request) as response, destination.open("wb") as handle:
+            shutil.copyfileobj(response, handle)
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"Failed to fetch target asset from {url}: {exc}") from exc
 
 
 class ClipOracle:

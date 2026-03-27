@@ -35,9 +35,11 @@ from app.samplers.line_search import LineSearchSampler
 from app.samplers.plateau_escape import PlateauEscapeSampler
 from app.samplers.quality_diversity_mix import QualityDiversityMixSampler
 from app.samplers.random_local import RandomLocalSampler
+from app.samplers.restart_bridge_mix import RestartBridgeMixSampler
 from app.samplers.spherical_cover import SphericalCoverSampler
 from app.samplers.two_scale_cover import TwoScaleCoverSampler
 from app.samplers.uncertainty import UncertaintyGuidedSampler
+from app.updaters.advantage_softmax_pref import AdvantageSoftmaxPreferenceUpdater
 from app.storage.repository import JsonRepository
 from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
 from app.updaters.borda_pref import BordaPreferenceUpdater
@@ -77,6 +79,7 @@ class Orchestrator:
             "spherical_cover": SphericalCoverSampler(),
             "two_scale_cover": TwoScaleCoverSampler(),
             "quality_diversity_mix": QualityDiversityMixSampler(),
+            "restart_bridge_mix": RestartBridgeMixSampler(),
         }
         self.updaters = {
             "winner_copy": WinnerCopyUpdater(),
@@ -89,6 +92,7 @@ class Orchestrator:
             "bradley_terry_preference": BradleyTerryPreferenceUpdater(),
             "challenger_mixture_preference": ChallengerMixturePreferenceUpdater(),
             "plackett_luce_preference": PlackettLucePreferenceUpdater(),
+            "advantage_softmax_preference": AdvantageSoftmaxPreferenceUpdater(),
         }
 
     @staticmethod

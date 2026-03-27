@@ -291,22 +291,41 @@ def build_site() -> None:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(render_page(source, mapping, files), encoding="utf-8")
     copy_static_assets()
+    copy_built_paper_html()
 
 
 def copy_static_assets() -> None:
     """Copy publishable image assets used by the Markdown docs into the site."""
 
-    for asset_root in (REPO_ROOT / "docs" / "assets",):
+    for asset_root in (
+        REPO_ROOT / "docs" / "assets",
+        REPO_ROOT / "paper" / "figures",
+        REPO_ROOT / "paper" / "assets",
+    ):
         if not asset_root.exists():
             continue
         for source in asset_root.rglob("*"):
             if not source.is_file():
                 continue
-            if source.suffix.lower() not in IMAGE_SUFFIXES:
+            if source.suffix.lower() not in IMAGE_SUFFIXES and source.suffix.lower() not in {".js"}:
                 continue
             destination = SITE_ROOT / source.relative_to(REPO_ROOT)
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
+
+
+def copy_built_paper_html() -> None:
+    """Copy the styled standalone paper HTML outputs into the site mirror."""
+
+    for source in (
+        REPO_ROOT / "paper" / "journal_manuscript.html",
+        REPO_ROOT / "paper" / "journal_appendix.html",
+    ):
+        if not source.exists():
+            continue
+        destination = SITE_ROOT / source.relative_to(REPO_ROOT)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
 
 
 if __name__ == "__main__":

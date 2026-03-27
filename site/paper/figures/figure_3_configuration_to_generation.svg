@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">YAML configuration to generation flow</title>
+  <desc id="desc">Diagram showing how per-session YAML is loaded into StrategyConfig and affects sampler, updater, and image generation.</desc>
+  <style>
+    .bg { fill: #fbfaf6; }
+    .box { fill: #ffffff; stroke: #334155; stroke-width: 2.4; rx: 18; ry: 18; }
+    .yaml { fill: #fff5df; }
+    .cfg { fill: #eef4ff; }
+    .gen { fill: #eaf7ee; }
+    .title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .label { font: 700 18px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .body { font: 15px 'Segoe UI', Arial, sans-serif; fill: #344054; }
+    .small { font: 14px 'Segoe UI', Arial, sans-serif; fill: #475467; }
+    .arrow { stroke: #4c6284; stroke-width: 3.3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#4c6284"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="620"/>
+  <text class="title" x="60" y="56">Per-Session YAML to Runtime Behavior</text>
+
+  <rect class="box yaml" x="60" y="120" width="270" height="360"/>
+  <text class="label" x="90" y="158">Editable YAML</text>
+  <text class="body" x="90" y="194">sampler</text>
+  <text class="body" x="90" y="222">updater</text>
+  <text class="body" x="90" y="250">feedback_mode</text>
+  <text class="body" x="90" y="278">seed_policy</text>
+  <text class="body" x="90" y="306">candidate_count</text>
+  <text class="body" x="90" y="334">trust_radius</text>
+  <text class="body" x="90" y="362">anchor_strength</text>
+  <text class="body" x="90" y="390">guidance_scale</text>
+  <text class="body" x="90" y="418">num_inference_steps</text>
+  <text class="body" x="90" y="446">image_size and model_name</text>
+
+  <rect class="box cfg" x="410" y="180" width="280" height="240"/>
+  <text class="label" x="440" y="218">StrategyConfig</text>
+  <text class="body" x="440" y="254">Validated at session creation</text>
+  <text class="body" x="440" y="282">Stored as immutable session snapshot</text>
+  <text class="body" x="440" y="310">Read by orchestrator for every round</text>
+  <text class="body" x="440" y="338">Prevents config drift inside a session</text>
+
+  <rect class="box cfg" x="770" y="80" width="320" height="150"/>
+  <text class="label" x="800" y="118">Sampling and Update Behavior</text>
+  <text class="body" x="800" y="154">Sampler, updater, feedback mode,</text>
+  <text class="body" x="800" y="182">seed policy, candidate count</text>
+
+  <rect class="box gen" x="770" y="280" width="320" height="190"/>
+  <text class="label" x="800" y="318">Generation Behavior</text>
+  <text class="body" x="800" y="354">Model source</text>
+  <text class="body" x="800" y="382">Image size</text>
+  <text class="body" x="800" y="410">Guidance scale and denoising steps</text>
+  <text class="body" x="800" y="438">Steering offset strength</text>
+
+  <rect class="box gen" x="410" y="500" width="680" height="80"/>
+  <text class="label" x="440" y="540">Result</text>
+  <text class="body" x="510" y="540">Per-session YAML changes the actual images, candidate proposal pattern, feedback controls, and seed behavior.</text>
+
+  <path class="arrow" d="M330 300 L410 300"/>
+  <path class="arrow" d="M690 250 L770 180"/>
+  <path class="arrow" d="M690 350 L770 350"/>
+  <path class="arrow" d="M550 420 L550 500"/>
+</svg>

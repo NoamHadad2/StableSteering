@@ -141,6 +141,7 @@ Supported values:
 - `spherical_cover`
 - `two_scale_cover`
 - `quality_diversity_mix`
+- `restart_bridge_mix`
 
 Effect:
 
@@ -161,6 +162,7 @@ Related code:
 - [spherical_cover.py](../app/samplers/spherical_cover.py)
 - [two_scale_cover.py](../app/samplers/two_scale_cover.py)
 - [quality_diversity_mix.py](../app/samplers/quality_diversity_mix.py)
+- [restart_bridge_mix.py](../app/samplers/restart_bridge_mix.py)
 
 ### `updater`
 
@@ -178,6 +180,7 @@ Supported values:
 - `bradley_terry_preference`
 - `challenger_mixture_preference`
 - `plackett_luce_preference`
+- `advantage_softmax_preference`
 
 Effect:
 
@@ -196,6 +199,7 @@ Related code:
 - [bradley_terry_pref.py](../app/updaters/bradley_terry_pref.py)
 - [challenger_mixture.py](../app/updaters/challenger_mixture.py)
 - [plackett_luce_pref.py](../app/updaters/plackett_luce_pref.py)
+- [advantage_softmax_pref.py](../app/updaters/advantage_softmax_pref.py)
 
 ### `feedback_mode`
 
@@ -251,14 +255,34 @@ Notes:
 
 Describes the steering representation family.
 
-Current value used by the MVP:
+Supported values:
 
 - `low_dimensional`
+- `content_masked`
+- `token_factorized`
+- `token_vector_field`
 
 Effect:
 
-- selects the steering representation contract used by generation
-- generation now explicitly routes through the `low_dimensional` steering path and rejects unsupported modes during rendering
+- selects how the low-dimensional steering state is injected into prompt embeddings during generation
+- changes whether the same hidden-space offset is shared by all tokens or modulated across content tokens
+
+Implemented behaviors:
+
+- `low_dimensional`
+  applies one shared hidden-space offset to every prompt token
+- `content_masked`
+  applies the same hidden-space offset only to content-bearing tokens and downweights special or padded tokens
+- `token_factorized`
+  applies a low-rank token-dependent offset so different prompt tokens can receive different steering perturbations
+- `token_vector_field`
+  applies a full token-by-hidden vector field so each content token receives its own steering vector rather than only a scaled copy of one shared hidden direction
+
+Notes:
+
+- all four modes use the same session-level steering vector `z_t`
+- the main difference is the operator that maps `z_t` into prompt-embedding space
+- in the current compact oracle comparison, `content_masked` gave the strongest final CLIP score, while `low_dimensional` and `token_factorized` remained strongest on final DINOv2 and recovery delta
 
 ### `steering_dimension`
 
@@ -279,7 +303,7 @@ Effect:
 Notes:
 
 - this is a per-session YAML setting
-- the current implementation still uses `low_dimensional` steering mode, but the dimension inside that mode is now configurable
+- the same `steering_dimension` applies across `low_dimensional`, `content_masked`, `token_factorized`, and `token_vector_field`
 
 ### `candidate_count`
 
@@ -641,6 +665,32 @@ Use this when:
 - you want later rounds to keep proposing serious challengers instead of drifting into incumbent-only repetition
 - you want score-rich feedback to update the next state with a softmax-weighted preference aggregation
 - you are running oracle-style or analyst-style sessions where visible plateau behavior matters as much as final best score
+
+### Restart-Bridge Session
+
+```yaml
+sampler: restart_bridge_mix
+updater: advantage_softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+stagnation_patience: 1
+stagnation_trust_radius_scale: 1.2
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 12
+model_name: runwayml/stable-diffusion-v1-5
+```
+
+Use this when:
+
+- you want one round to mix incumbent-adjacent refinements with partial restarts into new regions
+- you want feedback to reward challengers that beat the incumbent without discarding the incumbent entirely
+- you are diagnosing late-round plateauing and want a softer alternative to hard incumbent cooldown
 
 ### Annealed Shell Session
 

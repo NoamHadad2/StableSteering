@@ -54,10 +54,10 @@ This folder contains developer-facing helper scripts.
   Copies and prepares paper figures from repository-contained experiment bundles into `paper/figures/`.
 
 - `build_journal_manuscript_html.py`
-  Renders the self-contained journal manuscript HTML with justified text and MathJax equations.
+  Renders the self-contained journal manuscript HTML with justified text and a bundled local MathJax runtime for offline equation rendering.
 
 - `build_journal_appendix_html.py`
-  Renders the self-contained journal appendix HTML with justified text and MathJax equations.
+  Renders the self-contained journal appendix HTML with justified text and a bundled local MathJax runtime for offline equation rendering.
 
 - `build_paper_html.py`
   Renders the older Markdown manuscript draft into a standalone HTML document under `paper/`.

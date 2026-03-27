@@ -1,0 +1,70 @@
+suite_name: budget_matched_direct_baselines
+description: Budget-matched direct baseline comparison for hidden-target refinement.
+oracle_model: openai/clip-vit-base-patch32
+evaluation_models:
+- id: openai/clip-vit-base-patch32
+  short_name: clip
+  label: CLIP cosine
+  kind: clip
+- id: facebook/dinov2-base
+  short_name: dinov2
+  label: DINOv2 cosine
+  kind: dinov2
+repeats_per_target: 1
+max_rounds: 1
+fixed_conditions:
+  sampler: quality_diversity_mix
+  updater: bradley_terry_preference
+  feedback_mode: top_k
+  seed_policy: fixed-per-candidate
+  steering_mode: content_masked
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+methods:
+- id: prompt_best_of_budget
+  label: Prompt-only best-of-budget
+  description: Same caption for all rounds, independent seed resampling, keep the
+    best image seen so far.
+- id: prompt_modifier_search
+  label: Heuristic prompt-rewrite search
+  description: Maintain the current prompt and propose prompt-modifier variants under
+    the same per-round image budget.
+- id: no_update_resampling
+  label: No-update resampling
+  description: Use the same steering-direction sampler as StableSteering but reset
+    the state each round and do not update it from feedback.
+- id: stablesteering_best
+  label: StableSteering best current policy
+  description: Use the current strongest paper policy under the same visible-candidate
+    budget.
+prompt_rewrite_modifiers:
+- with cleaner composition and stronger subject separation
+- with more natural lighting and clearer depth
+- with higher realism and sharper fine details
+- as a polished editorial photograph
+- with stronger geometry and more coherent structure
+- with a cleaner background and reduced clutter
+- with more vivid atmosphere and tonal contrast
+- with improved material detail and surface realism
+- with stronger perspective clarity and spatial layering
+- with a more cinematic but realistic framing
+- with clearer edges and more stable object structure
+- with better balance between subject and environment
+- with more faithful color relationships and lighting cues
+- with improved depth separation and local detail
+- with a more coherent scene layout and visual hierarchy
+targets:
+- id: mountain_lake
+  label: Mountain lake landscape
+  image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/Mountain%20lake.jpg
+  caption: A serene mountain lake bordered by evergreen forest with snow-capped peaks
+    in the background under clear daylight.
+  negative_prompt: low detail, blurry, distorted mountains, text, watermark, people,
+    buildings
+  attribution: Wikimedia Commons, source page File:Mountain lake.jpg

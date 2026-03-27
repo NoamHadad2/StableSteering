@@ -4,9 +4,12 @@ import math
 from pathlib import Path
 import sys
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from app.core.schema import Candidate, FeedbackRequest, FeedbackType, Session, StrategyConfig
+from app.core.schema import Candidate, FeedbackRequest, FeedbackType, Session, SteeringMode, StrategyConfig
+from app.engine.generation import DiffusersGenerationEngine
 from app.feedback.normalization import normalize_feedback
 from app.samplers.annealed_shell import AnnealedShellSampler
 from app.samplers.diversity_shell import DiversityShellSampler
@@ -14,6 +17,7 @@ from app.samplers.line_search import LineSearchSampler
 from app.samplers.plateau_escape import PlateauEscapeSampler
 from app.samplers.quality_diversity_mix import QualityDiversityMixSampler
 from app.samplers.spherical_cover import SphericalCoverSampler
+from app.samplers.restart_bridge_mix import RestartBridgeMixSampler
 from app.samplers.two_scale_cover import TwoScaleCoverSampler
 from app.updaters.borda_pref import BordaPreferenceUpdater
 from app.updaters.bradley_terry_pref import BradleyTerryPreferenceUpdater
@@ -22,6 +26,7 @@ from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
 from app.updaters.plackett_luce_pref import PlackettLucePreferenceUpdater
 from app.updaters.score_weighted import ScoreWeightedPreferenceUpdater
 from app.updaters.softmax_pref import SoftmaxPreferenceUpdater
+from app.updaters.advantage_softmax_pref import AdvantageSoftmaxPreferenceUpdater
 from run_paper_method_extension_comparison import _apply_oracle_policy
 from run_paper_oracle_progress_diagnosis import PolicySpec, _oracle_score_candidates
 from run_paper_oracle_multimetric_repeated import _eligible_oracle_candidates, _oracle_feedback_request
@@ -173,6 +178,20 @@ def test_quality_diversity_mix_sampler_covers_multiple_emitter_roles() -> None:
     assert max(distances) - min(distances) > 0.15
 
 
+def test_restart_bridge_mix_sampler_includes_partial_restart_candidates() -> None:
+    session = _session(trust_radius=0.7, candidate_count=5, current_z=[0.32, 0.08, 0.0, 0.0, 0.0])
+    sampler = RestartBridgeMixSampler()
+
+    candidates = sampler.propose(session, seed=47)
+    roles = {candidate.sampler_role for candidate in candidates}
+    norms = [math.sqrt(sum(value * value for value in candidate.z)) for candidate in candidates]
+
+    assert "partial_restart" in roles
+    assert "lateral_restart" in roles
+    assert min(norms) < max(norms)
+    assert any(candidate.generation_params["retain_fraction"] < 0.5 for candidate in candidates)
+
+
 def test_score_weighted_preference_uses_ratings_to_form_weighted_centroid() -> None:
     session = _session(trust_radius=0.7, current_z=[0.0, 0.0])
     candidates = [
@@ -310,6 +329,77 @@ def test_softmax_preference_uses_rankings_when_ratings_are_unavailable() -> None
     assert summary["winner_candidate_id"] == "c2"
     assert updated[0] > -0.2
     assert updated[1] > 0.0
+
+
+def test_advantage_softmax_preference_prefers_candidates_beating_incumbent() -> None:
+    session = _session(trust_radius=0.8, current_z=[0.28, 0.04])
+    candidates = [
+        Candidate(
+            id="incumbent",
+            round_id="rnd_test",
+            candidate_index=0,
+            z=[0.28, 0.04],
+            sampler_role="incumbent",
+            seed=1,
+            generation_params={"carried_forward": True},
+        ),
+        _candidate("challenger_a", [0.52, 0.08]),
+        _candidate("challenger_b", [0.15, 0.46]),
+    ]
+    feedback = normalize_feedback(
+        "rnd_test",
+        FeedbackRequest(
+            feedback_type=FeedbackType.scalar_rating,
+            payload={"ratings": {"incumbent": 3.0, "challenger_a": 5.0, "challenger_b": 4.0}},
+        ),
+    )
+
+    updated, summary = AdvantageSoftmaxPreferenceUpdater().update(session, candidates, feedback)
+
+    assert summary["updater"] == "advantage_softmax_preference"
+    assert summary["positive_advantage_present"] is True
+    assert updated[0] > session.current_z[0]
+
+
+def test_oracle_directional_mix_penalizes_incumbent_when_challenger_moves_toward_target() -> None:
+    policy = PolicySpec(
+        id="restart_directional",
+        label="Restart directional mix",
+        sampler="restart_bridge_mix",
+        updater="bradley_terry_preference",
+        feedback_mode="top_k",
+        oracle_policy="clip_directional_mix",
+    )
+    scored_candidates = [
+        {
+            "candidate_id": "incumbent",
+            "clip_score": 0.80,
+            "dinov2_score": 0.50,
+            "novelty_to_incumbent": 0.0,
+            "carried_forward": True,
+            "_clip_embedding": [0.8, 0.2],
+        },
+        {
+            "candidate_id": "challenger",
+            "clip_score": 0.79,
+            "dinov2_score": 0.52,
+            "novelty_to_incumbent": 0.2,
+            "carried_forward": False,
+            "_clip_embedding": [0.95, 0.25],
+        },
+    ]
+
+    _oracle_score_candidates(
+        scored_candidates,
+        policy=policy,
+        margin_epsilon=0.01,
+        target_clip_embedding=[1.0, 0.3],
+        incumbent_clip_embedding=[0.8, 0.2],
+    )
+
+    challenger_score = next(row["oracle_score"] for row in scored_candidates if row["candidate_id"] == "challenger")
+    incumbent_score = next(row["oracle_score"] for row in scored_candidates if row["candidate_id"] == "incumbent")
+    assert challenger_score > incumbent_score
 
 
 def test_borda_preference_uses_full_ranking_order() -> None:
@@ -522,6 +612,125 @@ def test_pareto_frontier_oracle_can_choose_balanced_candidate_over_clip_only() -
 
     winner = max(scored, key=lambda row: float(row["oracle_score"]))
     assert winner["candidate_id"] == "balanced"
+
+
+def test_low_dimensional_steering_applies_same_offset_to_all_tokens() -> None:
+    torch = pytest.importorskip("torch")
+    engine = DiffusersGenerationEngine(model_source="dummy")
+    engine._torch = torch
+    prompt_embeds = torch.zeros((1, 6, 8), dtype=torch.float32)
+
+    offset = engine._steering_offset(
+        prompt_embeds,
+        [0.4, -0.2],
+        0.7,
+        steering_mode=SteeringMode.low_dimensional,
+    )
+
+    assert torch.allclose(offset[:, 0, :], offset[:, 1, :])
+    assert torch.allclose(offset[:, 2, :], offset[:, 5, :])
+
+
+def test_content_masked_steering_suppresses_special_and_padding_tokens() -> None:
+    torch = pytest.importorskip("torch")
+    engine = DiffusersGenerationEngine(model_source="dummy")
+    engine._torch = torch
+    prompt_embeds = torch.zeros((1, 6, 8), dtype=torch.float32)
+
+    class DummyTokenizer:
+        bos_token_id = 101
+        eos_token_id = 102
+        pad_token_id = 0
+
+    token_inputs = {
+        "input_ids": torch.tensor([[101, 11, 12, 13, 102, 0]], dtype=torch.long),
+        "attention_mask": torch.tensor([[1, 1, 1, 1, 1, 0]], dtype=torch.float32),
+    }
+
+    offset = engine._steering_offset(
+        prompt_embeds,
+        [0.3],
+        0.8,
+        steering_mode=SteeringMode.content_masked,
+        token_inputs=token_inputs,
+        tokenizer=DummyTokenizer(),
+    )
+
+    assert torch.allclose(offset[:, 0, :], torch.zeros_like(offset[:, 0, :]))
+    assert torch.allclose(offset[:, 4, :], torch.zeros_like(offset[:, 4, :]))
+    assert torch.allclose(offset[:, 5, :], torch.zeros_like(offset[:, 5, :]))
+    assert torch.norm(offset[:, 2, :]) > 0.0
+
+
+def test_token_factorized_steering_varies_across_tokens() -> None:
+    torch = pytest.importorskip("torch")
+    engine = DiffusersGenerationEngine(model_source="dummy")
+    engine._torch = torch
+    prompt_embeds = torch.zeros((1, 6, 8), dtype=torch.float32)
+
+    class DummyTokenizer:
+        bos_token_id = 101
+        eos_token_id = 102
+        pad_token_id = 0
+
+    token_inputs = {
+        "input_ids": torch.tensor([[101, 11, 12, 13, 102, 0]], dtype=torch.long),
+        "attention_mask": torch.tensor([[1, 1, 1, 1, 1, 0]], dtype=torch.float32),
+    }
+
+    offset = engine._steering_offset(
+        prompt_embeds,
+        [0.5, -0.15],
+        0.75,
+        steering_mode=SteeringMode.token_factorized,
+        token_inputs=token_inputs,
+        tokenizer=DummyTokenizer(),
+    )
+
+    assert not torch.allclose(offset[:, 1, :], offset[:, 2, :])
+    assert not torch.allclose(offset[:, 2, :], offset[:, 3, :])
+    assert torch.allclose(offset[:, 5, :], torch.zeros_like(offset[:, 5, :]))
+
+
+def test_token_vector_field_assigns_distinct_hidden_vectors_per_token() -> None:
+    torch = pytest.importorskip("torch")
+    engine = DiffusersGenerationEngine(model_source="dummy")
+    engine._torch = torch
+    prompt_embeds = torch.zeros((1, 6, 8), dtype=torch.float32)
+
+    class DummyTokenizer:
+        bos_token_id = 101
+        eos_token_id = 102
+        pad_token_id = 0
+
+    token_inputs = {
+        "input_ids": torch.tensor([[101, 11, 12, 13, 102, 0]], dtype=torch.long),
+        "attention_mask": torch.tensor([[1, 1, 1, 1, 1, 0]], dtype=torch.float32),
+    }
+
+    offset = engine._steering_offset(
+        prompt_embeds,
+        [0.45, -0.2, 0.1],
+        0.8,
+        steering_mode=SteeringMode.token_vector_field,
+        token_inputs=token_inputs,
+        tokenizer=DummyTokenizer(),
+    )
+
+    token_1 = offset[0, 1, :]
+    token_2 = offset[0, 2, :]
+    token_3 = offset[0, 3, :]
+    cosine_12 = torch.dot(token_1, token_2) / (torch.norm(token_1) * torch.norm(token_2))
+    cosine_23 = torch.dot(token_2, token_3) / (torch.norm(token_2) * torch.norm(token_3))
+
+    assert torch.norm(token_1) > 0.0
+    assert torch.norm(token_2) > 0.0
+    assert torch.norm(token_3) > 0.0
+    assert cosine_12 < 0.995
+    assert cosine_23 < 0.995
+    assert torch.allclose(offset[:, 0, :], torch.zeros_like(offset[:, 0, :]))
+    assert torch.allclose(offset[:, 4, :], torch.zeros_like(offset[:, 4, :]))
+    assert torch.allclose(offset[:, 5, :], torch.zeros_like(offset[:, 5, :]))
 
 
 def _mean_distance(candidates: list[Candidate], center: list[float]) -> float:

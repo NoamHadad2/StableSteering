@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import random
 import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -106,6 +107,22 @@ def _safe_std(values: list[float]) -> float:
     return math.sqrt(sum((value - mean) ** 2 for value in values) / (len(values) - 1))
 
 
+def _bootstrap_mean_ci(values: list[float], *, seed: int = 0, samples: int = 2000) -> tuple[float, float]:
+    if not values:
+        return (0.0, 0.0)
+    if len(values) == 1:
+        return (values[0], values[0])
+    rng = random.Random(seed)
+    sample_means: list[float] = []
+    for _ in range(samples):
+        drawn = [values[rng.randrange(len(values))] for _ in range(len(values))]
+        sample_means.append(sum(drawn) / len(drawn))
+    sample_means.sort()
+    lo_index = max(0, int(0.025 * samples) - 1)
+    hi_index = min(samples - 1, int(0.975 * samples) - 1)
+    return (sample_means[lo_index], sample_means[hi_index])
+
+
 def _build_metric_objects(metric_specs: list[MetricSpec], oracle_model_id: str) -> dict[str, Any]:
     metric_objects: dict[str, Any] = {}
     for spec in metric_specs:
@@ -208,6 +225,10 @@ def _build_dual_metric_svg(curve_rows: list[dict[str, Any]], output_path: Path) 
     clip_base = [float(row["mean_baseline_clip"]) for row in curve_rows]
     dino_scores = [float(row["mean_best_dinov2"]) for row in curve_rows]
     dino_base = [float(row["mean_baseline_dinov2"]) for row in curve_rows]
+    clip_ci_lows = [float(row["ci_low_best_clip"]) for row in curve_rows]
+    clip_ci_highs = [float(row["ci_high_best_clip"]) for row in curve_rows]
+    dino_ci_lows = [float(row["ci_low_best_dinov2"]) for row in curve_rows]
+    dino_ci_highs = [float(row["ci_high_best_dinov2"]) for row in curve_rows]
 
     def x_pos(round_index: int) -> float:
         if len(rounds) == 1:
@@ -219,13 +240,18 @@ def _build_dual_metric_svg(curve_rows: list[dict[str, Any]], output_path: Path) 
             return y0 + panel_height / 2
         return y0 + (1 - ((score - lo) / (hi - lo))) * panel_height
 
-    clip_lo = min(min(clip_scores), min(clip_base)) - 0.02
-    clip_hi = max(max(clip_scores), max(clip_base)) + 0.02
-    dino_lo = min(min(dino_scores), min(dino_base)) - 0.02
-    dino_hi = max(max(dino_scores), max(dino_base)) + 0.02
+    clip_lo = min(min(clip_scores), min(clip_base), min(clip_ci_lows)) - 0.02
+    clip_hi = max(max(clip_scores), max(clip_base), max(clip_ci_highs)) + 0.02
+    dino_lo = min(min(dino_scores), min(dino_base), min(dino_ci_lows)) - 0.02
+    dino_hi = max(max(dino_scores), max(dino_base), max(dino_ci_highs)) + 0.02
 
     def series(points: list[float], y0: float, lo: float, hi: float) -> str:
         return " ".join(f"{x_pos(r):.1f},{y_pos(v, y0, lo, hi):.1f}" for r, v in zip(rounds, points, strict=True))
+
+    def band(points_low: list[float], points_high: list[float], y0: float, lo: float, hi: float) -> str:
+        upper = [f"{x_pos(r):.1f},{y_pos(v, y0, lo, hi):.1f}" for r, v in zip(rounds, points_high, strict=True)]
+        lower = [f"{x_pos(r):.1f},{y_pos(v, y0, lo, hi):.1f}" for r, v in zip(reversed(rounds), reversed(points_low), strict=True)]
+        return " ".join(upper + lower)
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">Repeated-seed multi-metric oracle study</title>
@@ -234,6 +260,8 @@ def _build_dual_metric_svg(curve_rows: list[dict[str, Any]], output_path: Path) 
     .bg {{ fill: #fbfaf6; }}
     .axis {{ stroke: #475467; stroke-width: 2.1; }}
     .grid {{ stroke: #d9cfbf; stroke-width: 1.1; }}
+    .clipBand {{ fill: #8b4513; opacity: 0.12; }}
+    .dinoBand {{ fill: #1f6f8b; opacity: 0.12; }}
     .clip {{ fill: none; stroke: #8b4513; stroke-width: 3.8; }}
     .clipBase {{ fill: none; stroke: #8b4513; stroke-width: 2.2; stroke-dasharray: 10 7; opacity: 0.65; }}
     .dino {{ fill: none; stroke: #1f6f8b; stroke-width: 3.8; }}
@@ -245,11 +273,11 @@ def _build_dual_metric_svg(curve_rows: list[dict[str, Any]], output_path: Path) 
   </style>
   <rect class="bg" width="{width}" height="{height}"/>
   <text class="title" x="70" y="44">Repeated-Seed Multi-Metric Oracle Study</text>
-  <text class="subtitle" x="70" y="70">Mean best-candidate similarity over rounds with three repeats per target.</text>
+  <text class="subtitle" x="70" y="70">Mean best-candidate similarity over rounds with 95% bootstrap confidence intervals.</text>
 """
-    for y0, lo, hi, panel_title, score_points, base_points, score_class, base_class in [
-        (top_panel_y, clip_lo, clip_hi, "CLIP cosine to target", clip_scores, clip_base, "clip", "clipBase"),
-        (bottom_panel_y, dino_lo, dino_hi, "DINOv2 cosine to target", dino_scores, dino_base, "dino", "dinoBase"),
+    for y0, lo, hi, panel_title, score_points, base_points, ci_low, ci_high, band_class, score_class, base_class in [
+        (top_panel_y, clip_lo, clip_hi, "CLIP cosine to target", clip_scores, clip_base, clip_ci_lows, clip_ci_highs, "clipBand", "clip", "clipBase"),
+        (bottom_panel_y, dino_lo, dino_hi, "DINOv2 cosine to target", dino_scores, dino_base, dino_ci_lows, dino_ci_highs, "dinoBand", "dino", "dinoBase"),
     ]:
         svg += f'  <text class="panel" x="{left}" y="{y0 - 18}">{panel_title}</text>\n'
         svg += f'  <line class="axis" x1="{left}" y1="{y0}" x2="{left}" y2="{y0 + panel_height}"/>\n'
@@ -263,6 +291,7 @@ def _build_dual_metric_svg(curve_rows: list[dict[str, Any]], output_path: Path) 
             x = x_pos(round_index)
             svg += f'  <line class="grid" x1="{x:.1f}" y1="{y0}" x2="{x:.1f}" y2="{y0 + panel_height}"/>\n'
             svg += f'  <text class="tick" x="{x:.1f}" y="{y0 + panel_height + 22}" text-anchor="middle">{round_index}</text>\n'
+        svg += f'  <polygon class="{band_class}" points="{band(ci_low, ci_high, y0, lo, hi)}"/>\n'
         svg += f'  <polyline class="{base_class}" points="{series(base_points, y0, lo, hi)}"/>\n'
         svg += f'  <polyline class="{score_class}" points="{series(score_points, y0, lo, hi)}"/>\n'
     svg += "</svg>\n"
@@ -431,7 +460,7 @@ def _run_target_repeat(
     return {"summary": summary, "round_rows": round_rows, "candidate_rows": candidate_rows}
 
 
-def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_rows: list[dict[str, Any]], metric_specs: list[MetricSpec]) -> None:
+def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_rows: list[dict[str, Any]], metric_specs: list[MetricSpec], suite: dict[str, Any]) -> None:
     analysis_root = output_dir / "analysis"
     rounds_by_index: dict[int, list[dict[str, Any]]] = {}
     for row in round_rows:
@@ -444,14 +473,25 @@ def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_r
         for spec in metric_specs:
             best_values = [float(row[f"best_{spec.short_name}"]) for row in rows]
             baseline_values = [float(row[f"baseline_{spec.short_name}"]) for row in rows]
+            ci_low, ci_high = _bootstrap_mean_ci(best_values, seed=(round_index * 1000) + len(best_values))
             record[f"mean_best_{spec.short_name}"] = round(_safe_mean(best_values), 6)
             record[f"std_best_{spec.short_name}"] = round(_safe_std(best_values), 6)
             record[f"mean_baseline_{spec.short_name}"] = round(_safe_mean(baseline_values), 6)
+            record[f"ci_low_best_{spec.short_name}"] = round(ci_low, 6)
+            record[f"ci_high_best_{spec.short_name}"] = round(ci_high, 6)
         curve_rows.append(record)
 
     curve_fields = ["round_index"]
     for spec in metric_specs:
-        curve_fields.extend([f"mean_best_{spec.short_name}", f"std_best_{spec.short_name}", f"mean_baseline_{spec.short_name}"])
+        curve_fields.extend(
+            [
+                f"mean_best_{spec.short_name}",
+                f"std_best_{spec.short_name}",
+                f"mean_baseline_{spec.short_name}",
+                f"ci_low_best_{spec.short_name}",
+                f"ci_high_best_{spec.short_name}",
+            ]
+        )
     _write_csv(analysis_root / "round_curve.csv", curve_rows, curve_fields)
     _build_dual_metric_svg(curve_rows, analysis_root / "oracle_multimetric_repeated.svg")
 
@@ -481,9 +521,23 @@ def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_r
         baselines = [float(row[f"baseline_{spec.short_name}"]) for row in target_rows]
         finals = [float(row[f"final_best_{spec.short_name}"]) for row in target_rows]
         deltas = [float(row[f"delta_{spec.short_name}"]) for row in target_rows]
+        final_ci_low, final_ci_high = _bootstrap_mean_ci(finals, seed=100 + len(finals))
+        delta_ci_low, delta_ci_high = _bootstrap_mean_ci(deltas, seed=200 + len(deltas))
         lines.append(
-            f"- {spec.label}: baseline `{_safe_mean(baselines):.3f}`, final `{_safe_mean(finals):.3f}`, delta `{_safe_mean(deltas):.3f}` (sd `{_safe_std(deltas):.3f}`)"
+            f"- {spec.label}: baseline `{_safe_mean(baselines):.3f}`, final `{_safe_mean(finals):.3f}` "
+            f"(95% CI `{final_ci_low:.3f}` to `{final_ci_high:.3f}`), delta `{_safe_mean(deltas):.3f}` "
+            f"(95% CI `{delta_ci_low:.3f}` to `{delta_ci_high:.3f}`; sd `{_safe_std(deltas):.3f}`)"
         )
+
+    dataset = suite.get("dataset", {})
+    candidate_count = int(suite.get("fixed_conditions", {}).get("candidate_count", 0))
+    dataset_block = [
+        f"- dataset: `{dataset.get('name', 'unspecified')}`",
+        f"- source: `{dataset.get('source', 'unspecified')}`",
+        f"- split: `{dataset.get('split', 'unspecified')}`",
+        f"- selected targets: `{dataset.get('selected_target_count', len(by_target))}`",
+        f"- total candidates evaluated: `{len(round_rows) * candidate_count}`",
+    ]
 
     target_table = "\n".join(
         f"| {row['target_label']} | {row['repeats']} | "
@@ -496,8 +550,10 @@ def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_r
     )
     summary_md = (
         "# Repeated-Seed Multi-Metric Oracle Analysis\n\n"
-        "This study repeats the oracle target-recovery protocol three times per target and evaluates the resulting trajectories under two pretrained image-embedding families.\n\n"
-        "## Scope\n\n"
+        "This study repeats the oracle target-recovery protocol on a deterministic public image-caption subset and evaluates the resulting trajectories under two pretrained image-embedding families.\n\n"
+        "## Dataset and scope\n\n"
+        + "\n".join(dataset_block)
+        + "\n"
         f"- targets: `{len(by_target)}`\n"
         f"- repeats per target: `{len(target_rows) // max(1, len(by_target))}`\n"
         f"- total runs: `{len(target_rows)}`\n"
@@ -509,6 +565,7 @@ def _build_analysis(output_dir: Path, target_rows: list[dict[str, Any]], round_r
         + "\n\n## Interpretation boundary\n\n"
         "- CLIP remains the oracle selection metric.\n"
         "- DINOv2 is added as an independent evaluation metric rather than an oracle.\n"
+        "- Confidence intervals are bootstrapped over run-level outcomes.\n"
         "- Repeated seeds reduce the chance that the observed trend is a single-session artifact.\n"
         "- The study is still a proxy target-recovery evaluation, not a human-preference study.\n\n"
         "## Figure\n\n![Repeated-seed multi-metric oracle convergence](oracle_multimetric_repeated.svg)\n"
@@ -583,7 +640,7 @@ def main() -> int:
             "backend": args.backend,
         },
     )
-    _build_analysis(output_dir, target_rows, round_rows, metric_specs)
+    _build_analysis(output_dir, target_rows, round_rows, metric_specs, suite)
     _write_text(
         output_dir / "README.md",
         (

@@ -41,6 +41,8 @@ Core empirical artifacts:
 - oracle target-recovery analysis: [results/oracle_target_recovery/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_target_recovery\analysis\analysis_summary.md)
 - repeated multi-metric oracle bundle: [results/oracle_multimetric_repeated/README.md](E:\Projects\StableSteering\paper\results\oracle_multimetric_repeated\README.md)
 - repeated multi-metric oracle analysis: [results/oracle_multimetric_repeated/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_multimetric_repeated\analysis\analysis_summary.md)
+- budget-matched direct baseline bundle: [results/budget_matched_direct_baselines/README.md](E:\Projects\StableSteering\paper\results\budget_matched_direct_baselines\README.md)
+- budget-matched direct baseline analysis: [results/budget_matched_direct_baselines/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\budget_matched_direct_baselines\analysis\analysis_summary.md)
 - plateau-escape oracle bundle: [results/oracle_plateau_escape/README.md](E:\Projects\StableSteering\paper\results\oracle_plateau_escape\README.md)
 - plateau-escape oracle analysis: [results/oracle_plateau_escape/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_plateau_escape\analysis\analysis_summary.md)
 - stagnation-control oracle bundle: [results/oracle_plateau_escape_stagnation_control/README.md](E:\Projects\StableSteering\paper\results\oracle_plateau_escape_stagnation_control\README.md)
@@ -57,12 +59,19 @@ Core empirical artifacts:
 - oracle progress follow-up analysis: [results/oracle_progress_followup/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_progress_followup\analysis\analysis_summary.md)
 - inspired-method oracle bundle: [results/oracle_inspired_methods/README.md](E:\Projects\StableSteering\paper\results\oracle_inspired_methods\README.md)
 - inspired-method oracle analysis: [results/oracle_inspired_methods/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_inspired_methods\analysis\analysis_summary.md)
+- oracle plateau reformulation bundle: [results/oracle_plateau_reformulation/README.md](E:\Projects\StableSteering\paper\results\oracle_plateau_reformulation\README.md)
+- oracle plateau reformulation analysis: [results/oracle_plateau_reformulation/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_plateau_reformulation\analysis\analysis_summary.md)
+- caption-source and multi-metric oracle bundle: [results/oracle_caption_metric_extension/README.md](E:\Projects\StableSteering\paper\results\oracle_caption_metric_extension\README.md)
+- caption-source and multi-metric oracle analysis: [results/oracle_caption_metric_extension/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_caption_metric_extension\analysis\analysis_summary.md)
+- steering-mode comparison bundle: [results/steering_mode_comparison/README.md](E:\Projects\StableSteering\paper\results\steering_mode_comparison\README.md)
+- steering-mode comparison analysis: [results/steering_mode_comparison/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\steering_mode_comparison\analysis\analysis_summary.md)
 - human pairwise evaluation package: [results/human_pairwise_evaluation/README.md](E:\Projects\StableSteering\paper\results\human_pairwise_evaluation\README.md)
 - human pairwise analysis summary: [results/human_pairwise_evaluation/analysis_summary.md](E:\Projects\StableSteering\paper\results\human_pairwise_evaluation\analysis_summary.md)
 
 Paper figures generated for the journal manuscript:
 
 - [figure_1_system_overview.svg](E:\Projects\StableSteering\paper\figures\figure_1_system_overview.svg)
+- [figure_2_candidate_batches.png](E:\Projects\StableSteering\paper\figures\figure_2_candidate_batches.png)
 - [figure_2_session_lifecycle.svg](E:\Projects\StableSteering\paper\figures\figure_2_session_lifecycle.svg)
 - [figure_3_configuration_to_generation.svg](E:\Projects\StableSteering\paper\figures\figure_3_configuration_to_generation.svg)
 - [figure_4_case_study_progression.png](E:\Projects\StableSteering\paper\figures\figure_4_case_study_progression.png)
@@ -79,6 +88,11 @@ Paper figures generated for the journal manuscript:
 - [figure_15_oracle_policy_curve.svg](E:\Projects\StableSteering\paper\figures\figure_15_oracle_policy_curve.svg)
 - [figure_16_oracle_progress_diagnosis.svg](E:\Projects\StableSteering\paper\figures\figure_16_oracle_progress_diagnosis.svg)
 - [figure_17_oracle_inspired_methods.svg](E:\Projects\StableSteering\paper\figures\figure_17_oracle_inspired_methods.svg)
+- [figure_18_oracle_plateau_reformulation.svg](E:\Projects\StableSteering\paper\figures\figure_18_oracle_plateau_reformulation.svg)
+- [figure_19_steering_mode_curve.svg](E:\Projects\StableSteering\paper\figures\figure_19_steering_mode_curve.svg)
+- [figure_20_steering_mode_examples.png](E:\Projects\StableSteering\paper\figures\figure_20_steering_mode_examples.png)
+- [figure_21_budget_matched_direct_baselines_curve.svg](E:\Projects\StableSteering\paper\figures\figure_21_budget_matched_direct_baselines_curve.svg)
+- [figure_22_budget_matched_direct_baselines_examples.png](E:\Projects\StableSteering\paper\figures\figure_22_budget_matched_direct_baselines_examples.png)
 
 Paper support docs:
 
@@ -106,6 +120,10 @@ Current evidence boundary:
 - one focused oracle-progress diagnosis bundle for incumbent lock-in and late-round movement
 - one focused oracle-progress follow-up bundle for Bradley-Terry and progress-aware policy combinations
 - one inspired-method oracle comparison bundle for quality-diversity sampling, listwise preference modeling, and Pareto-style oracle steering
+- one restart-style oracle reformulation bundle for challenger-preserving anti-plateau search
+- one caption-source and multi-metric oracle extension using BLIP-generated captions, SigLIP, and LPIPS on a curated Flickr8k subset
+- one steering-direction computation comparison bundle for shared-token, content-masked, token-factorized, and token-vector-field prompt-embedding control
+- one budget-matched direct baseline comparison slice against prompt-only search, heuristic prompt rewriting, and no-update resampling
 - one collection-ready human pairwise evaluation layer
 
 Current verification snapshot cited by the package:

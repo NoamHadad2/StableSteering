@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Budget-Matched Direct Baseline Comparison</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Budget-Matched Direct Baseline Comparison</h1>
+<p>This bundle compares four methods under the same visible candidate budget: <code>5</code> rounds and <code>4</code> candidates per round.</p>
+<h2>Headline results</h2>
+<ul>
+<li><code>no_update_resampling</code>: final CLIP <code>0.881</code> (gain <code>+0.051</code>), final DINOv2 <code>0.556</code> (gain <code>+0.089</code>)</li>
+<li><code>prompt_modifier_search</code>: final CLIP <code>0.875</code> (gain <code>+0.046</code>), final DINOv2 <code>0.498</code> (gain <code>+0.031</code>)</li>
+<li><code>stablesteering_best</code>: final CLIP <code>0.873</code> (gain <code>+0.044</code>), final DINOv2 <code>0.553</code> (gain <code>+0.086</code>)</li>
+<li><code>prompt_best_of_budget</code>: final CLIP <code>0.873</code> (gain <code>+0.044</code>), final DINOv2 <code>0.602</code> (gain <code>+0.135</code>)</li>
+</ul>
+<h2>Interpretation</h2>
+<ul>
+<li><code>prompt_best_of_budget</code> answers whether simple seed search under the same budget is sufficient.</li>
+<li><code>prompt_modifier_search</code> is a direct but heuristic prompt-editing baseline: it rewrites the prompt through a fixed library of textual modifiers rather than through latent steering.</li>
+<li><code>no_update_resampling</code> asks whether diversity alone is enough without state updates.</li>
+<li><code>stablesteering_best</code> tests whether the current best loop uses the same budget more effectively.</li>
+</ul>
+<p>This comparison is stronger than the earlier workflow pilot because all methods now consume the same visible candidate budget. It is still conservative: the prompt-rewrite arm is heuristic rather than a full language-model prompt optimizer.</p>
+<p>Targets: <code>3</code>; repeats per target: <code>2</code>; total method runs: <code>24</code>.</p></article></main>
+  </body>
+</html>

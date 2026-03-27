@@ -34,7 +34,12 @@ def resolve_steering_mode(session: Session) -> SteeringMode:
     """Resolve and validate the session steering mode used at generation time."""
 
     mode = session.config.steering_mode
-    if mode == SteeringMode.low_dimensional:
+    if mode in {
+        SteeringMode.low_dimensional,
+        SteeringMode.content_masked,
+        SteeringMode.token_factorized,
+        SteeringMode.token_vector_field,
+    }:
         return mode
     raise ValueError(f"Unsupported steering mode: {mode}")
 
@@ -259,19 +264,127 @@ class DiffusersGenerationEngine:
             "Run scripts/setup_huggingface.py first or enable STABLE_STEERING_ALLOW_REMOTE_MODEL_DOWNLOAD=true."
         )
 
-    def _steering_offset(self, prompt_embeds, z, anchor_strength: float):
+    def _hidden_basis(self, hidden: int, index_id: int, *, device, dtype):
+        """Build a deterministic hidden-space basis vector for one steering axis."""
+
+        torch = self._torch
+        index = torch.linspace(0.0, 1.0, hidden, device=device, dtype=dtype)
+        basis = torch.sin(index * (index_id + 1) * torch.pi) + torch.cos(index * (index_id + 1) * 0.5 * torch.pi)
+        return basis / torch.norm(basis)
+
+    def _token_hidden_basis(self, seq_len: int, hidden: int, index_id: int, *, device, dtype):
+        """Build a deterministic per-token hidden-vector field for one steering axis."""
+
+        torch = self._torch
+        token_index = torch.linspace(0.0, 1.0, seq_len, device=device, dtype=dtype).view(seq_len, 1)
+        hidden_index = torch.linspace(0.0, 1.0, hidden, device=device, dtype=dtype).view(1, hidden)
+        frequency = float(index_id + 1)
+        basis = (
+            torch.sin((token_index + 0.17 * frequency) * (hidden_index + 0.11) * torch.pi * (1.0 + frequency))
+            + 0.7 * torch.cos((token_index * (0.45 + 0.08 * frequency) - hidden_index * (0.63 + 0.04 * frequency)) * torch.pi)
+            + 0.35 * torch.sin((token_index * hidden_index + 0.13 * frequency) * 2.0 * torch.pi)
+        )
+        return basis / torch.clamp(torch.norm(basis), min=torch.tensor(1e-6, device=device, dtype=dtype))
+
+    def _token_inputs(self, pipe, prompt: str, *, seq_len: int, device, dtype):
+        """Tokenize the prompt so token-aware steering modes can shape per-token offsets."""
+
+        tokenizer = getattr(pipe, "tokenizer", None)
+        if tokenizer is None:
+            return None
+
+        tokenized = tokenizer(
+            prompt,
+            padding="max_length",
+            truncation=True,
+            max_length=seq_len,
+            return_tensors="pt",
+        )
+        input_ids = tokenized.input_ids.to(device=device)
+        attention_mask = tokenized.attention_mask.to(device=device, dtype=dtype)
+        return {"input_ids": input_ids, "attention_mask": attention_mask}
+
+    def _content_mask(self, token_inputs, *, tokenizer, dtype):
+        """Build a mask that suppresses padding and special tokens for token-aware steering."""
+
+        attention_mask = token_inputs["attention_mask"].to(dtype=dtype)
+        input_ids = token_inputs["input_ids"]
+        content_mask = attention_mask.clone()
+
+        if tokenizer is not None:
+            for attr in ("bos_token_id", "eos_token_id", "pad_token_id"):
+                token_id = getattr(tokenizer, attr, None)
+                if token_id is not None:
+                    content_mask = content_mask * (input_ids != token_id).to(dtype=dtype)
+
+        if float(content_mask.sum()) <= 0.0:
+            return attention_mask
+        return content_mask
+
+    def _steering_offset(self, prompt_embeds, z, anchor_strength: float, *, steering_mode: SteeringMode, token_inputs=None, tokenizer=None):
         """Project the low-dimensional steering vector into embedding space."""
 
         torch = self._torch
+        seq_len = prompt_embeds.shape[1]
         hidden = prompt_embeds.shape[-1]
         device = prompt_embeds.device
         dtype = prompt_embeds.dtype
-        index = torch.linspace(0.0, 1.0, hidden, device=device, dtype=dtype)
         offset = torch.zeros_like(prompt_embeds)
-        for i, value in enumerate(z):
-            basis = torch.sin(index * (i + 1) * torch.pi) + torch.cos(index * (i + 1) * 0.5 * torch.pi)
-            basis = basis / torch.norm(basis)
-            offset = offset + (float(value) * float(anchor_strength)) * basis.view(1, 1, hidden)
+
+        if steering_mode == SteeringMode.low_dimensional:
+            for i, value in enumerate(z):
+                basis = self._hidden_basis(hidden, i, device=device, dtype=dtype)
+                offset = offset + (float(value) * float(anchor_strength)) * basis.view(1, 1, hidden)
+            return offset
+
+        if token_inputs is None:
+            raise ValueError(f"Token-aware steering mode {steering_mode.value} requires token inputs.")
+
+        content_mask = self._content_mask(token_inputs, tokenizer=tokenizer, dtype=dtype)
+        token_positions = torch.linspace(0.0, 1.0, seq_len, device=device, dtype=dtype)
+
+        if steering_mode == SteeringMode.content_masked:
+            token_profile = 0.35 + 0.65 * torch.sin(token_positions * torch.pi)
+            token_profile = token_profile.view(1, seq_len, 1) * content_mask.view(1, seq_len, 1)
+            active_tokens = torch.clamp(content_mask.sum(), min=1.0)
+            normalizer = torch.clamp(token_profile.sum(dim=1, keepdim=True), min=1.0)
+            token_profile = token_profile * (active_tokens / normalizer)
+            for i, value in enumerate(z):
+                basis = self._hidden_basis(hidden, i, device=device, dtype=dtype)
+                offset = offset + (float(value) * float(anchor_strength)) * token_profile * basis.view(1, 1, hidden)
+            return offset
+
+        if steering_mode == SteeringMode.token_factorized:
+            mask = content_mask.view(seq_len)
+            for i, value in enumerate(z):
+                hidden_basis = self._hidden_basis(hidden, i, device=device, dtype=dtype)
+                token_basis = (
+                    torch.sin(token_positions * (i + 1) * torch.pi)
+                    + 0.5 * torch.cos(token_positions * (i + 1) * 2.0 * torch.pi)
+                ) * mask
+                if float(token_basis.abs().sum()) > 0.0:
+                    token_basis = token_basis - ((token_basis * mask).sum() / torch.clamp(mask.sum(), min=1.0)) * mask
+                    token_norm = torch.norm(token_basis)
+                    if float(token_norm) > 0.0:
+                        token_basis = token_basis / token_norm
+                offset = offset + (float(value) * float(anchor_strength) * 0.8) * token_basis.view(1, seq_len, 1) * hidden_basis.view(1, 1, hidden)
+            return offset
+
+        if steering_mode == SteeringMode.token_vector_field:
+            mask = content_mask.view(seq_len, 1)
+            active_tokens = torch.clamp(mask.sum(), min=1.0)
+            for i, value in enumerate(z):
+                token_hidden_basis = self._token_hidden_basis(seq_len, hidden, i, device=device, dtype=dtype) * mask
+                if float(token_hidden_basis.abs().sum()) > 0.0:
+                    token_hidden_basis = token_hidden_basis - token_hidden_basis.sum(dim=0, keepdim=True) / active_tokens
+                    token_hidden_basis = token_hidden_basis * mask
+                    token_hidden_basis = token_hidden_basis / torch.clamp(
+                        torch.norm(token_hidden_basis),
+                        min=torch.tensor(1e-6, device=device, dtype=dtype),
+                    )
+                offset = offset + (float(value) * float(anchor_strength) * 0.7) * token_hidden_basis.unsqueeze(0)
+            return offset
+
         return offset
 
     def _encode_steered_embeddings(self, session: Session, candidate: Candidate):
@@ -286,14 +399,21 @@ class DiffusersGenerationEngine:
             do_classifier_free_guidance=True,
             negative_prompt=session.negative_prompt or "",
         )
-        if steering_mode == SteeringMode.low_dimensional:
-            steered_prompt_embeds = prompt_embeds + self._steering_offset(
-                prompt_embeds,
-                candidate.z,
-                session.config.anchor_strength,
-            )
-        else:
-            raise ValueError(f"Unsupported steering mode: {steering_mode}")
+        token_inputs = self._token_inputs(
+            pipe,
+            session.prompt,
+            seq_len=prompt_embeds.shape[1],
+            device=prompt_embeds.device,
+            dtype=prompt_embeds.dtype,
+        )
+        steered_prompt_embeds = prompt_embeds + self._steering_offset(
+            prompt_embeds,
+            candidate.z,
+            session.config.anchor_strength,
+            steering_mode=steering_mode,
+            token_inputs=token_inputs,
+            tokenizer=getattr(pipe, "tokenizer", None),
+        )
         return steered_prompt_embeds, negative_prompt_embeds
 
     def render_candidate(self, session: Session, candidate: Candidate) -> Candidate:

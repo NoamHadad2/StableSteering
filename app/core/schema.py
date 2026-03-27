@@ -72,6 +72,7 @@ class SamplerType(str, Enum):
     spherical_cover = "spherical_cover"
     two_scale_cover = "two_scale_cover"
     quality_diversity_mix = "quality_diversity_mix"
+    restart_bridge_mix = "restart_bridge_mix"
 
 
 class UpdaterType(str, Enum):
@@ -85,10 +86,14 @@ class UpdaterType(str, Enum):
     bradley_terry_preference = "bradley_terry_preference"
     challenger_mixture_preference = "challenger_mixture_preference"
     plackett_luce_preference = "plackett_luce_preference"
+    advantage_softmax_preference = "advantage_softmax_preference"
 
 
 class SteeringMode(str, Enum):
     low_dimensional = "low_dimensional"
+    content_masked = "content_masked"
+    token_factorized = "token_factorized"
+    token_vector_field = "token_vector_field"
 
 
 class StrategyConfig(BaseModel):

@@ -153,7 +153,24 @@ python scripts/preload_experiment_models.py --include-default-diffusion
 
 This scans the protocol YAML files under `paper/protocols/`, prepares the
 referenced diffusion snapshots under `models/`, and caches CLIP/DINO-family
-evaluation models under `models/hf_cache/`.
+evaluation models under `models/hf_cache/`. Protocols that reference caption
+generation or supplementary similarity metrics also preload:
+
+- BLIP captioning weights
+- SigLIP image-embedding weights
+- LPIPS perceptual-distance weights
+
+Generate the curated caption artifact for the caption-extended oracle study:
+
+```bash
+python scripts/generate_oracle_dataset_captions.py
+```
+
+Run the caption-source and multi-metric oracle extension:
+
+```bash
+python scripts/run_paper_oracle_caption_metric_extension.py
+```
 
 Inspect persisted trace files:
 
@@ -197,6 +214,21 @@ When a prepared local model is available and the backend is set to `diffusers`,
 the generation step uses a real Stable Diffusion pipeline, pins inference to
 GPU, and applies a deterministic steering offset to `prompt_embeds` before
 rendering. If the model or GPU requirements are not satisfied, startup fails.
+
+The current generation engine supports four prompt-embedding steering modes:
+
+- `low_dimensional`
+  one hidden-space offset is broadcast across all prompt tokens
+- `content_masked`
+  the same hidden-space offset is applied selectively to content-bearing tokens while suppressing padding and special tokens
+- `token_factorized`
+  a low-rank token-aware perturbation allows different prompt tokens to receive different steering offsets
+- `token_vector_field`
+  a full token-by-hidden vector field gives each content token its own steering vector rather than only a token-specific scalar over one shared hidden direction
+
+These modes share the same session-level steering vector and outer loop. They
+only change the operator that maps the steering state into prompt-embedding
+space, which makes them suitable for controlled method comparisons.
 
 ## 5.1 Async API Endpoints
 
@@ -340,6 +372,7 @@ The current sampler and updater surface also includes the newer research-facing 
   - `spherical_cover`
   - `two_scale_cover`
   - `quality_diversity_mix`
+  - `restart_bridge_mix`
 - updaters:
   - `score_weighted_preference`
   - `contrastive_preference`
@@ -348,6 +381,7 @@ The current sampler and updater surface also includes the newer research-facing 
   - `bradley_terry_preference`
   - `challenger_mixture_preference`
   - `plackett_luce_preference`
+  - `advantage_softmax_preference`
 
 The current stagnation-control contract is:
 
@@ -392,6 +426,23 @@ That runner was added after the repeated oracle studies revealed a concrete fail
 - sampler geometry
 - richer feedback modeling
 - softer oracle selection when challengers are close to the incumbent
+
+The newest compact reformulation bundle extends that diagnosis again with:
+
+- a restart-style sampler that mixes bridge refinements with partial restarts
+- an incumbent-aware softmax updater that rewards challengers by advantage over the incumbent
+- oracle selectors that score either directional progress toward the hidden target or challenger advantage relative to the incumbent
+
+That compact suite is:
+
+- [run_paper_oracle_progress_diagnosis.py](../scripts/run_paper_oracle_progress_diagnosis.py)
+- [oracle_plateau_reformulation_suite.yaml](../paper/protocols/oracle_plateau_reformulation_suite.yaml)
+
+The most important lesson from that bundle is that anti-plateau policy is not one-dimensional:
+
+- `restart_directional` maximizes visible late-round movement and removes plateauing entirely in the compact slice
+- `restart_advantage` recovers the strongest final CLIP score in the same slice
+- these do not coincide, so the design problem is balancing challenger pressure against final proxy alignment rather than simply forcing motion
 
 ### 6.4 Evolve persistence
 

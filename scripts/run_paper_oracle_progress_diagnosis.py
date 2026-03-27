@@ -117,6 +117,8 @@ def _oracle_score_candidates(
     *,
     policy: PolicySpec,
     margin_epsilon: float,
+    target_clip_embedding: list[float] | Any = None,
+    incumbent_clip_embedding: list[float] | Any = None,
 ) -> list[dict[str, Any]]:
     if policy.oracle_policy == "clip_only":
         for row in scored_candidates:
@@ -125,6 +127,20 @@ def _oracle_score_candidates(
 
     if policy.oracle_policy == "pareto_frontier_mix":
         return _oracle_score_candidates_pareto(scored_candidates)
+
+    if policy.oracle_policy == "clip_advantage_novelty_mix":
+        return _oracle_score_candidates_advantage(
+            scored_candidates,
+            margin_epsilon=margin_epsilon,
+        )
+
+    if policy.oracle_policy == "clip_directional_mix":
+        return _oracle_score_candidates_directional(
+            scored_candidates,
+            target_clip_embedding=target_clip_embedding,
+            incumbent_clip_embedding=incumbent_clip_embedding,
+            margin_epsilon=margin_epsilon,
+        )
 
     if policy.oracle_policy != "clip_margin_mix":
         raise ValueError(f"Unsupported oracle policy: {policy.oracle_policy}")
@@ -156,6 +172,79 @@ def _oracle_score_candidates(
         blended = (0.68 * clip_value) + (0.22 * dino_value) + (0.10 * novelty_value)
         if row.get("carried_forward"):
             blended -= 0.025
+        row["oracle_score"] = blended
+    return scored_candidates
+
+
+def _oracle_score_candidates_advantage(
+    scored_candidates: list[dict[str, Any]],
+    *,
+    margin_epsilon: float,
+) -> list[dict[str, Any]]:
+    incumbent = next((row for row in scored_candidates if row.get("carried_forward")), None)
+    if incumbent is None:
+        for row in scored_candidates:
+            row["oracle_score"] = float(row["clip_score"])
+        return scored_candidates
+
+    incumbent_clip = float(incumbent["clip_score"])
+    clip_scaled = _rescale([float(row["clip_score"]) for row in scored_candidates])
+    novelty_scaled = _rescale([float(row["novelty_to_incumbent"]) for row in scored_candidates])
+    advantage_scaled = _rescale([float(row["clip_score"]) - incumbent_clip for row in scored_candidates])
+    any_positive_advantage = any((float(row["clip_score"]) - incumbent_clip) > (margin_epsilon * 0.5) for row in scored_candidates if not row.get("carried_forward"))
+    for row, clip_value, novelty_value, advantage_value in zip(
+        scored_candidates,
+        clip_scaled,
+        novelty_scaled,
+        advantage_scaled,
+        strict=True,
+    ):
+        blended = (0.52 * clip_value) + (0.33 * advantage_value) + (0.15 * novelty_value)
+        if row.get("carried_forward") and any_positive_advantage:
+            blended -= 0.04
+        row["oracle_score"] = blended
+    return scored_candidates
+
+
+def _projection_progress(candidate_embedding: Any, incumbent_embedding: Any, target_embedding: Any) -> float:
+    incumbent_to_target = [float(target) - float(incumbent) for target, incumbent in zip(target_embedding, incumbent_embedding, strict=False)]
+    incumbent_to_candidate = [float(candidate) - float(incumbent) for candidate, incumbent in zip(candidate_embedding, incumbent_embedding, strict=False)]
+    target_norm = math.sqrt(sum(value * value for value in incumbent_to_target))
+    if target_norm < 1e-8:
+        return 0.0
+    return sum(left * right for left, right in zip(incumbent_to_candidate, incumbent_to_target, strict=False)) / target_norm
+
+
+def _oracle_score_candidates_directional(
+    scored_candidates: list[dict[str, Any]],
+    *,
+    target_clip_embedding: Any,
+    incumbent_clip_embedding: Any = None,
+    margin_epsilon: float,
+) -> list[dict[str, Any]]:
+    if incumbent_clip_embedding is None:
+        for row in scored_candidates:
+            row["oracle_score"] = float(row["clip_score"])
+        return scored_candidates
+
+    clip_scaled = _rescale([float(row["clip_score"]) for row in scored_candidates])
+    novelty_scaled = _rescale([float(row["novelty_to_incumbent"]) for row in scored_candidates])
+    directional_values = [
+        _projection_progress(row["_clip_embedding"], incumbent_clip_embedding, target_clip_embedding)
+        for row in scored_candidates
+    ]
+    directional_scaled = _rescale(directional_values)
+    any_positive_directional = any(value > margin_epsilon for row, value in zip(scored_candidates, directional_values, strict=True) if not row.get("carried_forward"))
+    for row, clip_value, novelty_value, directional_value in zip(
+        scored_candidates,
+        clip_scaled,
+        novelty_scaled,
+        directional_scaled,
+        strict=True,
+    ):
+        blended = (0.45 * clip_value) + (0.35 * directional_value) + (0.20 * novelty_value)
+        if row.get("carried_forward") and any_positive_directional:
+            blended -= 0.035
         row["oracle_score"] = blended
     return scored_candidates
 
@@ -427,7 +516,13 @@ def _run_policy_target(
                 novelty = 1.0 - ClipOracle.cosine(record["_clip_embedding"], incumbent_clip_embedding)
             record["novelty_to_incumbent"] = round(novelty, 6)
 
-        _oracle_score_candidates(scored_candidates, policy=policy, margin_epsilon=margin_epsilon)
+        _oracle_score_candidates(
+            scored_candidates,
+            policy=policy,
+            margin_epsilon=margin_epsilon,
+            target_clip_embedding=target_embeddings["clip"],
+            incumbent_clip_embedding=incumbent_clip_embedding,
+        )
         feedback = _oracle_feedback_request(
             scored_candidates,
             feedback_mode=policy.feedback_mode,

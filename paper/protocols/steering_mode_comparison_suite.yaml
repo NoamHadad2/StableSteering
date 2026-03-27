@@ -1,0 +1,48 @@
+suite_name: steering_mode_comparison
+description: >
+  Compact hidden-target recovery comparison that keeps the outer steering loop
+  fixed and varies only how the low-dimensional steering direction is injected
+  into prompt embeddings.
+target_suite_path: paper/protocols/oracle_target_suite.yaml
+oracle_model: openai/clip-vit-base-patch32
+dino_model: facebook/dinov2-base
+oracle_policy: clip_dino_ensemble
+max_rounds: 5
+shared_conditions:
+  sampler: diversity_shell
+  updater: bradley_terry_preference
+  feedback_mode: top_k
+  seed_policy: fixed-per-candidate
+  steering_dimension: 5
+  candidate_count: 5
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+policies:
+  - id: global_shared
+    label: Shared-token offset
+    steering_mode: low_dimensional
+    description: >
+      Current baseline: the same hidden-space steering offset is broadcast to
+      every prompt token.
+  - id: content_masked
+    label: Content-masked offset
+    steering_mode: content_masked
+    description: >
+      Apply the steering direction mainly to non-special content tokens while
+      suppressing padding and special-token offsets.
+  - id: token_factorized
+    label: Token-factorized offset
+    steering_mode: token_factorized
+    description: >
+      Use a low-rank token-by-hidden steering pattern so different prompt
+      positions can move in different hidden directions.
+  - id: token_vector_field
+    label: Token-vector-field offset
+    steering_mode: token_vector_field
+    description: >
+      Give each content token its own hidden-space steering vector so the
+      steering state can induce a fully token-aware directional field.
