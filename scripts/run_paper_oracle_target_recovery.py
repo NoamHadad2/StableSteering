@@ -15,8 +15,8 @@ import markdown
 import torch
 import yaml
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-from transformers import CLIPModel, CLIPProcessor
 
+from app.bootstrap.experiment_models import get_clip_components
 from app.core.schema import ExperimentCreate, FeedbackRequest, FeedbackType, SessionCreate, StrategyConfig
 from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
@@ -94,9 +94,7 @@ class ClipOracle:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model_id = model_id
         self.device = device
-        self.model = CLIPModel.from_pretrained(model_id).to(device)
-        self.model.eval()
-        self.processor = CLIPProcessor.from_pretrained(model_id)
+        self.model, self.processor = get_clip_components(model_id, device)
 
     def embed_image(self, image_path: Path) -> torch.Tensor:
         image = Image.open(image_path).convert("RGB")

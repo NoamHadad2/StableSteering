@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Oracle Progress Diagnosis Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Oracle Progress Diagnosis Analysis</h1>
+<p>This compact study tests why oracle steering often stops making visible round-by-round progress. The comparison keeps the same hidden-target recovery scaffold while changing proposal geometry, feedback modeling, and oracle selection.</p>
+<h2>Scope</h2>
+<ul>
+<li>targets: <code>3</code></li>
+<li>policies: <code>4</code></li>
+<li>total runs: <code>12</code></li>
+<li>total rounds: <code>72</code></li>
+</ul>
+<h2>Policy summary</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">clip final</th>
+<th style="text-align: right;">clip delta</th>
+<th style="text-align: right;">dinov2 final</th>
+<th style="text-align: right;">late improvements</th>
+<th style="text-align: right;">incumbent selection share</th>
+<th style="text-align: right;">plateau share</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Two-scale cover sampler</td>
+<td style="text-align: right;">0.884</td>
+<td style="text-align: right;">0.054</td>
+<td style="text-align: right;">0.549</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.67</td>
+</tr>
+<tr>
+<td>Full progress-aware policy</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.522</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.73</td>
+<td style="text-align: right;">0.33</td>
+</tr>
+<tr>
+<td>Bradley-Terry cover</td>
+<td style="text-align: right;">0.878</td>
+<td style="text-align: right;">0.018</td>
+<td style="text-align: right;">0.631</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.67</td>
+</tr>
+<tr>
+<td>Bradley-Terry progress-aware</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.063</td>
+<td style="text-align: right;">0.630</td>
+<td style="text-align: right;">1.33</td>
+<td style="text-align: right;">0.60</td>
+<td style="text-align: right;">0.33</td>
+</tr>
+</tbody>
+</table>
+<h2>Interpretation</h2>
+<ul>
+<li>The baseline still shows heavy incumbent lock-in, with incumbent selection share <code>0.67</code>.</li>
+<li>The strongest anti-stagnation policy by late-round movement is <code>Bradley-Terry progress-aware</code>.</li>
+<li>The strongest final CLIP target-recovery policy in this compact slice is <code>Two-scale cover sampler</code>.</li>
+<li>The key question is therefore not only which policy ends highest, but which policy preserves challenger pressure without sacrificing final target recovery too heavily.</li>
+</ul>
+<h2>Figure</h2>
+<p><img alt="Oracle progress diagnosis" src="figures/oracle_progress_diagnosis.svg"></p></article></main>
+  </body>
+</html>

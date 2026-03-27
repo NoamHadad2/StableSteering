@@ -33,22 +33,26 @@ def _rewrite_trace_report_image_paths(report_path: Path, destination_path: Path)
     destination_path.write_text(rewritten, encoding="utf-8")
 
 
+def _relative_bundle_image_path(image_url: str) -> str:
+    return f"images/{Path(image_url).name}"
+
+
 def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int], str]:
     """Return deterministic user ratings and a short critique for one round."""
 
     candidate_ids = [candidate["id"] for candidate in round_payload["candidate_metadata"]]
     if round_index == 1:
         ratings = {
-            candidate_ids[0]: 2,
+            candidate_ids[0]: 3,
             candidate_ids[1]: 5,
             candidate_ids[2]: 4,
-            candidate_ids[3]: 3,
+            candidate_ids[3]: 2,
             candidate_ids[4]: 1,
         }
         critique = (
-            "The unmodified prompt baseline is promising, but candidate 2 has the clearest silhouette, "
-            "the strongest sunrise rim light, and the most premium hero-shot composition. "
-            "The extra alternatives are useful, but they do not beat the top two."
+            "The baseline already points in the right product direction, but candidate 2 is the strongest isolated side-profile "
+            "render with the cleanest silhouette, the most centered framing, and the least distracting scene content. "
+            "Candidate 3 is also plausible, but it is slightly weaker in product readability."
         )
         return ratings, critique
 
@@ -60,7 +64,7 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[3]: 3,
             candidate_ids[4]: 1,
         }
-        critique = "Keep the carried-forward winner, but push harder toward cleaner panel detail and a stronger studio-product framing."
+        critique = "Keep the incumbent, but refine toward cleaner wheel geometry, a calmer seamless backdrop, and a more catalog-like isolated composition."
         return ratings, critique
 
     if round_index == 3:
@@ -71,7 +75,7 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[3]: 2,
             candidate_ids[4]: 1,
         }
-        critique = "Candidate 2 improves the bodywork and surfacing. It feels more like a premium launch image while staying true to the concept."
+        critique = "Candidate 2 improves the overall silhouette and wheel balance while preserving the centered isolated product-shot framing."
         return ratings, critique
 
     if round_index == 4:
@@ -82,7 +86,7 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
             candidate_ids[3]: 2,
             candidate_ids[4]: 1,
         }
-        critique = "Candidate 2 has the best balance of dramatic lighting and realistic product geometry. Keep that direction for the next phase."
+        critique = "Candidate 2 has the best balance of realistic product geometry, clean background control, and a readable side-profile silhouette. Keep that direction."
         return ratings, critique
 
     ratings = {
@@ -92,7 +96,7 @@ def _pick_feedback(round_payload: dict, round_index: int) -> tuple[dict[str, int
         candidate_ids[3]: 2,
         candidate_ids[4]: 1,
     }
-    critique = "The incumbent now reads like the strongest finished hero image, so preserve it as the final preferred direction."
+    critique = "The incumbent now reads like the strongest finished isolated hero image, so preserve it as the final preferred direction."
     return ratings, critique
 
 
@@ -458,14 +462,18 @@ def main() -> int:
 
     experiment = orchestrator.create_experiment(
         ExperimentCreate(
-            name="Premium product hero image demo",
-            description="A scripted user steering walkthrough that demonstrates creative refinement on the real Diffusers backend.",
+            name="Studio product steering demo",
+            description="A scripted user steering walkthrough that demonstrates stable product-photo refinement on the real Diffusers backend.",
             config=StrategyConfig(
                 candidate_count=5,
                 image_size="512x512",
-                sampler="random_local",
-                updater="winner_average",
+                sampler="line_search",
+                updater="score_weighted_preference",
                 feedback_mode="scalar_rating",
+                seed_policy="fixed-per-candidate",
+                trust_radius=0.42,
+                anchor_strength=0.55,
+                steering_dimension=5,
                 model_name="runwayml/stable-diffusion-v1-5",
             ),
         )
@@ -473,26 +481,26 @@ def main() -> int:
     session = orchestrator.create_session(
         SessionCreate(
             experiment_id=experiment.id,
-            prompt="A premium cinematic product hero photo of an expedition-ready electric explorer motorcycle, photographed in a desert sunrise studio set with brushed titanium surfaces, crisp rim lighting, and magazine-cover composition",
-            negative_prompt="blurry, low contrast, flat lighting, distorted wheels, text, watermark, cluttered background, cropped subject",
+            prompt="Studio product photograph of a premium electric motorcycle, full side profile, isolated on a warm beige seamless backdrop, centered subject, catalog hero composition, polished body panels, no rider, no landscape",
+            negative_prompt="person, rider, helmet, outdoors, desert, road, trees, sky, scenery, motion blur, blurry, low contrast, flat lighting, distorted wheels, text, watermark, cropped subject",
         )
     )
     objective = (
-        "Demonstrate that StableSteering can start from a rich user text prompt and then guide image generation "
-        "toward a sharper, more premium product-marketing result through iterative user preferences rather than one-shot prompting."
+        "Demonstrate that StableSteering can start from a product-photography prompt and refine it over multiple rounds "
+        "toward a cleaner, more premium, and more compositionally stable isolated hero image through iterative user preference rather than prompt rewriting."
     )
     success_criteria = [
-        "The first round should include the unmodified-prompt baseline plus clearly different on-theme alternatives.",
+        "The first round should include the unmodified-prompt baseline plus clearly different but still on-theme product-photo alternatives.",
         "Later rounds should preserve the previous winner while still exploring nearby alternatives.",
-        "User preference should steer the session toward stronger silhouette, lighting, and premium material detail.",
-        "By round five, the session should look more aligned with the desired hero-shot direction than the initial round.",
+        "User preference should steer the session toward stronger side-profile silhouette, cleaner isolation, and more premium material detail.",
+        "By round five, the session should look more aligned with the desired hero-shot direction while preserving the overall product composition better than the initial round.",
         "The report should make the proposal, selection, and update logic easy to inspect after the run.",
     ]
     demo_script = [
-        "Start from a user-written product prompt rather than a hidden preset.",
-        "Generate a first comparison round and inspect the baseline prompt render beside two steered alternatives.",
-        "Choose the candidate with the strongest hero-shot silhouette and lighting.",
-        "Generate additional rounds that keep the previous winner visible while exploring nearby refinements.",
+        "Start from a user-written studio product prompt rather than a hidden preset.",
+        "Generate a first comparison round and inspect the baseline prompt render beside several steered studio-photo alternatives.",
+        "Choose the candidate with the strongest isolated side-profile framing and surface detail.",
+        "Generate additional rounds that keep the previous winner visible while exploring nearby refinements in geometry and background simplicity.",
         "Continue for five rounds so the session history shows convergence instead of a one-step jump.",
         "Review the report to see the proposed images, critiques, and incumbent transitions together.",
     ]
@@ -572,6 +580,68 @@ def main() -> int:
     portable_trace_report = bundle_root / "session_trace_report.html"
     _rewrite_trace_report_image_paths(trace_report_path, portable_trace_report)
 
+    panel_records: list[dict[str, Any]] = []
+    winner_rounds: list[dict[str, Any]] = []
+
+    if round_payloads:
+        baseline_candidate = next(
+            (
+                candidate
+                for candidate in round_payloads[0]["candidate_metadata"]
+                if candidate.get("generation_params", {}).get("baseline_prompt")
+                or candidate.get("sampler_role") == "baseline_prompt"
+            ),
+            None,
+        )
+        if baseline_candidate:
+            panel_records.append(
+                {
+                    "kind": "baseline",
+                    "round_index": 1,
+                    "candidate_id": baseline_candidate["id"],
+                    "label": "Baseline prompt render",
+                    "relative_image_path": copied_images[baseline_candidate["id"]],
+                }
+            )
+
+    for round_obj in rounds:
+        winner_id = round_obj.get("update_summary", {}).get("winner_candidate_id")
+        if not winner_id:
+            continue
+        winner_candidate = next(candidate for candidate in round_obj["candidates"] if candidate["id"] == winner_id)
+        winner_rounds.append(
+            {
+                "round_index": round_obj["round_index"],
+                "candidate_id": winner_id,
+                "label": f"Round {round_obj['round_index']} winner",
+                "relative_image_path": copied_images[winner_id],
+                "sampler_role": winner_candidate.get("sampler_role"),
+            }
+        )
+
+    if winner_rounds:
+        unique_winner_rounds: list[dict[str, Any]] = []
+        seen_image_paths: set[str] = set()
+        for record in winner_rounds:
+            image_path = record["relative_image_path"]
+            if image_path in seen_image_paths:
+                continue
+            seen_image_paths.add(image_path)
+            unique_winner_rounds.append(record)
+
+        if len(unique_winner_rounds) == 1:
+            panel_records.append(unique_winner_rounds[0])
+        elif len(unique_winner_rounds) == 2:
+            panel_records.extend(unique_winner_rounds)
+        else:
+            panel_records.extend(
+                [
+                    unique_winner_rounds[0],
+                    unique_winner_rounds[-2],
+                    unique_winner_rounds[-1],
+                ]
+            )
+
     manifest = {
         "session_id": session.id,
         "experiment_id": experiment.id,
@@ -583,6 +653,7 @@ def main() -> int:
         "candidate_count": sum(len(round_obj["candidates"]) for round_obj in rounds),
         "backend": generator.diagnostics(),
         "visual_checks": visual_checks,
+        "paper_case_study_panels": panel_records,
     }
     (bundle_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 

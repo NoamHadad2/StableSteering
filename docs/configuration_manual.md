@@ -139,6 +139,8 @@ Supported values:
 - `plateau_escape`
 - `annealed_shell`
 - `spherical_cover`
+- `two_scale_cover`
+- `quality_diversity_mix`
 
 Effect:
 
@@ -157,6 +159,8 @@ Related code:
 - [plateau_escape.py](../app/samplers/plateau_escape.py)
 - [annealed_shell.py](../app/samplers/annealed_shell.py)
 - [spherical_cover.py](../app/samplers/spherical_cover.py)
+- [two_scale_cover.py](../app/samplers/two_scale_cover.py)
+- [quality_diversity_mix.py](../app/samplers/quality_diversity_mix.py)
 
 ### `updater`
 
@@ -172,6 +176,8 @@ Supported values:
 - `softmax_preference`
 - `borda_preference`
 - `bradley_terry_preference`
+- `challenger_mixture_preference`
+- `plackett_luce_preference`
 
 Effect:
 
@@ -188,6 +194,8 @@ Related code:
 - [softmax_pref.py](../app/updaters/softmax_pref.py)
 - [borda_pref.py](../app/updaters/borda_pref.py)
 - [bradley_terry_pref.py](../app/updaters/bradley_terry_pref.py)
+- [challenger_mixture.py](../app/updaters/challenger_mixture.py)
+- [plackett_luce_pref.py](../app/updaters/plackett_luce_pref.py)
 
 ### `feedback_mode`
 

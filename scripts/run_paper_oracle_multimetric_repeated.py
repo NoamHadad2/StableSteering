@@ -11,8 +11,8 @@ from typing import Any
 import torch
 import yaml
 from PIL import Image
-from transformers import AutoImageProcessor, AutoModel
 
+from app.bootstrap.experiment_models import get_dino_components
 from app.core.schema import ExperimentCreate, FeedbackRequest, FeedbackType, SessionCreate, StrategyConfig
 from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
@@ -45,9 +45,7 @@ class DINOv2Metric:
     def __init__(self, model_id: str, device: str = "cpu") -> None:
         self.model_id = model_id
         self.device = device
-        self.processor = AutoImageProcessor.from_pretrained(model_id)
-        self.model = AutoModel.from_pretrained(model_id).to(device)
-        self.model.eval()
+        self.processor, self.model = get_dino_components(model_id, device)
 
     def embed_image(self, image_path: Path) -> torch.Tensor:
         image = Image.open(image_path).convert("RGB")

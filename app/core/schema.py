@@ -70,6 +70,8 @@ class SamplerType(str, Enum):
     plateau_escape = "plateau_escape"
     annealed_shell = "annealed_shell"
     spherical_cover = "spherical_cover"
+    two_scale_cover = "two_scale_cover"
+    quality_diversity_mix = "quality_diversity_mix"
 
 
 class UpdaterType(str, Enum):
@@ -81,6 +83,8 @@ class UpdaterType(str, Enum):
     softmax_preference = "softmax_preference"
     borda_preference = "borda_preference"
     bradley_terry_preference = "bradley_terry_preference"
+    challenger_mixture_preference = "challenger_mixture_preference"
+    plackett_luce_preference = "plackett_luce_preference"
 
 
 class SteeringMode(str, Enum):

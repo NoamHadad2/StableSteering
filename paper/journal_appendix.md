@@ -17,7 +17,9 @@ The main manuscript describes the steering loop at a systems level. This appendi
 | `line_search` | Probes forward, backtrack, and lateral moves around the current direction. | `forward_probe`, `far_forward`, `backtrack`, `lateral_probe`, `counter_lateral` |
 | `annealed_shell` | Starts with a wider shell around the incumbent and gradually narrows that shell as rounds progress, with paired probe and counter-probe directions plus controlled jitter. | `annealed_probe`, `annealed_counterprobe` |
 | `spherical_cover` | Greedily selects angularly separated challenger directions on the trust-region sphere to cover the available region more uniformly. | `cover_probe` |
+| `two_scale_cover` | Mixes short-radius and long-radius challenger probes over separated directions so one round can contain both local refinements and farther alternatives. | `near_cover_probe`, `far_cover_probe` |
 | `plateau_escape` | Proposes one carried-forward incumbent plus forward, lateral, and counter-probe challengers designed to escape visible late-round repetition. | `forward_escape`, `lateral_plus`, `lateral_minus`, `counter_probe` |
+| `quality_diversity_mix` | Mixes incumbent-adjacent proposals with angularly separated challenger probes inspired by quality-diversity coverage search so the batch preserves both local refinement and broader behavioral diversity. | `elite_probe`, `diversity_probe`, `counter_probe` |
 
 All samplers are bounded by the configured trust radius. In round one, the system also inserts a pinned `baseline_prompt` candidate with zero steering. In later rounds, the previous winner is inserted as a carried-forward incumbent before the sampler fills the remaining candidate slots.
 
@@ -47,6 +49,8 @@ The current implementation validates that referenced candidates belong to the cu
 | `softmax_preference` | `z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \pi_j z_t^{(j)}` with `\pi_j \propto \exp(\beta r_j)` over normalized scores | uses a softmax-weighted preference mixture so highly rated challengers dominate the next state without discarding the rest of the batch |
 | `borda_preference` | `z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \omega_j z_t^{(j)}` with Borda-style ordinal weights `\omega_j` derived from ranking position | treats the batch as an ordered list and moves toward a centroid that reflects the full ranking rather than only the winner |
 | `bradley_terry_preference` | `z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \rho_j z_t^{(j)}` where `\rho_j` is induced by lightweight Bradley-Terry latent utilities fit from pairwise comparisons implied by the batch | approximates a probabilistic pairwise preference model and uses the inferred utilities to weight the next steering state |
+| `challenger_mixture_preference` | `z_(t+1) = z_t + \alpha \Delta_{\text{winner}} + \beta \Delta_{\text{challengers}}` where challenger weights depend on margin to the incumbent | allows near-tie challengers to influence the next state even when the incumbent still wins the round |
+| `plackett_luce_preference` | `z_(t+1) = (1-\alpha) z_t + \alpha \sum_j \eta_j z_t^{(j)}` where `\eta_j` is induced by a lightweight Plackett-Luce-style listwise utility model fit from the ranked batch | uses the full ranked order to produce a probabilistic listwise update rather than a winner-only step |
 
 These update rules are deliberately lightweight. They should be read as session-level control policies, not as full statistical preference estimators or learned reward models.
 
@@ -315,7 +319,41 @@ This bundle is intentionally exploratory.
 3. The oracle slice changes the hidden-target selection rule, not only the evaluation metric.
 4. The resulting comparisons should therefore be read as evidence that the framework can host richer method families and that those families matter, not as a final ranking of globally best policies.
 
-## Appendix I. Reproducibility and Artifact Notes
+## Appendix I. Oracle Progress Diagnosis and Focused Follow-up
+
+The repeated oracle studies showed a concrete behavioral failure mode: later rounds often appeared frozen because the carried-forward incumbent kept winning and the same image was selected repeatedly. A focused compact diagnosis therefore asked a narrower question than the earlier bundles: what exactly is causing the visible lack of incremental progress, and can targeted changes improve either late-round movement or final target recovery?
+
+The diagnosis compared four policies under one shared protocol: the older baseline `exploit_orthogonal + linear_preference + CLIP-only oracle`, a new `two_scale_cover` sampler that mixes short- and long-radius challengers, a new `challenger_mixture_preference` updater that lets near-miss challengers influence the next state, and a fully progress-aware policy that combines both changes with a softer `clip_margin_mix` oracle. A small follow-up then swapped in the stronger ordinal `bradley_terry_preference` model to test whether a better ranking-based user model could recover a more favorable balance.
+
+### I.1 Diagnosis Bundle Summary
+
+| Policy | Final CLIP | CLIP delta | Final DINOv2 | Late improvements | Incumbent selection share | Plateau share |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline CLIP oracle | 0.884 | 0.054 | 0.557 | 0.00 | 0.80 | 1.00 |
+| Two-scale cover sampler | 0.889 | 0.080 | 0.606 | 0.33 | 0.93 | 1.00 |
+| Challenger-mixture updater | 0.873 | 0.055 | 0.535 | 0.33 | 0.73 | 1.00 |
+| Full progress-aware policy | 0.882 | 0.058 | 0.496 | 0.67 | 0.47 | 0.33 |
+
+Interpretation: the first compact diagnosis localizes the stagnation problem. A stronger sampler improves final proxy recovery but still leaves plateauing intact. A progress-aware oracle plus challenger-aware updater reduces incumbent lock-in and plateauing substantially, but the first version pays too much in DINOv2 recovery.
+
+### I.2 Follow-up with Bradley-Terry Preference Modeling
+
+| Policy | Final CLIP | CLIP delta | Final DINOv2 | Late improvements | Incumbent selection share | Plateau share |
+|---|---:|---:|---:|---:|---:|---:|
+| Two-scale cover sampler | 0.884 | 0.054 | 0.549 | 1.00 | 0.67 | 0.67 |
+| Full progress-aware policy | 0.876 | 0.045 | 0.522 | 1.00 | 0.73 | 0.33 |
+| Bradley-Terry cover | 0.878 | 0.018 | 0.631 | 0.67 | 0.80 | 0.67 |
+| Bradley-Terry progress-aware | 0.883 | 0.063 | 0.630 | 1.33 | 0.60 | 0.33 |
+
+Interpretation: the follow-up improves the compromise substantially. `Bradley-Terry progress-aware` preserves much of the late-round movement benefit while recovering strong final CLIP and DINOv2 scores. On this small study it is the clearest current candidate for a balanced anti-stagnation policy.
+
+### I.3 Interpretation Boundary
+
+1. Both compact bundles are still small three-target proxy studies.
+2. They are designed to diagnose behavior, not to establish a final best policy.
+3. The progress-aware oracle is still a handcrafted selection rule rather than a learned model of human preference.
+
+## Appendix J. Reproducibility and Artifact Notes
 
 The submission package rests on repository-contained artifacts:
 
@@ -330,6 +368,7 @@ The submission package rests on repository-contained artifacts:
 9. A sampler and feedback-model comparison slice with preserved runs, tables, and derived figures.
 10. Plateau-escape and stagnation-control oracle follow-ons with preserved runs and analysis summaries.
 11. A budget-matched incumbent-policy oracle slice with preserved summaries and a derived figure.
-12. Generated paper figures copied or built from repository-contained assets.
+12. Focused oracle-progress diagnosis and follow-up bundles with preserved summaries and a derived figure.
+13. Generated paper figures copied or built from repository-contained assets.
 
 The core reproducibility claim is artifact traceability. Each experimental bundle preserves runs, rounds, candidate rows, summaries, and derived analysis outputs under fixed protocols. The present appendix therefore supports the main text by documenting controlled evidence and submission packaging, not by introducing new scientific claims.

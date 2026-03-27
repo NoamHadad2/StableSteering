@@ -4,7 +4,8 @@ This folder contains the current paper-facing package for StableSteering.
 
 Recommended positioning:
 
-- systems/workshop paper on a traceable platform for interactive diffusion steering
+- methodology paper on interactive preference-guided text-to-image refinement
+- systems-and-methods paper on inference-time steering as local search
 
 Not recommended:
 
@@ -50,6 +51,12 @@ Core empirical artifacts:
 - sampler and feedback comparison analysis: [results/sampler_feedback_comparison/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\sampler_feedback_comparison\analysis\analysis_summary.md)
 - method extension comparison bundle: [results/method_extension_comparison/README.md](E:\Projects\StableSteering\paper\results\method_extension_comparison\README.md)
 - method extension comparison analysis: [results/method_extension_comparison/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\method_extension_comparison\analysis\analysis_summary.md)
+- oracle progress diagnosis bundle: [results/oracle_progress_diagnosis/README.md](E:\Projects\StableSteering\paper\results\oracle_progress_diagnosis\README.md)
+- oracle progress diagnosis analysis: [results/oracle_progress_diagnosis/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_progress_diagnosis\analysis\analysis_summary.md)
+- oracle progress follow-up bundle: [results/oracle_progress_followup/README.md](E:\Projects\StableSteering\paper\results\oracle_progress_followup\README.md)
+- oracle progress follow-up analysis: [results/oracle_progress_followup/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_progress_followup\analysis\analysis_summary.md)
+- inspired-method oracle bundle: [results/oracle_inspired_methods/README.md](E:\Projects\StableSteering\paper\results\oracle_inspired_methods\README.md)
+- inspired-method oracle analysis: [results/oracle_inspired_methods/analysis/analysis_summary.md](E:\Projects\StableSteering\paper\results\oracle_inspired_methods\analysis\analysis_summary.md)
 - human pairwise evaluation package: [results/human_pairwise_evaluation/README.md](E:\Projects\StableSteering\paper\results\human_pairwise_evaluation\README.md)
 - human pairwise analysis summary: [results/human_pairwise_evaluation/analysis_summary.md](E:\Projects\StableSteering\paper\results\human_pairwise_evaluation\analysis_summary.md)
 
@@ -70,6 +77,8 @@ Paper figures generated for the journal manuscript:
 - [figure_13_sampler_extension_curve.svg](E:\Projects\StableSteering\paper\figures\figure_13_sampler_extension_curve.svg)
 - [figure_14_preference_extension_curve.svg](E:\Projects\StableSteering\paper\figures\figure_14_preference_extension_curve.svg)
 - [figure_15_oracle_policy_curve.svg](E:\Projects\StableSteering\paper\figures\figure_15_oracle_policy_curve.svg)
+- [figure_16_oracle_progress_diagnosis.svg](E:\Projects\StableSteering\paper\figures\figure_16_oracle_progress_diagnosis.svg)
+- [figure_17_oracle_inspired_methods.svg](E:\Projects\StableSteering\paper\figures\figure_17_oracle_inspired_methods.svg)
 
 Paper support docs:
 
@@ -81,7 +90,7 @@ Paper support docs:
 
 Current evidence boundary:
 
-- software verification
+- one concept-first journal manuscript with integrated figures
 - one curated qualitative case study
 - one bounded workflow-comparison pilot
 - one appendix-style analysis layer
@@ -94,6 +103,9 @@ Current evidence boundary:
 - one budget-matched incumbent-policy oracle slice
 - one controlled sampler and feedback-model comparison slice
 - one extended method-comparison bundle for new samplers, new preference models, and oracle policies
+- one focused oracle-progress diagnosis bundle for incumbent lock-in and late-round movement
+- one focused oracle-progress follow-up bundle for Bradley-Terry and progress-aware policy combinations
+- one inspired-method oracle comparison bundle for quality-diversity sampling, listwise preference modeling, and Pareto-style oracle steering
 - one collection-ready human pairwise evaluation layer
 
 Current verification snapshot cited by the package:

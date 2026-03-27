@@ -33,14 +33,18 @@ from app.samplers.exploit_orthogonal import ExploitOrthogonalSampler
 from app.samplers.incumbent_mix import IncumbentMixSampler
 from app.samplers.line_search import LineSearchSampler
 from app.samplers.plateau_escape import PlateauEscapeSampler
+from app.samplers.quality_diversity_mix import QualityDiversityMixSampler
 from app.samplers.random_local import RandomLocalSampler
 from app.samplers.spherical_cover import SphericalCoverSampler
+from app.samplers.two_scale_cover import TwoScaleCoverSampler
 from app.samplers.uncertainty import UncertaintyGuidedSampler
 from app.storage.repository import JsonRepository
 from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
 from app.updaters.borda_pref import BordaPreferenceUpdater
 from app.updaters.bradley_terry_pref import BradleyTerryPreferenceUpdater
+from app.updaters.challenger_mixture import ChallengerMixturePreferenceUpdater
 from app.updaters.linear_pref import LinearPreferenceUpdater
+from app.updaters.plackett_luce_pref import PlackettLucePreferenceUpdater
 from app.updaters.softmax_pref import SoftmaxPreferenceUpdater
 from app.updaters.score_weighted import ScoreWeightedPreferenceUpdater
 from app.updaters.winner_average import WinnerAverageUpdater
@@ -71,6 +75,8 @@ class Orchestrator:
             "plateau_escape": PlateauEscapeSampler(),
             "annealed_shell": AnnealedShellSampler(),
             "spherical_cover": SphericalCoverSampler(),
+            "two_scale_cover": TwoScaleCoverSampler(),
+            "quality_diversity_mix": QualityDiversityMixSampler(),
         }
         self.updaters = {
             "winner_copy": WinnerCopyUpdater(),
@@ -81,6 +87,8 @@ class Orchestrator:
             "softmax_preference": SoftmaxPreferenceUpdater(),
             "borda_preference": BordaPreferenceUpdater(),
             "bradley_terry_preference": BradleyTerryPreferenceUpdater(),
+            "challenger_mixture_preference": ChallengerMixturePreferenceUpdater(),
+            "plackett_luce_preference": PlackettLucePreferenceUpdater(),
         }
 
     @staticmethod

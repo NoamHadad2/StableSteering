@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import shutil
 from pathlib import Path
 
@@ -47,6 +48,16 @@ def _read_csv_rows(path: Path) -> list[dict[str, str]]:
 
 
 def _load_case_study_panels() -> list[tuple[str, str]]:
+    manifest_path = CASE_STUDY_ROOT / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        panels = []
+        for record in manifest.get("paper_case_study_panels", []):
+            image_name = Path(record["relative_image_path"]).name
+            panels.append((record["label"], image_name))
+        if panels:
+            return panels
+
     return [
         ("Baseline prompt render", "cand_52bef0c2b1dd.png"),
         ("Round 1 selected direction", "cand_f830b6669999.png"),

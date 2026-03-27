@@ -145,6 +145,16 @@ Prepare Hugging Face assets:
 python scripts/setup_huggingface.py
 ```
 
+Warm all experiment models once for reuse across paper runs:
+
+```bash
+python scripts/preload_experiment_models.py --include-default-diffusion
+```
+
+This scans the protocol YAML files under `paper/protocols/`, prepares the
+referenced diffusion snapshots under `models/`, and caches CLIP/DINO-family
+evaluation models under `models/hf_cache/`.
+
 Inspect persisted trace files:
 
 ```text
@@ -328,12 +338,16 @@ The current sampler and updater surface also includes the newer research-facing 
   - `plateau_escape`
   - `annealed_shell`
   - `spherical_cover`
+  - `two_scale_cover`
+  - `quality_diversity_mix`
 - updaters:
   - `score_weighted_preference`
   - `contrastive_preference`
   - `softmax_preference`
   - `borda_preference`
   - `bradley_terry_preference`
+  - `challenger_mixture_preference`
+  - `plackett_luce_preference`
 
 The current stagnation-control contract is:
 
@@ -357,6 +371,27 @@ These are experiment-layer oracle selectors used by the paper runners rather tha
 
 - [run_paper_method_extension_comparison.py](../scripts/run_paper_method_extension_comparison.py)
 - [method_extension_comparison_suite.yaml](../paper/protocols/method_extension_comparison_suite.yaml)
+
+The current focused oracle-stagnation diagnosis surface adds one more compact paper runner:
+
+- [run_paper_oracle_progress_diagnosis.py](../scripts/run_paper_oracle_progress_diagnosis.py)
+- [oracle_progress_diagnosis_suite.yaml](../paper/protocols/oracle_progress_diagnosis_suite.yaml)
+
+A newer inspired-methods slice extends that same runner with:
+
+- a quality-diversity multi-emitter sampler
+- a listwise Plackett-Luce updater
+- a Pareto-style oracle selector that balances CLIP, DINOv2, and novelty-to-incumbent
+
+The compact suite for that comparison is:
+
+- [oracle_inspired_methods_suite.yaml](../paper/protocols/oracle_inspired_methods_suite.yaml)
+
+That runner was added after the repeated oracle studies revealed a concrete failure mode: the carried-forward incumbent often kept winning and visible progress stopped after the early rounds. The compact diagnosis bundle compares targeted fixes across:
+
+- sampler geometry
+- richer feedback modeling
+- softer oracle selection when challengers are close to the incumbent
 
 ### 6.4 Evolve persistence
 

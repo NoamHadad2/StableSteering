@@ -79,6 +79,26 @@ def prepare_huggingface_model(
     model_dir.mkdir(parents=True, exist_ok=True)
 
     allow_patterns = build_allow_patterns(extra_patterns)
+    manifest_path = model_dir / "prepare_manifest.json"
+    model_index_path = model_dir / "model_index.json"
+    if manifest_path.exists() and model_index_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            manifest = None
+        if (
+            isinstance(manifest, dict)
+            and str(manifest.get("model_id")) == model_id
+            and manifest.get("revision") == revision
+            and list(manifest.get("allow_patterns", [])) == allow_patterns
+        ):
+            return {
+                "model_id": model_id,
+                "model_dir": str(model_dir),
+                "snapshot_path": str(model_dir),
+                "manifest_path": str(manifest_path),
+            }
+
     snapshot_path = snapshot_download(
         repo_id=model_id,
         revision=revision,

@@ -1,89 +1,90 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
-  <title id="title">Conceptual view of StableSteering</title>
-  <desc id="desc">A concept-first diagram showing prompt initialization, latent steering state, candidate proposals, user preference, and iterative state updates.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">StableSteering runtime flow</title>
+  <desc id="desc">Diagram showing the frontend, API, orchestrator, sampling, updating, generation, storage, and tracing flow.</desc>
   <style>
-    .bg { fill: #fbfaf6; }
-    .panel { fill: #fffdfa; stroke: #31445e; stroke-width: 2.4; rx: 20; ry: 20; }
-    .prompt { fill: #efe8ff; }
-    .state { fill: #e8f1ff; }
-    .candidates { fill: #ecf8ee; }
-    .feedback { fill: #fff2de; }
-    .update { fill: #fbe8e6; }
-    .title { font: 700 28px Georgia, 'Times New Roman', serif; fill: #1d2430; }
-    .label { font: 700 20px Georgia, 'Times New Roman', serif; fill: #1d2430; }
-    .body { font: 16px Georgia, 'Times New Roman', serif; fill: #364152; }
-    .small { font: italic 15px Georgia, 'Times New Roman', serif; fill: #4b5565; }
-    .arrow { stroke: #4c6284; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
-    .loop { stroke-dasharray: 10 8; }
-    .orb { fill: #7b4411; opacity: 0.85; }
-    .candidate { fill: #6aa27c; opacity: 0.9; }
+    .bg { fill: #fbfaf5; }
+    .panel { fill: #fffdf8; stroke: #2f3b52; stroke-width: 2; rx: 18; ry: 18; }
+    .core { fill: #e8f0ff; }
+    .io { fill: #e8f7ef; }
+    .trace { fill: #fff1db; }
+    .title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .label { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .body { font: 16px 'Segoe UI', Arial, sans-serif; fill: #344054; }
+    .small { font: 14px 'Segoe UI', Arial, sans-serif; fill: #475467; }
+    .arrow { stroke: #476082; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
+    .dash { stroke-dasharray: 10 8; }
   </style>
   <defs>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M0,0 L12,6 L0,12 z" fill="#4c6284"/>
+      <path d="M0,0 L12,6 L0,12 z" fill="#476082"/>
     </marker>
   </defs>
 
-  <rect class="bg" width="1200" height="700"/>
-  <text class="title" x="60" y="54">StableSteering as Iterative Preference-Guided Search</text>
+  <rect class="bg" x="0" y="0" width="1200" height="760"/>
+  <text class="title" x="60" y="58">StableSteering Runtime Architecture</text>
 
-  <rect class="panel prompt" x="70" y="120" width="230" height="150"/>
-  <text class="label" x="95" y="158">Prompt Prior</text>
-  <text class="body" x="95" y="192">Text prompt sets</text>
-  <text class="body" x="95" y="218">coarse semantic intent</text>
-  <text class="body" x="95" y="244">and broad visual target</text>
+  <rect class="panel io" x="60" y="110" width="240" height="150"/>
+  <text class="label" x="85" y="150">Frontend</text>
+  <text class="body" x="85" y="182">Prompt-first setup page</text>
+  <text class="body" x="85" y="208">Session view and progress UI</text>
+  <text class="body" x="85" y="234">Replay and trace-report links</text>
 
-  <rect class="panel state" x="360" y="105" width="260" height="180"/>
-  <text class="label" x="388" y="145">Latent Steering State</text>
-  <text class="body" x="388" y="180">z<tspan baseline-shift="sub" font-size="13">t</tspan> is a compact control vector</text>
-  <text class="body" x="388" y="206">that carries directional refinement</text>
-  <text class="body" x="388" y="232">not captured by prompt text alone</text>
-  <circle class="orb" cx="490" cy="240" r="12"/>
-  <circle class="orb" cx="452" cy="212" r="10"/>
-  <circle class="orb" cx="530" cy="210" r="10"/>
-  <circle class="orb" cx="480" cy="192" r="7"/>
-  <text class="small" x="430" y="270">local search center</text>
+  <rect class="panel core" x="360" y="110" width="240" height="150"/>
+  <text class="label" x="385" y="150">FastAPI Routes</text>
+  <text class="body" x="385" y="182">Session creation</text>
+  <text class="body" x="385" y="208">Async job endpoints</text>
+  <text class="body" x="385" y="234">Diagnostics and replay</text>
 
-  <rect class="panel candidates" x="700" y="90" width="410" height="220"/>
-  <text class="label" x="728" y="128">Candidate Proposal Model</text>
-  <text class="body" x="728" y="162">Sampler generates a small set of local alternatives</text>
-  <text class="body" x="728" y="188">around the current steering state</text>
-  <text class="small" x="728" y="222">baseline / exploit / explore / challenger / axis probes</text>
-  <circle class="candidate" cx="820" cy="242" r="12"/>
-  <circle class="candidate" cx="870" cy="210" r="11"/>
-  <circle class="candidate" cx="922" cy="252" r="11"/>
-  <circle class="candidate" cx="980" cy="202" r="10"/>
-  <circle class="candidate" cx="1035" cy="238" r="12"/>
-  <circle class="orb" cx="930" cy="230" r="8"/>
-  <text class="small" x="885" y="286">candidate frontier around current state</text>
+  <rect class="panel core" x="660" y="110" width="260" height="170"/>
+  <text class="label" x="685" y="150">Orchestrator</text>
+  <text class="body" x="685" y="182">Session and round lifecycle</text>
+  <text class="body" x="685" y="208">Baseline and incumbent policy</text>
+  <text class="body" x="685" y="234">Feedback validation</text>
+  <text class="body" x="685" y="260">Replay export</text>
 
-  <rect class="panel feedback" x="700" y="390" width="220" height="160"/>
-  <text class="label" x="726" y="430">Preference Signal</text>
-  <text class="body" x="726" y="464">winner only</text>
-  <text class="body" x="726" y="490">pairwise</text>
-  <text class="body" x="726" y="516">ratings / ranking / approvals</text>
+  <rect class="panel io" x="980" y="110" width="160" height="150"/>
+  <text class="label" x="1005" y="150">SQLite</text>
+  <text class="body" x="1005" y="182">Experiments</text>
+  <text class="body" x="1005" y="208">Sessions</text>
+  <text class="body" x="1005" y="234">Rounds</text>
 
-  <rect class="panel update" x="980" y="380" width="190" height="180"/>
-  <text class="label" x="1008" y="420">Update Rule</text>
-  <text class="body" x="1008" y="454">move toward</text>
-  <text class="body" x="1008" y="480">preferred candidate</text>
-  <text class="body" x="1008" y="506">to obtain z<tspan baseline-shift="sub" font-size="13">t+1</tspan></text>
+  <rect class="panel core" x="300" y="360" width="220" height="150"/>
+  <text class="label" x="325" y="400">Samplers</text>
+  <text class="body" x="325" y="432">random_local</text>
+  <text class="body" x="325" y="458">axis_sweep</text>
+  <text class="body" x="325" y="484">incumbent_mix and others</text>
 
-  <rect class="panel state" x="280" y="430" width="300" height="150"/>
-  <text class="label" x="308" y="470">Next Steering State</text>
-  <text class="body" x="308" y="504">updated local search center</text>
-  <text class="body" x="308" y="530">for the next round of proposals</text>
-  <circle class="orb" cx="420" cy="520" r="12"/>
-  <circle class="orb" cx="390" cy="495" r="9"/>
-  <circle class="orb" cx="452" cy="490" r="9"/>
+  <rect class="panel core" x="560" y="360" width="220" height="150"/>
+  <text class="label" x="585" y="400">Updaters</text>
+  <text class="body" x="585" y="432">winner_average</text>
+  <text class="body" x="585" y="458">winner_copy</text>
+  <text class="body" x="585" y="484">linear_preference</text>
 
-  <path class="arrow" d="M300 195 L360 195"/>
-  <path class="arrow" d="M620 195 L700 195"/>
-  <path class="arrow" d="M860 310 L820 390"/>
-  <path class="arrow" d="M920 470 L980 470"/>
-  <path class="arrow" d="M980 535 L580 535"/>
-  <path class="arrow loop" d="M350 430 C240 360, 220 280, 250 220"/>
+  <rect class="panel io" x="820" y="340" width="260" height="190"/>
+  <text class="label" x="845" y="380">Generation Engine</text>
+  <text class="body" x="845" y="412">Diffusers pipeline on GPU</text>
+  <text class="body" x="845" y="438">Prompt plus steering offset</text>
+  <text class="body" x="845" y="464">Guidance, steps, image size</text>
+  <text class="body" x="845" y="490">Rendered candidate artifacts</text>
 
-  <text class="small" x="180" y="402">prompt gives coarse intent;</text>
-  <text class="small" x="180" y="424">steering state absorbs iterative refinement</text>
+  <rect class="panel trace" x="60" y="570" width="1080" height="130"/>
+  <text class="label" x="85" y="610">Tracing and Reports</text>
+  <text class="body" x="85" y="642">Backend events, frontend events, saved HTML session report, diagnostics snapshot, and replay-friendly provenance.</text>
+  <text class="small" x="85" y="672">Artifacts live on disk while structured records live in SQLite.</text>
+
+  <path class="arrow" d="M300 185 L360 185"/>
+  <path class="arrow" d="M600 185 L660 185"/>
+  <path class="arrow" d="M920 185 L980 185"/>
+  <path class="arrow" d="M770 280 L770 330"/>
+  <path class="arrow" d="M660 205 C590 230, 510 300, 450 360"/>
+  <path class="arrow" d="M730 280 C700 320, 690 330, 670 360"/>
+  <path class="arrow" d="M520 435 L560 435"/>
+  <path class="arrow" d="M780 435 L820 435"/>
+  <path class="arrow dash" d="M960 530 L960 570"/>
+  <path class="arrow dash" d="M770 280 C650 520, 420 555, 260 570"/>
+  <path class="arrow dash" d="M180 260 L180 570"/>
+
+  <text class="small" x="314" y="338">candidate proposals</text>
+  <text class="small" x="578" y="338">feedback-driven update</text>
+  <text class="small" x="835" y="320">render images</text>
 </svg>

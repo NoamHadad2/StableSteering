@@ -1,0 +1,1573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trace Report ses_e6c79f53d39c</title>
+  <style>
+    :root { color-scheme: light; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; background: #f5efe5; color: #1f1b16; }
+    main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .hero, .card { background: #fffdf8; border: 1px solid #d7cfc2; border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(56, 44, 22, 0.08); }
+    .hero { margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 16px 0 0; }
+    .metric { background: #f8f3ea; border-radius: 14px; padding: 14px; }
+    .metric h3 { margin: 0 0 8px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: #705a3d; }
+    .metric p { margin: 0; font-size: 1.05rem; font-weight: 700; }
+    .section { margin-top: 18px; }
+    .section h2 { margin: 0 0 12px; }
+    .round { margin-top: 16px; }
+    .candidate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .candidate { border: 1px solid #e6dccf; border-radius: 14px; background: #fff; overflow: hidden; }
+    .candidate img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; background: #eee5d9; }
+    .candidate .body { padding: 12px; }
+    .kv { margin: 0; font-size: 0.92rem; line-height: 1.45; }
+    .pill { display: inline-block; margin-right: 8px; margin-bottom: 8px; padding: 6px 10px; border-radius: 999px; background: #efe4d2; color: #5e4b31; font-size: 0.85rem; }
+    .events { width: 100%; border-collapse: collapse; }
+    .events th, .events td { text-align: left; padding: 10px; border-top: 1px solid #e7ddcf; vertical-align: top; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-word; background: #f7f2ea; border-radius: 12px; padding: 12px; }
+    a { color: #7a3f13; }
+    details.card { padding: 0; overflow: hidden; }
+    details.card > summary { list-style: none; cursor: pointer; padding: 20px; font-weight: 700; }
+    details.card > summary::-webkit-details-marker { display: none; }
+    details.card > summary::after { content: '+'; float: right; color: #7a3f13; }
+    details.card[open] > summary::after { content: '−'; }
+    .card-body { padding: 0 20px 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <p>StableSteering Run Trace Report</p>
+    <h1>A red bicycle parked outdoors on a quiet street in daylight with an urban wall or building nearby.</h1>
+    <p>Session <code>ses_e6c79f53d39c</code> from experiment <strong>Oracle progress diagnosis / Bradley-Terry cover / Red bicycle street photo</strong>.</p>
+    <p>Generated at 2026-03-27T07:25:05.587681+00:00. Stored in <code>report.html</code>.</p>
+    <div class="grid">
+      <div class="metric"><h3>Status</h3><p>ready</p></div>
+      <div class="metric"><h3>Rounds</h3><p>6</p></div>
+      <div class="metric"><h3>Images Proposed</h3><p>30</p></div>
+      <div class="metric"><h3>Feedback Events</h3><p>6</p></div>
+      <div class="metric"><h3>Backend</h3><p>diffusers</p></div>
+      <div class="metric"><h3>Active Device</h3><p>cuda</p></div>
+    </div>
+  </section>
+  <details class="card section" open>
+    <summary>Artifacts</summary>
+    <div class="card-body">
+    <p>Backend event log: <code>backend-events.jsonl</code></p>
+    <p>Frontend event log: <code>frontend-events.jsonl</code></p>
+    </div>
+  </details>
+  <details class="card section" open>
+    <summary>Runtime Diagnostics</summary>
+    <div class="card-body">
+    <pre>{
+  &quot;active_device&quot;: &quot;cuda&quot;,
+  &quot;backend&quot;: &quot;diffusers&quot;,
+  &quot;configured_device&quot;: &quot;cuda&quot;,
+  &quot;cuda_available&quot;: true,
+  &quot;default_model_source&quot;: &quot;models\\runwayml--stable-diffusion-v1-5&quot;,
+  &quot;default_num_inference_steps&quot;: 12,
+  &quot;loaded_model_sources&quot;: [
+    &quot;models\\runwayml--stable-diffusion-v1-5&quot;
+  ],
+  &quot;local_files_only&quot;: true,
+  &quot;model_source&quot;: &quot;models\\runwayml--stable-diffusion-v1-5&quot;,
+  &quot;pipeline_loaded&quot;: true,
+  &quot;test_only_backend&quot;: false,
+  &quot;torch_available&quot;: true
+}</pre>
+    </div>
+  </details>
+  <details class="card section" open>
+    <summary>Run Summary</summary>
+    <div class="card-body">
+    <p><strong>Initial prompt:</strong> A red bicycle parked outdoors on a quiet street in daylight with an urban wall or building nearby.</p>
+    <p><strong>Negative prompt:</strong> low detail, blurry, extra wheels, warped frame, text, watermark, crowded scene</p>
+    <p><strong>Model:</strong> <code>runwayml/stable-diffusion-v1-5</code></p>
+    <p><strong>Feedback mode:</strong> <code>top_k</code></p>
+    <p><strong>Sampler:</strong> <code>two_scale_cover</code></p>
+    <p><strong>Updater:</strong> <code>bradley_terry_preference</code></p>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 1</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_2340ca49d03c</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_ddf7a4babb04.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_ddf7a4babb04</strong></p>
+          <p class="kv">Role: baseline_prompt</p>
+          <p class="kv">Seed: 3935291090</p>
+          <p class="kv">z: <code>[0.0, 0.0, 0.0, 0.0, 0.0]</code></p>
+          <p class="kv">Predicted score: 0.0</p>
+          <p class="kv">Predicted uncertainty: 0.05</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_583b191238aa.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_583b191238aa</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 2508414256</p>
+          <p class="kv">z: <code>[0.5912089633726779, 0.34688839871001104, 0.19780635409290365, 0.08604072982994149, 0.04483346472236676]</code></p>
+          <p class="kv">Predicted score: 0.20933487296597186</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_e4ab7f8db92d.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_e4ab7f8db92d</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 3793036236</p>
+          <p class="kv">z: <code>[0.030878117250035447, -0.5443666022990302, -0.31430746974934526, 0.2577632283362772, -0.23639051747886816]</code></p>
+          <p class="kv">Predicted score: -0.03858086908133769</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_f7f21846892f.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_f7f21846892f</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 3037453831</p>
+          <p class="kv">z: <code>[0.05596573564742098, -0.0069979711763228465, 0.5983649350927409, 0.33915643320262207, -0.17984444648171785]</code></p>
+          <p class="kv">Predicted score: -0.22251376527777444</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_0e8b85a9678d.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_0e8b85a9678d</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 2035466268</p>
+          <p class="kv">z: <code>[-0.1913681171244746, -0.13807896489443766, 0.0971840449951564, -0.48330777140811504, 0.40300409246699304]</code></p>
+          <p class="kv">Predicted score: 0.7572899835561416</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:24:01.750155Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_583b191238aa&quot;,
+    &quot;cand_e4ab7f8db92d&quot;,
+    &quot;cand_f7f21846892f&quot;,
+    &quot;cand_ddf7a4babb04&quot;,
+    &quot;cand_0e8b85a9678d&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_583b191238aa&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_0e8b85a9678d&quot;: 0.02,
+    &quot;cand_583b191238aa&quot;: 0.5933,
+    &quot;cand_ddf7a4babb04&quot;: 0.0529,
+    &quot;cand_e4ab7f8db92d&quot;: 0.2247,
+    &quot;cand_f7f21846892f&quot;: 0.109
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_583b191238aa&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 2</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_0afe4c33c2e3</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_583b191238aa.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_459494368f83</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 2508414256</p>
+          <p class="kv">z: <code>[0.5912089633726779, 0.34688839871001104, 0.19780635409290365, 0.08604072982994149, 0.04483346472236676]</code></p>
+          <p class="kv">Predicted score: 0.20933487296597186</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_cb59b4389a28.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_cb59b4389a28</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 2766180804</p>
+          <p class="kv">z: <code>[0.31803058767799036, 0.20921340468938188, -0.025742593173221962, 0.1084767511485028, 0.10698555294823174]</code></p>
+          <p class="kv">Predicted score: 0.7169637032908848</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_8c8ab910a852.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_8c8ab910a852</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 1705474555</p>
+          <p class="kv">z: <code>[0.18038172119658383, -0.12301694815779157, 0.1298104264687118, 0.2481491150076524, -0.4429487171471734]</code></p>
+          <p class="kv">Predicted score: -0.011624402632016913</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_de5f151662a9.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_de5f151662a9</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 2541741916</p>
+          <p class="kv">z: <code>[0.13905338970731, 0.009436949154285536, 0.17048954969829827, 0.17534884227290926, 0.09247599259633352]</code></p>
+          <p class="kv">Predicted score: 0.5788047234291366</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_ac28f9c36b10.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_ac28f9c36b10</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 178289193</p>
+          <p class="kv">z: <code>[0.2254732881687392, -0.22631008629733398, -0.3033215651739379, -0.094025522425537, 0.034369888751138555]</code></p>
+          <p class="kv">Predicted score: -0.3758139969769311</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:24:14.614728Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_459494368f83&quot;,
+    &quot;cand_8c8ab910a852&quot;,
+    &quot;cand_cb59b4389a28&quot;,
+    &quot;cand_ac28f9c36b10&quot;,
+    &quot;cand_de5f151662a9&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_459494368f83&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_459494368f83&quot;: 0.5933,
+    &quot;cand_8c8ab910a852&quot;: 0.2247,
+    &quot;cand_ac28f9c36b10&quot;: 0.0529,
+    &quot;cand_cb59b4389a28&quot;: 0.109,
+    &quot;cand_de5f151662a9&quot;: 0.02
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_459494368f83&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 3</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_0d6038533b6d</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_583b191238aa.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_7315de788ea0</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 2508414256</p>
+          <p class="kv">z: <code>[0.5912089633726779, 0.34688839871001104, 0.19780635409290365, 0.08604072982994149, 0.04483346472236676]</code></p>
+          <p class="kv">Predicted score: 0.20933487296597186</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_00c07dff3145.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_00c07dff3145</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 183529313</p>
+          <p class="kv">z: <code>[0.21218992878662382, 0.13895657816497692, 0.13894130687684883, 0.17416558343913183, 0.10328191959585842]</code></p>
+          <p class="kv">Predicted score: 0.7675353168634398</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_6b8f75524e9b.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_6b8f75524e9b</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 3785277722</p>
+          <p class="kv">z: <code>[0.5351322449466918, 0.0863149623275996, 0.04311003329139651, -0.20834865281186513, -0.28881754032225027]</code></p>
+          <p class="kv">Predicted score: 0.16339104743157246</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_39ac4318274c.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_39ac4318274c</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 691167987</p>
+          <p class="kv">z: <code>[0.4886375996103977, 0.1734016757201286, 0.22131703161263144, 0.06522325137369533, 0.09933869879760043]</code></p>
+          <p class="kv">Predicted score: 1.0399182571144534</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_2c963310b9bf.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_2c963310b9bf</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 3641638382</p>
+          <p class="kv">z: <code>[0.4570467531658142, 0.18516207280463182, -0.0494644817438456, 0.4104518265983009, 0.09168334256128956]</code></p>
+          <p class="kv">Predicted score: 1.0828795133861908</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:24:27.417811Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_00c07dff3145&quot;,
+    &quot;cand_7315de788ea0&quot;,
+    &quot;cand_6b8f75524e9b&quot;,
+    &quot;cand_2c963310b9bf&quot;,
+    &quot;cand_39ac4318274c&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_00c07dff3145&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_00c07dff3145&quot;: 0.5933,
+    &quot;cand_2c963310b9bf&quot;: 0.0529,
+    &quot;cand_39ac4318274c&quot;: 0.02,
+    &quot;cand_6b8f75524e9b&quot;: 0.109,
+    &quot;cand_7315de788ea0&quot;: 0.2247
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_00c07dff3145&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 4</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_30dd43d96319</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_00c07dff3145.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_2d3e736c1645</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 183529313</p>
+          <p class="kv">z: <code>[0.21218992878662382, 0.13895657816497692, 0.13894130687684883, 0.17416558343913183, 0.10328191959585842]</code></p>
+          <p class="kv">Predicted score: 0.7675353168634398</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_f24149b9feab.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_f24149b9feab</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 745113635</p>
+          <p class="kv">z: <code>[0.3735649114162545, 0.11055982182898748, 0.009888493991440449, 0.2974352628683662, 0.06180005830213651]</code></p>
+          <p class="kv">Predicted score: 0.8532485484071851</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_ad351c0c1d5c.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_ad351c0c1d5c</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 1557351191</p>
+          <p class="kv">z: <code>[0.4017213626666612, 0.3421797799841597, 0.2582134660924538, -0.2573532823822596, -0.10548952044080565]</code></p>
+          <p class="kv">Predicted score: 0.6352718059202095</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_4e99e7a9ccd8.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_4e99e7a9ccd8</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 540801528</p>
+          <p class="kv">z: <code>[0.2172352085876203, 0.041061392173427885, 0.0902609005746901, 0.03558806116817011, 0.12845465737251988]</code></p>
+          <p class="kv">Predicted score: 0.5046002198764282</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_89a410983588.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_89a410983588</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 2462113739</p>
+          <p class="kv">z: <code>[0.291896036442479, 0.2520211921514701, 0.414050498308815, 0.31492365699948016, 0.05627875023504462]</code></p>
+          <p class="kv">Predicted score: 1.317170134137289</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:24:40.228635Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_2d3e736c1645&quot;,
+    &quot;cand_ad351c0c1d5c&quot;,
+    &quot;cand_f24149b9feab&quot;,
+    &quot;cand_89a410983588&quot;,
+    &quot;cand_4e99e7a9ccd8&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_2d3e736c1645&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_2d3e736c1645&quot;: 0.5933,
+    &quot;cand_4e99e7a9ccd8&quot;: 0.02,
+    &quot;cand_89a410983588&quot;: 0.0529,
+    &quot;cand_ad351c0c1d5c&quot;: 0.2247,
+    &quot;cand_f24149b9feab&quot;: 0.109
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_2d3e736c1645&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 5</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_ba7899dfca6b</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_00c07dff3145.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_deaeec5f157a</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 183529313</p>
+          <p class="kv">z: <code>[0.21218992878662382, 0.13895657816497692, 0.13894130687684883, 0.17416558343913183, 0.10328191959585842]</code></p>
+          <p class="kv">Predicted score: 0.7675353168634398</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_1cc3b69ae6ce.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_1cc3b69ae6ce</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 1781475643</p>
+          <p class="kv">z: <code>[0.176613879076837, 0.0890235886043624, 0.18302766867774112, 0.1415016604471231, 0.17890836193504123]</code></p>
+          <p class="kv">Predicted score: 0.7690751587411049</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_7fb041890570.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_7fb041890570</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 849301822</p>
+          <p class="kv">z: <code>[0.5050617538625057, 0.3773533068526129, -0.053293276929998135, -0.03410890227600502, -0.14496039463355478]</code></p>
+          <p class="kv">Predicted score: 0.6460524868755607</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_fa93d3384c33.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_fa93d3384c33</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 733415561</p>
+          <p class="kv">z: <code>[0.42647333991888475, 0.03034262049108922, 0.23919888217381619, 0.12534306394833455, -0.017360743755202294]</code></p>
+          <p class="kv">Predicted score: 0.7959971627769225</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_c63f2622c62d.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_c63f2622c62d</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 1079009477</p>
+          <p class="kv">z: <code>[-0.03476631060517859, 0.14851129101249272, 0.035054985418813744, 0.22394340556463727, -0.328746693207863]</code></p>
+          <p class="kv">Predicted score: 0.03199667818290215</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:24:52.808439Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_deaeec5f157a&quot;,
+    &quot;cand_1cc3b69ae6ce&quot;,
+    &quot;cand_c63f2622c62d&quot;,
+    &quot;cand_fa93d3384c33&quot;,
+    &quot;cand_7fb041890570&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_deaeec5f157a&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_1cc3b69ae6ce&quot;: 0.2247,
+    &quot;cand_7fb041890570&quot;: 0.02,
+    &quot;cand_c63f2622c62d&quot;: 0.109,
+    &quot;cand_deaeec5f157a&quot;: 0.5933,
+    &quot;cand_fa93d3384c33&quot;: 0.0529
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_deaeec5f157a&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section round">
+    <summary>Round 6</summary>
+    <div class="card-body">
+    <span class="pill">Round id: rnd_04d56c6a904f</span>
+    <span class="pill">Render status: succeeded</span>
+    <span class="pill">Latency: 75 ms</span>
+    <div class="candidate-grid">
+      <article class="candidate">
+        <img src="/artifacts/cand_00c07dff3145.png" alt="Candidate 0">
+        <div class="body">
+          <p class="kv"><strong>cand_dbad3c5dd51e</strong></p>
+          <p class="kv">Role: incumbent</p>
+          <p class="kv">Seed: 183529313</p>
+          <p class="kv">z: <code>[0.21218992878662382, 0.13895657816497692, 0.13894130687684883, 0.17416558343913183, 0.10328191959585842]</code></p>
+          <p class="kv">Predicted score: 0.7675353168634398</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_505f17f44deb.png" alt="Candidate 1">
+        <div class="body">
+          <p class="kv"><strong>cand_505f17f44deb</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 3568896467</p>
+          <p class="kv">z: <code>[0.37103140953628844, 0.09261154005895846, 0.14836907004870203, 0.03062828231518813, 0.19093230068809933]</code></p>
+          <p class="kv">Predicted score: 0.8335726026472364</p>
+          <p class="kv">Predicted uncertainty: 0.14</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_43707be90179.png" alt="Candidate 2">
+        <div class="body">
+          <p class="kv"><strong>cand_43707be90179</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 960765497</p>
+          <p class="kv">z: <code>[-0.1373548190991656, 0.27143157306832655, 0.08295481028902978, 0.12383262430267912, -0.28236751836152435]</code></p>
+          <p class="kv">Predicted score: 0.05449667019934548</p>
+          <p class="kv">Predicted uncertainty: 0.168</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_8b98fe01adcb.png" alt="Candidate 3">
+        <div class="body">
+          <p class="kv"><strong>cand_8b98fe01adcb</strong></p>
+          <p class="kv">Role: near_cover_probe</p>
+          <p class="kv">Seed: 1626820581</p>
+          <p class="kv">z: <code>[0.21549323882192123, 0.14498901473610526, 0.21594034747050506, 0.3452729461026495, 0.1512241620707374]</code></p>
+          <p class="kv">Predicted score: 1.0649197092019185</p>
+          <p class="kv">Predicted uncertainty: 0.196</p>
+        </div>
+      </article>
+      <article class="candidate">
+        <img src="/artifacts/cand_e8d8f06d7bc6.png" alt="Candidate 4">
+        <div class="body">
+          <p class="kv"><strong>cand_e8d8f06d7bc6</strong></p>
+          <p class="kv">Role: far_cover_probe</p>
+          <p class="kv">Seed: 2414375391</p>
+          <p class="kv">z: <code>[0.4205688173307621, 0.3782703214836639, 0.03172665613340381, 0.28499386076559197, -0.14249685045700083]</code></p>
+          <p class="kv">Predicted score: 0.961062805256421</p>
+          <p class="kv">Predicted uncertainty: 0.22400000000000003</p>
+        </div>
+      </article>
+    </div>
+    <h3>User Preferences</h3>
+    <p class="kv"><strong>top_k</strong> at 2026-03-27T07:25:05.560947Z</p>
+    <pre>{
+  &quot;ranking&quot;: [
+    &quot;cand_dbad3c5dd51e&quot;,
+    &quot;cand_8b98fe01adcb&quot;,
+    &quot;cand_505f17f44deb&quot;,
+    &quot;cand_e8d8f06d7bc6&quot;,
+    &quot;cand_43707be90179&quot;
+  ],
+  &quot;winner_candidate_id&quot;: &quot;cand_dbad3c5dd51e&quot;
+}</pre>
+    <p><strong>Critique:</strong> Oracle progress diagnosis policy: Bradley-Terry cover</p>
+    <h3>Update Summary</h3>
+    <pre>{
+  &quot;method&quot;: &quot;bradley_terry_softmax_center&quot;,
+  &quot;pair_count&quot;: 10,
+  &quot;updater&quot;: &quot;bradley_terry_preference&quot;,
+  &quot;weights&quot;: {
+    &quot;cand_43707be90179&quot;: 0.02,
+    &quot;cand_505f17f44deb&quot;: 0.109,
+    &quot;cand_8b98fe01adcb&quot;: 0.2247,
+    &quot;cand_dbad3c5dd51e&quot;: 0.5933,
+    &quot;cand_e8d8f06d7bc6&quot;: 0.0529
+  },
+  &quot;winner_candidate_id&quot;: &quot;cand_dbad3c5dd51e&quot;
+}</pre>
+    </div>
+  </details>
+  <details class="card section">
+    <summary>Event Timeline</summary>
+    <div class="card-body">
+    <table class="events">
+      <thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>2026-03-27T07:23:43.531495+00:00</td>
+          <td>backend</td>
+          <td><code>session.created</code></td>
+          <td><pre>{
+  &quot;experiment_id&quot;: &quot;exp_47585b0b6a65&quot;,
+  &quot;prompt&quot;: &quot;A red bicycle parked outdoors on a quiet street in daylight with an urban wall or building nearby.&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:23:43.563787+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 1,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:00.831941+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_ddf7a4babb04&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_ddf7a4babb04.png&quot;,
+      &quot;predicted_score&quot;: 0.0,
+      &quot;predicted_uncertainty&quot;: 0.05,
+      &quot;sampler_role&quot;: &quot;baseline_prompt&quot;,
+      &quot;seed&quot;: 3935291090,
+      &quot;seed_group&quot;: &quot;candidate:0&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_583b191238aa&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_583b191238aa.png&quot;,
+      &quot;predicted_score&quot;: 0.20933487296597186,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 2508414256,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5912089633726779,
+        0.34688839871001104,
+        0.19780635409290365,
+        0.08604072982994149,
+        0.04483346472236676
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_e4ab7f8db92d&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_e4ab7f8db92d.png&quot;,
+      &quot;predicted_score&quot;: -0.03858086908133769,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 3793036236,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.030878117250035447,
+        -0.5443666022990302,
+        -0.31430746974934526,
+        0.2577632283362772,
+        -0.23639051747886816
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_f7f21846892f&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_f7f21846892f.png&quot;,
+      &quot;predicted_score&quot;: -0.22251376527777444,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 3037453831,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.05596573564742098,
+        -0.0069979711763228465,
+        0.5983649350927409,
+        0.33915643320262207,
+        -0.17984444648171785
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_0e8b85a9678d&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_0e8b85a9678d.png&quot;,
+      &quot;predicted_score&quot;: 0.7572899835561416,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 2035466268,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.1913681171244746,
+        -0.13807896489443766,
+        0.0971840449951564,
+        -0.48330777140811504,
+        0.40300409246699304
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_2340ca49d03c&quot;,
+  &quot;round_index&quot;: 1,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:01.757261+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.239119,
+    0.074678,
+    0.076745,
+    0.076736,
+    -0.014541
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_583b191238aa&quot;,
+      &quot;cand_e4ab7f8db92d&quot;,
+      &quot;cand_f7f21846892f&quot;,
+      &quot;cand_ddf7a4babb04&quot;,
+      &quot;cand_0e8b85a9678d&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_583b191238aa&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_583b191238aa&quot;,
+      &quot;cand_e4ab7f8db92d&quot;,
+      &quot;cand_f7f21846892f&quot;,
+      &quot;cand_ddf7a4babb04&quot;,
+      &quot;cand_0e8b85a9678d&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_2340ca49d03c&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_583b191238aa&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:01.775934+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 2,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:13.698818+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_459494368f83&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_583b191238aa.png&quot;,
+      &quot;predicted_score&quot;: 0.20933487296597186,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 2508414256,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5912089633726779,
+        0.34688839871001104,
+        0.19780635409290365,
+        0.08604072982994149,
+        0.04483346472236676
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_cb59b4389a28&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_cb59b4389a28.png&quot;,
+      &quot;predicted_score&quot;: 0.7169637032908848,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 2766180804,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.31803058767799036,
+        0.20921340468938188,
+        -0.025742593173221962,
+        0.1084767511485028,
+        0.10698555294823174
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_8c8ab910a852&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_8c8ab910a852.png&quot;,
+      &quot;predicted_score&quot;: -0.011624402632016913,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 1705474555,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.18038172119658383,
+        -0.12301694815779157,
+        0.1298104264687118,
+        0.2481491150076524,
+        -0.4429487171471734
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_de5f151662a9&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_de5f151662a9.png&quot;,
+      &quot;predicted_score&quot;: 0.5788047234291366,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 2541741916,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.13905338970731,
+        0.009436949154285536,
+        0.17048954969829827,
+        0.17534884227290926,
+        0.09247599259633352
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_ac28f9c36b10&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_ac28f9c36b10.png&quot;,
+      &quot;predicted_score&quot;: -0.3758139969769311,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 178289193,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.2254732881687392,
+        -0.22631008629733398,
+        -0.3033215651739379,
+        -0.094025522425537,
+        0.034369888751138555
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_0afe4c33c2e3&quot;,
+  &quot;round_index&quot;: 2,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:14.621957+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.375123,
+    0.159165,
+    0.116027,
+    0.097886,
+    -0.030129
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_459494368f83&quot;,
+      &quot;cand_8c8ab910a852&quot;,
+      &quot;cand_cb59b4389a28&quot;,
+      &quot;cand_ac28f9c36b10&quot;,
+      &quot;cand_de5f151662a9&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_459494368f83&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_459494368f83&quot;,
+      &quot;cand_8c8ab910a852&quot;,
+      &quot;cand_cb59b4389a28&quot;,
+      &quot;cand_ac28f9c36b10&quot;,
+      &quot;cand_de5f151662a9&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_0afe4c33c2e3&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_459494368f83&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:14.639466+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 3,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:26.557644+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_7315de788ea0&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_583b191238aa.png&quot;,
+      &quot;predicted_score&quot;: 0.20933487296597186,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 2508414256,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5912089633726779,
+        0.34688839871001104,
+        0.19780635409290365,
+        0.08604072982994149,
+        0.04483346472236676
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_00c07dff3145&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_00c07dff3145.png&quot;,
+      &quot;predicted_score&quot;: 0.7675353168634398,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 183529313,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.21218992878662382,
+        0.13895657816497692,
+        0.13894130687684883,
+        0.17416558343913183,
+        0.10328191959585842
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_6b8f75524e9b&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_6b8f75524e9b.png&quot;,
+      &quot;predicted_score&quot;: 0.16339104743157246,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 3785277722,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5351322449466918,
+        0.0863149623275996,
+        0.04311003329139651,
+        -0.20834865281186513,
+        -0.28881754032225027
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_39ac4318274c&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_39ac4318274c.png&quot;,
+      &quot;predicted_score&quot;: 1.0399182571144534,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 691167987,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.4886375996103977,
+        0.1734016757201286,
+        0.22131703161263144,
+        0.06522325137369533,
+        0.09933869879760043
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_2c963310b9bf&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_2c963310b9bf.png&quot;,
+      &quot;predicted_score&quot;: 1.0828795133861908,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 3641638382,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.4570467531658142,
+        0.18516207280463182,
+        -0.0494644817438456,
+        0.4104518265983009,
+        0.09168334256128956
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_0d6038533b6d&quot;,
+  &quot;round_index&quot;: 3,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:27.425893+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.346795,
+    0.169098,
+    0.127006,
+    0.11806,
+    0.02163
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_00c07dff3145&quot;,
+      &quot;cand_7315de788ea0&quot;,
+      &quot;cand_6b8f75524e9b&quot;,
+      &quot;cand_2c963310b9bf&quot;,
+      &quot;cand_39ac4318274c&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_00c07dff3145&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_00c07dff3145&quot;,
+      &quot;cand_7315de788ea0&quot;,
+      &quot;cand_6b8f75524e9b&quot;,
+      &quot;cand_2c963310b9bf&quot;,
+      &quot;cand_39ac4318274c&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_0d6038533b6d&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_00c07dff3145&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:27.445254+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 4,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:39.362653+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_2d3e736c1645&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_00c07dff3145.png&quot;,
+      &quot;predicted_score&quot;: 0.7675353168634398,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 183529313,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.21218992878662382,
+        0.13895657816497692,
+        0.13894130687684883,
+        0.17416558343913183,
+        0.10328191959585842
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_f24149b9feab&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_f24149b9feab.png&quot;,
+      &quot;predicted_score&quot;: 0.8532485484071851,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 745113635,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.3735649114162545,
+        0.11055982182898748,
+        0.009888493991440449,
+        0.2974352628683662,
+        0.06180005830213651
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_ad351c0c1d5c&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_ad351c0c1d5c.png&quot;,
+      &quot;predicted_score&quot;: 0.6352718059202095,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 1557351191,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.4017213626666612,
+        0.3421797799841597,
+        0.2582134660924538,
+        -0.2573532823822596,
+        -0.10548952044080565
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_4e99e7a9ccd8&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_4e99e7a9ccd8.png&quot;,
+      &quot;predicted_score&quot;: 0.5046002198764282,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 540801528,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.2172352085876203,
+        0.041061392173427885,
+        0.0902609005746901,
+        0.03558806116817011,
+        0.12845465737251988
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_89a410983588&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_89a410983588.png&quot;,
+      &quot;predicted_score&quot;: 1.317170134137289,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 2462113739,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.291896036442479,
+        0.2520211921514701,
+        0.414050498308815,
+        0.31492365699948016,
+        0.05627875023504462
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_30dd43d96319&quot;,
+  &quot;round_index&quot;: 4,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:40.236313+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.298281,
+    0.174307,
+    0.147321,
+    0.112298,
+    0.043914
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_2d3e736c1645&quot;,
+      &quot;cand_ad351c0c1d5c&quot;,
+      &quot;cand_f24149b9feab&quot;,
+      &quot;cand_89a410983588&quot;,
+      &quot;cand_4e99e7a9ccd8&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_2d3e736c1645&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_2d3e736c1645&quot;,
+      &quot;cand_ad351c0c1d5c&quot;,
+      &quot;cand_f24149b9feab&quot;,
+      &quot;cand_89a410983588&quot;,
+      &quot;cand_4e99e7a9ccd8&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_30dd43d96319&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_2d3e736c1645&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:40.256132+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 5,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:51.946813+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_deaeec5f157a&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_00c07dff3145.png&quot;,
+      &quot;predicted_score&quot;: 0.7675353168634398,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 183529313,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.21218992878662382,
+        0.13895657816497692,
+        0.13894130687684883,
+        0.17416558343913183,
+        0.10328191959585842
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_1cc3b69ae6ce&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_1cc3b69ae6ce.png&quot;,
+      &quot;predicted_score&quot;: 0.7690751587411049,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 1781475643,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.176613879076837,
+        0.0890235886043624,
+        0.18302766867774112,
+        0.1415016604471231,
+        0.17890836193504123
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_7fb041890570&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_7fb041890570.png&quot;,
+      &quot;predicted_score&quot;: 0.6460524868755607,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 849301822,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.5050617538625057,
+        0.3773533068526129,
+        -0.053293276929998135,
+        -0.03410890227600502,
+        -0.14496039463355478
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_fa93d3384c33&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_fa93d3384c33.png&quot;,
+      &quot;predicted_score&quot;: 0.7959971627769225,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 733415561,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.42647333991888475,
+        0.03034262049108922,
+        0.23919888217381619,
+        0.12534306394833455,
+        -0.017360743755202294
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_c63f2622c62d&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_c63f2622c62d.png&quot;,
+      &quot;predicted_score&quot;: 0.03199667818290215,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 1079009477,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.03476631060517859,
+        0.14851129101249272,
+        0.035054985418813744,
+        0.22394340556463727,
+        -0.328746693207863
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_ba7899dfca6b&quot;,
+  &quot;round_index&quot;: 5,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:52.816213+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.237769,
+    0.147523,
+    0.142309,
+    0.145085,
+    0.058802
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_deaeec5f157a&quot;,
+      &quot;cand_1cc3b69ae6ce&quot;,
+      &quot;cand_c63f2622c62d&quot;,
+      &quot;cand_fa93d3384c33&quot;,
+      &quot;cand_7fb041890570&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_deaeec5f157a&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_deaeec5f157a&quot;,
+      &quot;cand_1cc3b69ae6ce&quot;,
+      &quot;cand_c63f2622c62d&quot;,
+      &quot;cand_fa93d3384c33&quot;,
+      &quot;cand_7fb041890570&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_ba7899dfca6b&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_deaeec5f157a&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:24:52.837178+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.started</code></td>
+          <td><pre>{
+  &quot;round_index&quot;: 6,
+  &quot;sampler&quot;: &quot;two_scale_cover&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:25:04.710230+00:00</td>
+          <td>backend</td>
+          <td><code>round.generation.completed</code></td>
+          <td><pre>{
+  &quot;candidate_count&quot;: 5,
+  &quot;candidates&quot;: [
+    {
+      &quot;candidate_id&quot;: &quot;cand_dbad3c5dd51e&quot;,
+      &quot;candidate_index&quot;: 0,
+      &quot;image_path&quot;: &quot;/artifacts/cand_00c07dff3145.png&quot;,
+      &quot;predicted_score&quot;: 0.7675353168634398,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;incumbent&quot;,
+      &quot;seed&quot;: 183529313,
+      &quot;seed_group&quot;: &quot;carried_forward&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.21218992878662382,
+        0.13895657816497692,
+        0.13894130687684883,
+        0.17416558343913183,
+        0.10328191959585842
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_505f17f44deb&quot;,
+      &quot;candidate_index&quot;: 1,
+      &quot;image_path&quot;: &quot;/artifacts/cand_505f17f44deb.png&quot;,
+      &quot;predicted_score&quot;: 0.8335726026472364,
+      &quot;predicted_uncertainty&quot;: 0.14,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 3568896467,
+      &quot;seed_group&quot;: &quot;candidate:1&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.37103140953628844,
+        0.09261154005895846,
+        0.14836907004870203,
+        0.03062828231518813,
+        0.19093230068809933
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_43707be90179&quot;,
+      &quot;candidate_index&quot;: 2,
+      &quot;image_path&quot;: &quot;/artifacts/cand_43707be90179.png&quot;,
+      &quot;predicted_score&quot;: 0.05449667019934548,
+      &quot;predicted_uncertainty&quot;: 0.168,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 960765497,
+      &quot;seed_group&quot;: &quot;candidate:2&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        -0.1373548190991656,
+        0.27143157306832655,
+        0.08295481028902978,
+        0.12383262430267912,
+        -0.28236751836152435
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_8b98fe01adcb&quot;,
+      &quot;candidate_index&quot;: 3,
+      &quot;image_path&quot;: &quot;/artifacts/cand_8b98fe01adcb.png&quot;,
+      &quot;predicted_score&quot;: 1.0649197092019185,
+      &quot;predicted_uncertainty&quot;: 0.196,
+      &quot;sampler_role&quot;: &quot;near_cover_probe&quot;,
+      &quot;seed&quot;: 1626820581,
+      &quot;seed_group&quot;: &quot;candidate:3&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.21549323882192123,
+        0.14498901473610526,
+        0.21594034747050506,
+        0.3452729461026495,
+        0.1512241620707374
+      ]
+    },
+    {
+      &quot;candidate_id&quot;: &quot;cand_e8d8f06d7bc6&quot;,
+      &quot;candidate_index&quot;: 4,
+      &quot;image_path&quot;: &quot;/artifacts/cand_e8d8f06d7bc6.png&quot;,
+      &quot;predicted_score&quot;: 0.961062805256421,
+      &quot;predicted_uncertainty&quot;: 0.22400000000000003,
+      &quot;sampler_role&quot;: &quot;far_cover_probe&quot;,
+      &quot;seed&quot;: 2414375391,
+      &quot;seed_group&quot;: &quot;candidate:4&quot;,
+      &quot;seed_policy&quot;: &quot;fixed-per-candidate&quot;,
+      &quot;z&quot;: [
+        0.4205688173307621,
+        0.3782703214836639,
+        0.03172665613340381,
+        0.28499386076559197,
+        -0.14249685045700083
+      ]
+    }
+  ],
+  &quot;round_id&quot;: &quot;rnd_04d56c6a904f&quot;,
+  &quot;round_index&quot;: 6,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;
+}</pre></td>
+        </tr>
+        <tr>
+          <td>2026-03-27T07:25:05.568638+00:00</td>
+          <td>backend</td>
+          <td><code>round.feedback.applied</code></td>
+          <td><pre>{
+  &quot;critique_text&quot;: &quot;Oracle progress diagnosis policy: Bradley-Terry cover&quot;,
+  &quot;feedback_type&quot;: &quot;top_k&quot;,
+  &quot;next_incumbent_state&quot;: [
+    0.233462,
+    0.148191,
+    0.146056,
+    0.176359,
+    0.08529
+  ],
+  &quot;normalized_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_dbad3c5dd51e&quot;,
+      &quot;cand_8b98fe01adcb&quot;,
+      &quot;cand_505f17f44deb&quot;,
+      &quot;cand_e8d8f06d7bc6&quot;,
+      &quot;cand_43707be90179&quot;
+    ],
+    &quot;winner_candidate_id&quot;: &quot;cand_dbad3c5dd51e&quot;
+  },
+  &quot;raw_feedback_payload&quot;: {
+    &quot;ranking&quot;: [
+      &quot;cand_dbad3c5dd51e&quot;,
+      &quot;cand_8b98fe01adcb&quot;,
+      &quot;cand_505f17f44deb&quot;,
+      &quot;cand_e8d8f06d7bc6&quot;,
+      &quot;cand_43707be90179&quot;
+    ]
+  },
+  &quot;round_id&quot;: &quot;rnd_04d56c6a904f&quot;,
+  &quot;session_id&quot;: &quot;ses_e6c79f53d39c&quot;,
+  &quot;winner_candidate_id&quot;: &quot;cand_dbad3c5dd51e&quot;
+}</pre></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </details>
+</main>
+</body>
+</html>

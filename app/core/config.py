@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("data")
     artifacts_dir_name: str = "artifacts"
     models_dir: Path = Path("models")
+    huggingface_cache_dir: Path = Path("models") / "hf_cache"
     traces_dir_name: str = "traces"
     default_candidate_count: int = 4
     default_image_size: str = "512x512"

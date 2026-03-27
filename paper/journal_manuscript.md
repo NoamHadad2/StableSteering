@@ -1,415 +1,395 @@
-# StableSteering: Interactive Preference-Guided Steering for Diffusion Image Generation
-
-**Journal-style manuscript draft prepared from repository-contained artifacts**
+# StableSteering: Interactive Preference-Guided Local Search for Iterative Text-to-Image Refinement
 
 ## Abstract
 
-Text-to-image diffusion models are powerful but difficult to refine when users can recognize better candidates more easily than they can author better prompts. StableSteering studies this mismatch as a control problem: starting from a text prompt, the method proposes a small batch of candidate images, elicits a structured preference signal, updates a low-dimensional steering state, and repeats. The central modeling idea is to separate prompt semantics from iterative control, so that language specifies coarse intent while a compact latent state absorbs directional corrections that may be hard to verbalize. This paper formalizes that loop, describes families of proposal, oracle, and preference-update models that instantiate it, and evaluates the resulting framework through a preserved five-round qualitative case study, bounded protocol slices over seeds and update rules, an oracle-based target-recovery study, a repeated-seed multi-metric oracle extension, follow-on anti-stagnation oracle comparisons, a budget-matched incumbent-policy slice, a controlled comparison of candidate-sampling and feedback-model variants, and a later method-extension comparison that adds new samplers, new preference models, and new oracle steering policies. The contribution is therefore conceptual and methodological rather than benchmark-superiority oriented: the paper introduces iterative preference-guided steering as an explicit research object and shows that it can be studied through reproducible multi-round protocols. The current evidence supports the viability of this framing and its usefulness for controlled proxy evaluation, while the new collection-ready human pairwise layer makes the next validation step explicit rather than merely aspirational.
+Text-to-image diffusion systems offer strong one-shot generation ability, but iterative refinement remains awkward when users can recognize better images more easily than they can rewrite prompts. This paper studies an alternative interaction model in which refinement is posed as a repeated local search process driven by explicit preferences over candidate images. The central idea is to separate the persistent textual intent from a lower-dimensional session state that is updated over rounds of candidate generation, preference elicitation, and state revision. We present StableSteering as a methodological framework for this setting and evaluate it through a sequence of controlled proxy studies rather than a benchmark-superiority claim. The empirical program combines a preserved multi-round qualitative case study, oracle target-recovery experiments built from real images and manual captions, repeated-seed multi-metric evaluation, controlled sampler and preference-model slices, and focused plateau-diagnosis experiments. Across the repeated oracle target-recovery setting, mean best-candidate similarity improves from `0.828` to `0.881` under CLIP and from `0.452` to `0.595` under DINOv2. Broader proposal geometries and richer preference models materially affect behavior, and the strongest late-round progress arises when challenger pressure is preserved without fully suppressing the incumbent. The results support a narrower but scientifically useful conclusion: iterative preference-guided steering is a plausible inference-time control paradigm whose behavior depends strongly on the interaction between sampling, feedback modeling, and incumbent management.
 
 ## 1. Introduction
 
-Text-to-image diffusion systems have made high-quality image synthesis broadly accessible, yet fine-grained control remains difficult. The problem is not simply that prompts are imperfect. Rather, prompts are often a poor interface for iterative refinement. In many realistic settings, users can reliably say that one candidate is closer to what they want than another, or that a candidate improves lighting, composition, or product shape, without being able to translate that judgment into a precise prompt rewrite. Existing interaction patterns therefore ask users to communicate through language when the more natural supervision signal may be comparative preference.
+Recent text-to-image systems can produce compelling images from short prompts, yet local refinement remains an unsolved interaction problem. A user often knows that one candidate image is better than another, or that the current result is close but not quite right, while lacking a concise textual edit that expresses the desired change. Prompt editing therefore mixes two different burdens: specifying intent and describing iterative correction. This mismatch is especially visible in settings where the desired change is subtle, multidimensional, or partly perceptual.
 
-StableSteering is designed around that mismatch. Instead of treating generation as a one-shot prompt-to-image mapping, it formulates steering as a bounded iterative process. A prompt initializes the task, but subsequent progress is driven by structured preference over proposed candidates. Each round proposes several local alternatives, the user or oracle selects among them, and the system updates an internal steering state that parameterizes the next search step. The key conceptual move is to let prompt text express initial intent while a separate latent control state absorbs iterative directional corrections.
+StableSteering starts from a simple conceptual shift. Instead of treating refinement as repeated prompt rewriting, it treats refinement as iterative local search around a persistent prompt-conditioned intent. The prompt establishes the semantic task. A lower-dimensional steering state captures the current local direction of search. Each round proposes candidates near the current state, obtains user or oracle preferences over those candidates, and updates the state for the next round. The user no longer needs to produce a new prompt at every step; instead, the user supplies comparative information.
 
-This paper makes three contributions. First, it introduces a concrete formulation of interactive preference-guided diffusion steering in which candidate sampling, preference elicitation, oracle scoring, and state updating are explicit model components. Second, it instantiates that formulation in a modular framework that supports multi-round sessions and controlled comparisons among steering policies, including explicit anti-stagnation controls for later-round oracle studies. Third, it presents a compact but varied evidence package: a preserved five-round case study, controlled protocol slices that isolate key design choices, an oracle-based target-recovery proxy task, a repeated-seed multi-metric oracle extension, anti-stagnation follow-on comparisons, a budget-matched incumbent-policy slice, a new method-extension comparison over samplers, preference models, and oracle steering policies, and a ready-to-run human pairwise evaluation layer. The paper is intentionally modest in scope: it does not claim a universally optimal steering algorithm. Its scientific claim is narrower and, we argue, useful: iterative preference-guided steering can be treated as a reproducible sequential decision problem rather than as an informal prompt-editing workflow.
+This framing connects text-to-image refinement to three established ideas. First, it resembles classical relevance feedback, where an initial query is improved from judgments over returned items rather than replaced outright. Second, it resembles preference-based online learning, where supervision arrives as relative judgments instead of absolute labels. Third, it resembles local black-box search, where proposal geometry and incumbent management shape whether the search exploits promising directions or escapes local stagnation. What distinguishes the present setting is that the search space is induced indirectly through a text-conditioned diffusion model, and the refinement signal is expressed through image judgments rather than scalar objective access.
 
-The manuscript is intentionally conservative about claim scope. The present evidence supports the conceptual viability of iterative preference-guided steering and shows that the framework can preserve coherent multi-round trajectories under controlled protocols. It does not yet support broad claims of image-quality superiority, population-level user benefit, or statistically grounded superiority over competing control paradigms. That boundary is central to the paper’s framing, experiments, and limitations.
+The paper makes four contributions.
 
-## 2. Related Work and Positioning
+1. It formulates iterative text-to-image refinement as preference-guided local search around a persistent prompt and an explicit steering state.
+2. It organizes a family of sampling, preference-modeling, and oracle policies within one common steering loop, enabling controlled comparison rather than one-off heuristics.
+3. It introduces a target-recovery proxy protocol in which real images and manually written captions define hidden targets, making round-by-round progress measurable without exposing the target image to the generator.
+4. It provides empirical evidence that the main scientific behavior of the loop is not monotonic improvement by default, but a tradeoff among proposal diversity, preference aggregation, and incumbent preservation.
 
-StableSteering sits at the intersection of diffusion-based image generation, interactive control, and preference-guided adaptation. The most relevant literature can be organized into five comparison clusters: diffusion-generation foundations, prompt- and edit-based control, multi-turn interactive generation, preference-based diffusion alignment, and iterative test-time refinement. This organization is preferable to a flat paper list because the present work is not claiming a new base generator, a new editing backbone, or a new preference-training objective. Its claim is narrower: iterative preference-guided steering at inference time.
+The paper does not claim that StableSteering is the best refinement algorithm, nor that the current evidence matches the standards of a large human study or a broad benchmark campaign. Its claim is methodological: iterative preference-guided steering can be studied as a well-defined inference-time process, and this process exhibits interpretable regimes, failure modes, and design tradeoffs.
 
-The first cluster establishes the generative substrate on which StableSteering operates. Latent Diffusion Models made high-resolution diffusion synthesis practical at scale, while classifier-free guidance became a standard inference-time mechanism for shaping prompt faithfulness and image quality [1, 2]. StableSteering inherits this diffusion backbone. It does not modify the denoiser architecture or propose a new guidance objective; instead, it studies how a user can iteratively control an existing generator after prompt initialization.
+## 2. Related Work and Conceptual Positioning
 
-The second cluster concerns prompt-based, instruction-based, and edit-based control. Prompt-to-Prompt showed that cross-attention manipulation can change prompt semantics while preserving much of the original image structure [3]. InstructPix2Pix learned to transform natural-language editing instructions into image edits [4]. DiffusionCLIP and Imagic showed that meaningful control can be obtained by intervening in internal text-conditioned or latent representations rather than only rewriting the visible prompt [5, 6]. SDEdit demonstrated guided editing from an intermediate image state through a diffusion prior [8], while ControlNet added explicit spatial conditioning pathways to pretrained text-to-image models [9]. These methods collectively expanded the control surface beyond raw prompting. However, they still primarily assume that the user specifies desired changes through language, structure, or explicit conditioning inputs. StableSteering differs in supervision: the main interaction primitive is repeated preference over candidate images.
+### 2.1 Diffusion foundations and inference-time control
 
-The third cluster is multi-turn interactive image generation, which is the closest adjacent line of work in terms of user experience. TheaterGen studies consistent multi-turn image generation with an LLM-guided prompt-book abstraction for maintaining subject and context consistency across successive turns [12]. AutoStudio explores the same broad setting with a multi-agent formulation aimed at maintaining subject consistency over iterative editing sessions [13]. T2I-Copilot also treats text-to-image generation as an iterative process, using a training-free multi-agent framework to interpret prompts, select models, and refine outputs over multiple steps [14]. These works show that multi-turn generation is an active and important problem. StableSteering differs in both scope and formulation. It does not attempt to solve full conversational generation or general prompt rewriting. Instead, it proposes a narrower iterative-search model in which each round performs local candidate generation around a persistent steering state and preference provides the update signal.
+StableSteering operates on top of latent diffusion generation rather than replacing the underlying generator. Latent Diffusion Models made high-resolution text-to-image generation practical by moving diffusion into a compressed latent space, and classifier-free guidance became the dominant inference-time mechanism for strengthening prompt alignment (Rombach et al., 2022; Ho and Salimans, 2022). The present work therefore does not contribute a new generative backbone. Its novelty lies in how inference-time interaction is organized across rounds.
 
-The fourth cluster uses preference information to alter the generator itself. DPOK and Curriculum DPO are representative of methods that use preference or reward information to fine-tune text-to-image diffusion behavior [7, 10]. Using Human Feedback to Fine-tune Diffusion Models without Any Reward Model further develops this line by adapting direct preference optimization ideas to diffusion training without an explicit reward model [15]. These works are important because they establish that preference is a useful supervisory signal for image generation. Yet the intervention point is fundamentally different from that of StableSteering. In those methods, preference updates model parameters or the training objective. In StableSteering, preference updates only the session-level steering state and therefore affects subsequent proposals within one interaction, not the underlying model weights.
+Several diffusion-control methods show that powerful editing can be achieved without retraining the full generator. Prompt-to-Prompt manipulates cross-attention to preserve layout while changing text semantics (Hertz et al., 2022). DiffusionCLIP and Imagic operate through learned or optimized text/image directions (Kim et al., 2022; Kawar et al., 2023). SDEdit and ControlNet enrich generation with image-based initialization or spatial conditioning (Meng et al., 2022; Zhang et al., 2023). SEGA further highlights the value of semantic directions as an inference-time steering primitive (Brack et al., 2023). StableSteering is adjacent to this literature, but conceptually narrower: it studies the interaction loop that chooses and updates steering directions, rather than proposing a new conditioning architecture.
 
-The fifth and most recent cluster concerns iterative inference-time refinement. Iterative Refinement Improves Compositional Image Generation uses a vision-language critic to progressively revise generations over multiple steps and reports gains over compute-matched parallel sampling in compositional settings [16]. This result is relevant because it supports the broader idea that iterative correction can improve difficult generations even without retraining the image generator. At the same time, the feedback loop in that work is automated and critic-driven, whereas StableSteering is explicitly framed around user or oracle preference over candidate images. The conceptual similarity is therefore at the level of iterative correction, while the methodological difference lies in the role of explicit preference and persistent session state.
+### 2.2 Interactive multi-turn generation
 
-DiffusionDB provides an additional methodological backdrop [11]. By exposing millions of real prompts and generations, it showed that practical text-to-image use is diverse, fragile, and often highly sensitive to prompt wording. StableSteering addresses a complementary question: if prompts are an incomplete interface for iterative refinement, how should the refinement process itself be represented and studied? The answer proposed here is intentionally narrow. StableSteering should not be understood as the first interactive diffusion system or as a replacement for preference-based model alignment. Rather, it occupies a specific niche among prior work: a controlled framework for studying interactive preference-guided steering at inference time using a persistent low-dimensional state, explicit candidate proposals, and structured preference normalization.
+A second nearby line of work studies iterative or multi-turn image generation more directly. AutoStudio, TheaterGen, and related systems investigate consistency and multi-turn control, often with stronger structure around subjects, scenes, or LLM-mediated prompt planning (Cheng et al., 2024; Xian et al., 2024). T2I-Copilot explores multi-agent text-to-image generation with prompt engineering and self-improvement (Lian et al., 2024). These systems are important because they show that multi-turn generation is a real use case rather than a hypothetical extension of one-shot prompting.
 
-## 3. Conceptual Framework
+StableSteering differs in what it abstracts. Instead of treating the next prompt as the primary control object, it treats the steering state and candidate set as the primary objects of inference-time adaptation. This choice makes the work closer to local search and relevance feedback than to prompt-planning systems, even though all of these approaches are motivated by the limits of one-shot prompting.
 
-StableSteering is best understood as a model of iterative image steering rather than as an application stack. The framework decomposes the problem into five conceptual objects: a prompt, a steering state, a candidate generator, a preference signal, and an update rule. These pieces matter because together they define one repeated loop: initialize from language, propose local alternatives, elicit relative judgment, update the latent steering state, and repeat.
+### 2.3 Preference-guided diffusion alignment
 
-<figure>
-  <img src="figures/figure_1_system_overview.svg" alt="System overview diagram">
-  <figcaption><strong>Figure 1.</strong> StableSteering conceptual loop. A text prompt initializes the task, candidate images are proposed around the current steering state, preference is elicited over the candidates, and the steering state is updated before the next round.</figcaption>
-</figure>
+Preference signals are increasingly used to align diffusion models. ImageReward learns a reward model for text-to-image preferences and uses that model for evaluation and optimization (Xu et al., 2023). DPOK, reward-feedback learning, and related methods use preference-derived signals to fine-tune diffusion models or associated policies (Fan et al., 2024; Yang et al., 2023; Croitoru et al., 2025). Training Diffusion Models with Reinforcement Learning and related work further show that diffusion behavior can be improved with reinforcement-style objectives (Black et al., 2024; Miao et al., 2024).
 
-At initialization time, the user provides a text prompt `p`, an optional negative prompt `n`, and a configuration `c` that specifies the steering policy. The prompt defines the coarse semantic objective. The configuration determines how local search is performed: how many candidates are proposed, how far proposals may move from the current state, how randomness is handled, how user preference is elicited, and how the next state is updated.
+StableSteering differs in locus. These papers modify model parameters or learned objectives. StableSteering keeps the generator fixed during interaction and instead updates a session-level state. This is a weaker claim, but also a different scientific question: what can be achieved by preference-guided inference-time search before one pays the cost of model-level adaptation?
 
-The central modeling choice is the session-level steering state `z_t` of dimension `d` at round `t`. The state is initialized at the origin, `z_0 = 0`, and then updated after every round of feedback. Intuitively, `z_t` is not a prompt embedding itself and not a full image latent. It is a compact control variable that parameterizes how the current round should deviate from the original prompt. This separation is useful because it lets language provide the starting point while leaving room for iterative nonverbal refinement.
+### 2.4 Preference search, ranking, and relevance feedback
 
-The core operators can be written compactly as:
+The methodology here is also connected to older literatures that are rarely discussed in text-to-image papers. Classical relevance feedback updates a query from judgments over retrieved results rather than from a newly written query; Rocchio-style updates are the canonical example (Rocchio, 1971; Salton and Buckley, 1990). Preference-based online learning and dueling-bandit formulations likewise study how relative comparisons can guide sequential decision making (Bengs et al., 2021). Listwise ranking models such as Plackett-Luce and pairwise models such as Bradley-Terry provide principled ways to convert partial rankings or pairwise preferences into latent utilities. These analogies are conceptually productive for StableSteering because the system receives relative judgments over candidate images, not direct access to a scalar ground-truth objective.
 
-<div class="equation">
-\[
-\mathcal{C}_t = S_m(z_t, c, \xi_t), \qquad
-I_t^{(j)} = G\!\left(p, n, z_t^{(j)}, c, s_t^{(j)}\right), \qquad
-\tilde{f}_t = N(f_t), \qquad
-z_{t+1} = U_u\!\left(z_t, \mathcal{C}_t, \tilde{f}_t\right).
-\]
-</div>
+### 2.5 Search-space coverage and diversity maintenance
 
-Here, `S_m` is the configured sampler, `G` is the renderer, `N` is the feedback normalizer, `U_u` is the configured updater, `ξ_t` is sampler randomness, and `s_t^j` is the deterministic seed assigned to candidate `j` in round `t`. Operationally, the loop is:
+A final conceptual anchor is quality-diversity search. MAP-Elites and related methods show that covering a search space with diverse, high-performing candidates can be more informative than following a single exploitative trajectory (Mouret and Clune, 2015). This perspective helps explain a recurring empirical phenomenon in StableSteering: repeated incumbent carry-forward can freeze visible progress even when the search has not exhausted useful alternatives. Quality-diversity ideas therefore motivate broader proposal geometries and explicit challenger preservation in later experiments.
 
-<div class="equation">
-\[
-\text{prompt} \;\rightarrow\; \text{candidate generation} \;\rightarrow\; \text{preference elicitation} \;\rightarrow\; \text{state update} \;\rightarrow\; \text{next round}.
-\]
-</div>
+In summary, StableSteering should be read neither as a new diffusion architecture nor as a new preference-trained model. It is best understood as an inference-time interaction framework that sits at the intersection of diffusion control, preference-guided search, and iterative relevance-feedback-style refinement.
 
-In practice, the first round contains an unmodified-prompt baseline plus exploratory variants. Later rounds preserve the previous winner as an incumbent while proposing local alternatives. This makes the steering process interpretable as a sequence of local preference-guided corrections rather than a sequence of unrelated generations.
+## 3. Problem Formulation and Conceptual Pipeline
 
-A useful conceptual view is to treat StableSteering as local search over an implicit user-utility landscape. Let `u_t(j)` denote the latent utility assigned by the user to candidate `j` at round `t`. The interaction never observes this utility directly. Instead, it observes a coarse preference event, such as a winner, a ranking, or a set of approvals, and then projects that event into a state update. In that sense, the framework sits between classical relevance-feedback methods and modern diffusion control: it uses relative judgments to navigate a generator's local control space without requiring the user to specify the target direction explicitly.
+Let \(p\) denote the persistent text prompt and let \(z_t \in \mathbb{R}^d\) denote the steering state at round \(t\). The state is not assumed to be semantically interpretable coordinate by coordinate. It is simply the current point in a low-dimensional control space used to generate the next candidate batch.
 
-## 4. Sampling and Preference Modeling
-
-The scientific core of StableSteering lies in how it samples candidate directions and how it converts preference into state updates. This section therefore focuses on the steering model itself rather than on implementation-level lifecycle details.
-
-<figure>
-  <img src="figures/figure_2_session_lifecycle.svg" alt="Session lifecycle diagram">
-  <figcaption><strong>Figure 2.</strong> StableSteering session lifecycle. The first round includes an unmodified-prompt baseline candidate. Later rounds preserve the previous winner as the incumbent while still exploring neighboring alternatives.</figcaption>
-</figure>
-
-The framework supports several feedback forms, including scalar ratings, winner-only selection, pairwise comparison, approve-or-reject, and top-k ranking. These interaction modes are normalized into a unified updater-facing representation `f̃_t` before the configured updater computes the next state. This design allows the elicitation burden to vary while keeping the underlying steering loop fixed.
-
-Sampling is likewise modular. The framework spans local exploration, structured axis probing, and diversity-forward search policies. The update layer spans winner-centric, score-aware, and contrastive preference models. The present manuscript does not claim that any one module family is best. The defensible claim is narrower: one common interaction loop can host and compare these modeling choices under controlled conditions.
-
-### 4.1 Candidate Sampling Mechanism
-
-At round `t`, the sampler receives the current steering state `z_t`, the session configuration, and a deterministic sampler seed. It returns a batch of candidate steering vectors `z_t^j` together with role labels that describe why each proposal was included. Sampling takes place inside a bounded trust region centered on the current state. Formally, each proposal is restricted to a session-level radius `r`, so `||z_t^j - z_t||_2 <= r` under the trust-region approximation used in the present study.
-
-The first round is special because there is no incumbent image yet. StableSteering therefore pins one visible `baseline_prompt` candidate with steering vector equal to the zero vector. This candidate is rendered from the raw prompt without any steering offset and serves as the reference point for the rest of the session. The remaining first-round proposals are widened deliberately so that the user sees a broader exploratory spread instead of near-duplicates. One candidate is kept close to the origin as an `exploit`-style local perturbation, while the remaining exploratory candidates are blended toward separated directions in steering space and forced to satisfy a minimum radius from the baseline.
-
-From round two onward, the previous round's winning candidate is carried forward explicitly as the incumbent. That image is not re-rendered; instead, its prior steering vector, seed, and render artifact are preserved and inserted as candidate `0` in the next round. The sampler then fills the remaining candidate slots with new challenger proposals around the updated state. This policy makes the compare-select-update loop visible to the user and prevents the currently preferred direction from disappearing between rounds.
-
-In conceptual terms, the sampler family spans four behaviors: conservative local refinement, structured directional probing, diversity-forward search, and schedule-aware exploration. Conservative samplers stay close to the incumbent and ask whether a small correction is preferred. Structured samplers probe interpretable directions such as forward, backward, orthogonal, or axis-aligned moves. Diversity-forward samplers deliberately spread candidates across the available trust region so that early rounds are less likely to collapse into near-duplicates. The newer schedule-aware samplers add temporal structure to that geometry. `annealed_shell`, for example, starts with a wider shell and narrows as rounds progress, while `spherical_cover` greedily chooses angularly separated challenger directions to cover the available trust region more uniformly. The main text focuses on the modeling role of these families; the precise sampler inventory is deferred to the appendix.
-
-Seed assignment is also part of the sampling contract because visual diversity depends strongly on noise reuse. The framework studies three deterministic seed policies. `fixed-per-round` assigns the same seed to all newly rendered candidates in a round, making geometry more comparable but often reducing visible diversity. `fixed-per-candidate` assigns each candidate slot its own deterministic seed, increasing within-round variation. `fixed-per-candidate-role` shares seeds across roles, such as all `explore` candidates or all `axis_positive` probes. Carried-forward incumbents preserve their original seed and image artifact instead of being regenerated.
-
-### 4.2 Preference Elicitation and Normalization
-
-The user-facing interface supports multiple preference modes because different studies may require different elicitation burdens. However, the framework deliberately separates the elicitation interface from the updater contract. Whatever the UI mode, the raw event is converted into a normalized feedback object before any state update is applied.
-
-For scalar ratings, the payload is a mapping from candidate identifier to numeric score. The ratings are sorted in descending order and the highest-rated candidate becomes the winner, using candidate identifier as a deterministic tie-breaker. For pairwise feedback, the event contains both a winner and a loser candidate and rejects degenerate self-comparisons. For winner-only feedback, the payload contains only the selected winner. For approve-or-reject feedback, the event stores the full approval map, the set of approved candidates, the set of rejected candidates, and a preferred winner chosen from the approved set. For top-k feedback, the event stores a ranked list and uses the first ranked candidate as the winner.
-
-This normalization strategy yields a common structured preference representation:
+At round \(t\), the sampler proposes \(k\) steering perturbations \(s_t^{(1)}, \dots, s_t^{(k)}\) around the current state. The diffusion renderer then produces a candidate set
 
 <div class="equation">
-\[
-\tilde{f}_t
-=
-\left\{
-\texttt{winner\_candidate\_id},
-\;
-\texttt{optional\ loser},
-\;
-\texttt{optional\ ranking},
-\;
-\texttt{optional\ approval\ sets}
-\right\}.
-\]
+$$
+C_t = \left\{x_t^{(j)} = G\!\left(p, z_t, s_t^{(j)}; \theta \right)\right\}_{j=1}^{k},
+$$
 </div>
 
-The essential point is that elicitation and update are decoupled. The same outer loop can accept sparse winner signals, graded scores, or partial rankings, then translate them into a normalized object that drives the next state update. This remains a deliberately lightweight preference-modeling regime: the framework supports winner-centric, score-aware, and contrastive heuristics, but it is not yet a full probabilistic preference-estimation framework.
-
-At the conceptual level, however, one can still view the framework through a latent-utility model. If `u_t(j)` is the user's unobserved utility for candidate `j`, then winner-only and pairwise events can be interpreted as sparse observations of the order relation induced by `u_t`, while scalar ratings and top-k rankings provide denser but noisier partial measurements. StableSteering therefore treats normalization as the interface between human-friendly supervision and update-friendly control.
-
-### 4.3 State Update Mechanism
-
-After normalization, the configured updater computes the next steering state `z_(t+1)`. The update family used in this paper has three conceptual forms: direct winner following, smoothed winner following, and preference aggregation. Let `w_t` denote the steering vector of the winning candidate selected at round `t`. Then the core winner-centric update rules are:
+where \(G\) is a fixed generator with parameters \(\theta\). The user, or an oracle in proxy experiments, provides feedback \(f_t\) over the batch \(C_t\). A normalization map converts that feedback into a comparable internal signal:
 
 <div class="equation">
-\[
-\texttt{winner\_copy}: \quad z_{t+1} = w_t,
-\]
-\[
-\texttt{winner\_average}: \quad z_{t+1} = \tfrac{1}{2} z_t + \tfrac{1}{2} w_t,
-\]
-\[
-\texttt{linear\_preference}: \quad z_{t+1} = 0.35\, z_t + 0.65\, w_t.
-\]
+$$
+\tilde f_t = N(f_t, C_t).
+$$
 </div>
 
-`winner_copy` is the most aggressive update because it replaces the incumbent state exactly with the winner. `winner_average` smooths the transition and reduces abrupt jumps between rounds. `linear_preference` takes a stronger weighted step toward the winner and should be understood as a simple heuristic approximation to a preference-driven move rather than as a learned gradient estimator.
-
-Two richer update rules extend this family. `score_weighted_preference` forms a weighted centroid of positively scored candidates, using rating magnitude, ranking position, or approval membership to define the weights, and then blends the current state toward that centroid. `contrastive_preference` forms a positive centroid and a negative centroid and moves the state along their difference vector. More recent extensions make the preference model more explicitly ordinal. `borda_preference` treats the ranked batch as an ordered list and updates toward a Borda-weighted centroid, while `bradley_terry_preference` interprets the same ranking as a set of pairwise wins and fits a lightweight latent-utility model before moving toward the resulting weighted center. In compact form:
+An update operator \(U\) then produces the next steering state:
 
 <div class="equation">
-\[
-\texttt{score\_weighted\_preference}: \quad z_{t+1} = (1-\alpha) z_t + \alpha \mu_t^{+},
-\]
-\[
-\texttt{contrastive\_preference}: \quad z_{t+1} = z_t + \alpha (\mu_t^{+} - \mu_t^{-}),
-\]
+$$
+z_{t+1} = U(z_t, C_t, \tilde f_t; \phi),
+$$
 </div>
 
-where `\mu_t^{+}` and `\mu_t^{-}` are centroids formed from the preferred and dispreferred candidate subsets induced by the normalized event. These rules remain heuristic control policies rather than learned reward models, but they make the framework rich enough to compare winner-only, score-aware, and contrastive interpretations of user feedback under a shared steering lifecycle.
+where \(\phi\) denotes the parameters of the chosen update rule rather than learned model parameters. The loop repeats until a stopping condition is met.
 
-Together, the sampler, feedback normalizer, and updater form a modular but intentionally lightweight steering model. The present paper treats them as explicit hypothesis-bearing components: different samplers correspond to different local search strategies, different elicitation modes correspond to different supervision burdens, and different updaters correspond to different assumptions about how aggressively preference should move the steering state.
+This formulation separates three modeling choices that are often conflated in iterative generation systems:
 
-In the oracle studies, one further modeling choice becomes visible: the oracle itself. The simplest oracle chooses candidates by CLIP similarity to a hidden target image, but this is only one possible target-recovery proxy. The current framework also studies a CLIP+DINO ensemble oracle and a CLIP-plus-novelty oracle that rewards movement away from the current incumbent image. Conceptually, these oracle choices matter because they determine what kind of hidden objective the steering loop is being asked to optimize: pure target alignment, alignment under multi-metric agreement, or alignment under an explicit exploration pressure.
+1. **Sampling model**: how the candidate batch explores the local neighborhood around the current state.
+2. **Preference model**: how ratings, pairwise choices, or rankings are transformed into a batch-level update signal.
+3. **Steering policy**: how the next state balances incumbent preservation against challenger influence.
 
-## 5. Model Families and Design Axes
-
-StableSteering is better interpreted as a family of models than as one fixed algorithm. Four design axes determine the behavior of a session: the proposal model, the elicitation model, the update model, and the rendering model. Figure 3 summarizes this view.
-
-<figure>
-  <img src="figures/figure_3_configuration_to_generation.svg" alt="Model families and design axes diagram">
-  <figcaption><strong>Figure 3.</strong> Design axes of StableSteering. A steering session is determined by a proposal model that explores candidate directions, an elicitation model that captures user preference, an update model that converts preference into state motion, and a rendering model that turns the current prompt-state pair into candidate images.</figcaption>
-</figure>
-
-The proposal model determines the local search geometry around the current state. It encodes assumptions about whether the next round should emphasize exploitation near the incumbent, broader exploration away from it, or structured probing along interpretable axes. The elicitation model determines what kind of supervision the user provides and therefore how much information the system receives per round. The update model determines how aggressively the steering state moves after a preference event. Finally, the rendering model determines how the pair `(p, z_t)` is turned into images. In the current instantiation, this last step is implemented by perturbing prompt embeddings with a deterministic basis expansion of `z_t`, but the framework itself is compatible with richer rendering mechanisms.
-
-This decomposition matters conceptually because it distinguishes StableSteering from several adjacent method families. It is not merely prompt editing, because a latent steering state persists across rounds. It is not preference-based model fine-tuning, because preference changes only the interaction state. It is not fully automated iterative refinement, because the correction signal is meant to come from a user or an explicit oracle rather than from an internal critic alone. The framework is thus best viewed as a user-centered sequential control model for diffusion generation.
-
-## 6. Qualitative End-to-End Case Study
-
-The paper’s central qualitative artifact is a preserved five-round session generated from a cinematic product-hero prompt for an expedition-ready electric motorcycle, together with a negative prompt that suppresses blur, geometry distortions, unwanted text, and clutter. The run uses five candidates per round, the `random_local` sampler, the `winner_average` updater, scalar-rating feedback, `512 x 512` output resolution, and 30 inference steps.
-
-The purpose of this artifact is not benchmark comparison. Its role is to make the platform behavior visible: a baseline prompt render, a diverse first round, explicit selection of a preferred candidate, carry-forward of the incumbent, additional local exploration, and preservation of all intermediate states.
+The corresponding conceptual pipeline is shown in Figure 1.
 
 <figure>
-  <img src="figures/figure_4_case_study_progression.png" alt="Case-study montage from baseline to final incumbent">
-  <figcaption><strong>Figure 4.</strong> Main qualitative montage from the preserved five-round case study. The panels show the baseline prompt render, the first selected direction, a mid-run refinement, and the final incumbent. The figure illustrates a coherent compare-select-update trajectory across multiple rounds.</figcaption>
+  <img src="figures/figure_1_system_overview.svg" alt="Conceptual overview of the StableSteering loop">
+  <figcaption><strong>Figure 1.</strong> Conceptual overview of StableSteering. A persistent prompt defines the task, the sampler proposes a local candidate set around the current steering state, preferences are elicited over the candidates, and an update operator produces the next state. The scientific question is not only whether the loop can improve alignment, but how the sampling, preference, and incumbent policies shape that behavior.</figcaption>
 </figure>
 
-The qualitative trajectory is consistent with the intended use of the system. The first round juxtaposes the unmodified prompt baseline with more exploratory alternatives. Subsequent rounds preserve the incumbent while refining lighting, silhouette, and product geometry. By round five, the session reaches a visually stronger product-hero direction than the initial baseline. This interpretation remains qualitative by design; the case study is a systems demonstration, not a claim of generalized visual improvement.
+## 4. Methodology
 
-Table 1 summarizes the case-study runtime settings.
+### 4.1 Rendering model and steering state
 
-| Setting | Value |
-|---|---|
-| Prompt family | Cinematic product hero shot of an expedition-ready electric explorer motorcycle |
-| Backend / model | Diffusers / `runwayml/stable-diffusion-v1-5` |
-| Resolution | `512 x 512` |
-| Inference steps | `30` |
-| Candidates per round | `5` |
-| Sampler | `random_local` |
-| Updater | `winner_average` |
-| Feedback mode | `scalar_rating` |
-| Session length | `5` rounds |
-| Visual sanity failures | `0` |
+The generator remains fixed within a session. The prompt \(p\) is constant, and all iterative behavior is expressed through the steering state \(z_t\), the proposal set \(s_t^{(j)}\), and the update rule. In the current implementation the steering state modulates prompt embeddings and generation settings at inference time, but the methodological point is more general: StableSteering treats iterative refinement as stateful search over a prompt-conditioned local control manifold.
 
-## 7. Evaluation Design
+The initial state is \(z_0 = 0\), which corresponds to a baseline prompt-only render. Round 1 always includes this unmodified baseline candidate. In later rounds, the previously selected winner is carried forward as an incumbent. This choice stabilizes the search but also creates the possibility of late-round stagnation, a phenomenon that becomes important in the experiments.
 
-To move beyond a single qualitative case study, the manuscript addresses nine empirical questions. The first asks whether the steering loop can be preserved as a coherent multi-round artifact rather than only as an anecdotal prompt-editing story. The second asks whether the framework can support small repeated protocol studies with fixed bookkeeping and reproducible traces. The third asks whether a hidden-target oracle can reveal measurable round-by-round progress from caption-only initialization. The fourth asks whether that oracle signal remains visible under repeated seeds and an independent image-embedding metric. The fifth asks whether visible later-round stagnation can be mitigated without sacrificing proxy recovery. The sixth asks whether seed choice and winner-centric update rules can be isolated cleanly under matched budgets. The seventh asks whether broader proposal policies and richer preference models matter under the same oracle proxy. The eighth asks whether newly added sampler, updater, and oracle families materially broaden the method space under a shared protocol. The ninth asks whether the paper package now includes a concrete direct-human comparison layer rather than only future-work language about human studies.
+### 4.2 Candidate-sampling model families
 
-These questions are answered by seven intentionally small but controlled studies, three follow-on oracle analyses, and one collection-ready evaluation layer. The repeated minimal baseline matrix establishes that the loop can be executed repeatedly under fixed bookkeeping. The seed-policy slice and updater ablation then test whether local design choices can be isolated without changing the outer protocol. The oracle target-recovery study asks whether caption-only initialization can be improved against a hidden target under automated preference, and the repeated multi-metric oracle extension asks whether that signal persists across seeds and an independent evaluator. Three follow-on oracle comparisons then ask a more behavioral question: how should the framework respond when the incumbent keeps winning and visible progress appears to stall, and what happens when incumbent handling itself is changed under a matched budget? The sampler-and-feedback comparison broadens the modeling axes by comparing alternative proposal policies and richer preference-update rules under the same proxy framing. A later method-extension comparison then adds new samplers, more explicitly ordinal preference models, and alternative oracle steering policies under one shared hidden-target scaffold. Finally, a small human pairwise pilot package curates six comparison pairs and annotation materials for direct judgment collection, although no human annotations are yet reported in this paper.
+The candidate sampler determines which local alternatives are visible at each round. StableSteering implements several families that can be grouped conceptually.
 
-Table 2 summarizes how each study maps onto the paper's central empirical questions.
+1. **Local exploit/explore samplers** such as `random_local` and `exploit_orthogonal` keep proposals near the incumbent while mixing conservative and slightly broader offsets.
+2. **Axis and line-search samplers** such as `axis_sweep` and `line_search` probe interpretable directional patterns around the current state.
+3. **Coverage-oriented samplers** such as `diversity_shell`, `spherical_cover`, and `quality_diversity_mix` prioritize angular separation and broader neighborhood coverage.
+4. **Adaptive anti-plateau samplers** such as `two_scale_cover`, `plateau_escape`, and `annealed_shell` mix local and broader probes or adapt proposal geometry over time.
 
-| Study | Prompts | Policies | Repeats per cell | Runs | Rounds | Candidate rows | Supported question |
-|---|---:|---:|---:|---:|---:|---:|---|
-| Minimal baseline matrix | 3 | 3 | 3 | 27 | 36 | 144 | Can the loop support repeated protocol-level comparison across distinct workflow structures? |
-| Seed-policy slice | 3 | 2 | 3 | 18 | 36 | 180 | Does the framework isolate seed-policy choice under matched budgets? |
-| Updater ablation | 3 | 3 | 3 | 27 | 54 | 270 | Does the framework isolate winner-centric update rules under matched budgets? |
-| Oracle target recovery | 3 | 1 | 1 | 3 | 30 | 120 | Can iterative steering improve a hidden-target proxy metric over rounds? |
-| Repeated multi-metric oracle | 3 | 1 | 3 | 9 | 90 | 360 | Does oracle progress persist across seeds and an independent evaluation metric? |
-| Incumbent-policy oracle slice | 3 | 3 | 1 | 9 | 54 | 270 | Can incumbent handling reduce visible stagnation without degrading proxy target recovery? |
-| Sampler and feedback comparison | 3 | 8 | 1 | 24 | 120 | 480 | Do proposal and preference-model choices measurably affect proxy target recovery? |
-| Method extension comparison | 3 | 11 | 1 | 33 | 165 | 660 | Do newer sampler, updater, and oracle families broaden the steering design space in a meaningful way? |
-| Human pairwise pilot package | 3 | 2 | 1 | 6 pairs | n/a | n/a | Is a direct human judgment layer concretely packaged for the next validation step? |
+The proposal set at round \(t\) can be written abstractly as
 
-## 8. Experimental Results
+<div class="equation">
+$$
+S_t = \mathcal{S}(z_t, \rho_t, k),
+$$
+</div>
 
-### 8.1 Minimal Baseline Matrix
+where \(\rho_t\) is an effective search radius. In anti-stagnation variants, \(\rho_t\) may expand when repeated incumbent reuse signals that the search is locally frozen.
 
-The minimal baseline matrix answers a narrow but important question: can the steering loop be studied repeatedly as a protocol rather than only demonstrated once? The answer is yes. Across all prompt-policy cells, the loop preserves the intended interaction structure. As designed, the prompt-only and no-update conditions remain one-round, zero-feedback runs, while the default StableSteering condition remains a two-round, one-feedback run in every repeated cell.
+### 4.3 Preference elicitation and normalization
+
+The framework supports several forms of user feedback: scalar ratings, winner-only selection, pairwise winner/loser choice, approve/reject markings, and ranked top-\(k\) lists. These raw forms are heterogeneous, so they are normalized into internal batch-level preference weights or contrasts.
+
+For example, a scalar-rating round may yield normalized nonnegative weights \(w_t^{(j)}\) satisfying \(\sum_j w_t^{(j)} = 1\). A pairwise round may produce a winner-loser contrast. A top-\(k\) ranking may induce ordinal or probabilistic utilities over the entire batch. This normalization step is essential because it determines whether the update uses only the winner, the full ranking, or explicit positive-versus-negative evidence.
+
+### 4.4 Update models
+
+The simplest update rules are winner-centric:
+
+<div class="equation">
+$$
+z_{t+1} = z_t + \alpha \left(z_t^{\star} - z_t\right),
+$$
+</div>
+
+where \(z_t^{\star}\) is the selected winner state and \(\alpha \in (0,1]\) controls step size. `winner_copy`, `winner_average`, and `linear_preference` differ mainly in how aggressively they move toward \(z_t^{\star}\).
+
+Richer models use more of the batch. A score-weighted or softmax-weighted update forms a centroid of all candidate states:
+
+<div class="equation">
+$$
+z_{t+1} = (1-\alpha)z_t + \alpha \sum_{j=1}^{k} \pi_t^{(j)} z_t^{(j)},
+\qquad
+\pi_t^{(j)} \propto \exp(\beta r_t^{(j)}),
+$$
+</div>
+
+where \(r_t^{(j)}\) is a normalized score and \(\beta\) controls concentration. A contrastive update moves toward preferred candidates and away from dispreferred ones:
+
+<div class="equation">
+$$
+z_{t+1} = z_t + \alpha \left(\mu_t^{+} - \mu_t^{-}\right).
+$$
+</div>
+
+Listwise and pairwise probabilistic models go one step further. `borda_preference` converts rankings into ordinal weights. `plackett_luce_preference` interprets rankings through a listwise choice model. `bradley_terry_preference` induces latent utilities from pairwise comparisons implied by the batch. These models matter because they transform feedback from “pick the best image” into “estimate a structured preference surface over the batch.”
+
+### 4.5 Oracle models for target-recovery evaluation
+
+The main quantitative validation in this paper uses oracle-driven target recovery. Each task starts from a real image \(y\) and a manually written caption \(p\). The generator sees only \(p\), not \(y\). The oracle chooses winners by comparing candidate images to the hidden target \(y\) in a pretrained embedding space.
+
+The simplest oracle is CLIP cosine similarity:
+
+<div class="equation">
+$$
+o_t^{(j)} = \cos\!\left(e_{\text{CLIP}}(x_t^{(j)}), e_{\text{CLIP}}(y)\right).
+$$
+</div>
+
+Later experiments also use DINOv2 for independent evaluation and explore ensemble or novelty-aware policies, for example
+
+<div class="equation">
+$$
+o_t^{(j)} = \lambda\, o_{\text{CLIP}}^{(j)} + (1-\lambda)\, o_{\text{DINO}}^{(j)} + \gamma\, \nu_t^{(j)},
+$$
+</div>
+
+where \(\nu_t^{(j)}\) is a novelty or challenger bonus. The purpose of these oracle variants is not to claim that CLIP or DINO is the ground truth. Their purpose is to create controlled hidden-target tasks in which progress can be measured round by round.
+
+### 4.6 Incumbent management and anti-stagnation controls
+
+Carrying the current winner forward into the next round is intuitively attractive because it preserves the best-known image. However, it also creates a structural bias toward repeated re-selection. StableSteering therefore studies incumbent handling explicitly.
+
+The framework includes three increasingly strong anti-stagnation ideas:
+
+1. **Radius expansion** after repeated same-image reuse.
+2. **Soft incumbent penalties**, which reduce incumbent dominance without forbidding it.
+3. **Hard incumbent cooldown**, which temporarily excludes the incumbent from winner selection.
+
+These choices are important because visible plateauing in iterative refinement often has less to do with “poor generation quality” than with the interaction between incumbent carry-forward, narrow proposal geometry, and winner-only updates.
+
+## 5. Experimental Methodology
+
+### 5.1 Research questions
+
+The experiments are organized around four questions.
+
+1. **RQ1:** Can iterative steering produce measurable progress toward a hidden visual target when the generator receives only a caption?
+2. **RQ2:** Do different sampling and preference models materially change the behavior of the loop?
+3. **RQ3:** Why do many iterative runs appear to stop changing visually even when more rounds remain?
+4. **RQ4:** Which anti-stagnation strategies preserve challenger pressure without destroying final alignment?
+
+### 5.2 Shared runtime setting
+
+All experiments use the same real diffusion backend: `runwayml/stable-diffusion-v1-5` through Diffusers on GPU. The paper intentionally studies inference-time steering on a fixed generator rather than model fine-tuning. Unless otherwise noted, images are generated at `512×512`, rounds are small-budget sessions rather than exhaustive searches, and all reported bundles are archived in the repository with manifests, summaries, and figures.
+
+### 5.3 Preserved qualitative case study
+
+The qualitative case study is a five-round preserved session starting from a product-photography prompt for an electric motorcycle. Its purpose is illustrative rather than statistical. It shows the mechanics of the loop in a fully archived session: baseline prompt render, successive winner selection, and final incumbent preservation.
 
 <figure>
-  <img src="figures/figure_6_baseline_workflow_summary.png" alt="Baseline workflow summary plot">
-  <figcaption><strong>Figure 5.</strong> Protocol structure in the repeated minimal baseline matrix. The prompt-only and no-update policies remain one-round runs, while the StableSteering default policy performs one preference update and a second round. This figure should be read as protocol evidence, not as an image-quality comparison.</figcaption>
+  <img src="figures/figure_4_case_study_progression.png" alt="Qualitative case study progression">
+  <figcaption><strong>Figure 2.</strong> Preserved qualitative case study from a five-round session. The prompt is held fixed while the steering state changes over rounds. The example is included to show what the interaction loop looks like in practice, not as evidence of general superiority.</figcaption>
 </figure>
 
-This result is useful but intentionally narrow. It shows that the framework supports repeated protocol execution, not that any policy produces better images. Because the three policies use unequal interaction budgets, the study should not be interpreted as an apples-to-apples benchmark.
+### 5.4 Oracle target-recovery protocol
 
-Table 3 summarizes the repeatability pattern across the three prompt families. The main signal is not image quality but protocol stability: the recorded number of rounds and feedback events is invariant across repeats in every prompt-policy cell. The only nonzero screening flags appear in the portrait prompt family, where lightweight visual checks flagged some candidates in the no-update and StableSteering conditions. These flags are retained only as diagnostic signals rather than as paper-facing performance metrics.
+The main quantitative protocol uses real images paired with manually written captions. For each target image \(y\), generation begins from the caption alone. The hidden target is used only by the oracle that scores candidates. The base oracle study uses 3 targets, 10 rounds per target, 4 candidates per round, and a fixed steering configuration. This yields 120 candidate images in total.
 
-| Prompt family | Prompt-only rounds (mean ± sd) | No-update rounds (mean ± sd) | StableSteering rounds (mean ± sd) | Portrait-only screening flags |
-|---|---|---|---|---:|
-| Landscape / environment | 1.0 ± 0.0 | 1.0 ± 0.0 | 2.0 ± 0.0 | 0 |
-| Portrait / character | 1.0 ± 0.0 | 1.0 ± 0.0 | 2.0 ± 0.0 | 14 |
-| Product hero shot | 1.0 ± 0.0 | 1.0 ± 0.0 | 2.0 ± 0.0 | 0 |
+The repeated-seed extension repeats each target 3 times under different deterministic seeds, yielding 9 runs, 90 rounds, and 360 candidate rows. Final evaluation is reported under both CLIP and DINOv2. This reduces the risk that results reflect one unusually favorable run or one embedding family alone.
 
-### 8.2 Controlled Follow-on Slices
+### 5.5 Controlled module slices
 
-The seed-policy and updater studies extend the empirical scaffold while keeping interpretation conservative. In both cases, the matched two-round steering-loop budget is preserved exactly: every run completes two rounds and one feedback event. This matters because it shows that local changes to seed handling or update rules can be compared without changing the outer experimental protocol.
+To isolate design choices inside the steering loop, the paper includes several matched-budget slices.
+
+1. **Sampler slice:** compares proposal geometries while holding update and oracle choice fixed.
+2. **Preference-model slice:** compares winner-centric, score-weighted, contrastive, and listwise updates while holding the proposal family fixed.
+3. **Method-extension slice:** introduces newer samplers (`annealed_shell`, `spherical_cover`) and richer updaters (`borda_preference`, `bradley_terry_preference`) together with oracle-policy variants.
+4. **Incumbent-policy and progress-diagnosis slices:** study plateauing directly through late-round movement, incumbent selection share, and plateau share.
+
+The goal of these slices is not to declare one universal winner. The goal is to identify which modeling choices most strongly alter the search dynamics.
+
+### 5.6 Human pairwise layer
+
+The paper package also includes a small human pairwise evaluation protocol with curated pairs and annotation tooling. At present, it is protocol-ready but contains no collected human judgments. It is therefore part of the methodological infrastructure, not of the reported evidence.
+
+## 6. Results
+
+### 6.1 Hidden-target recovery is measurable and nontrivial
+
+The most important outcome is that the loop supports measurable target recovery rather than only anecdotal improvement. In the base oracle target-recovery study, mean best-candidate CLIP similarity improves from `0.825` for the prompt-only baseline to `0.896` by round 10. In the repeated-seed multi-metric extension, mean CLIP similarity improves from `0.828` to `0.881`, while mean DINOv2 similarity improves from `0.452` to `0.595`.
 
 <figure>
-  <img src="figures/figure_5_bundle_coverage.png" alt="Coverage of the three executed bundles">
-  <figcaption><strong>Figure 6.</strong> Coverage of the executed evaluation studies. The controlled slices substantially increase the amount of preserved paper-facing evidence without changing the narrow interpretation boundary: these are controlled steering studies rather than benchmark claims about output quality.</figcaption>
+  <img src="figures/figure_11_oracle_multimetric_repeated.svg" alt="Repeated-seed multi-metric oracle convergence">
+  <figcaption><strong>Figure 3.</strong> Repeated-seed multi-metric oracle target recovery. Improvement is visible under both the oracle metric (CLIP) and an independent evaluation metric (DINOv2), supporting the claim that the loop is not merely replaying noise. At the same time, the gains are moderate rather than dramatic, which is consistent with a local-search interpretation.</figcaption>
 </figure>
 
-The seed-policy study contributes 18 runs, 36 rounds, and 180 candidate rows. The updater study contributes 27 runs, 54 rounds, and 270 candidate rows. Together with the repeated baseline matrix, these results show that StableSteering can support controlled steering experiments rather than only one-off demonstrations.
+These gains are scientifically meaningful for two reasons. First, they show that iterative preference-guided inference can do more than produce a large first-round batch. Second, they show that the loop is not solely improving under the metric that chooses winners: DINOv2 also improves on average even though it is not the selection oracle in the base repeated protocol.
 
-### 8.3 Oracle-Based Target-Recovery Proxy
+### 6.2 Proposal geometry matters
 
-The fourth study asks a more outcome-facing question while remaining fully automated and reproducible: if a real target image is hidden from the generator but paired with a manually written caption, can iterative steering recover images that move closer to that target over time? This setting preserves the prompt-first interface while replacing the human judge with an oracle that scores candidates by CLIP image-similarity to the hidden target. The generator therefore receives no target embedding directly; the target is used only to simulate preference selection and to evaluate progress.
-
-The study contains three targets, ten steering rounds per target, and four candidates per round. Averaged over the three targets, the mean baseline similarity is `0.825`, the mean round-one best-candidate similarity is `0.888`, and the mean round-ten best-candidate similarity is `0.896`, corresponding to a mean improvement of `0.071` from the baseline prompt render to the best candidate found by round ten. All three targets improve relative to their caption-only baselines, although the gains are front-loaded: two targets reach their best score in the first round, while one target improves further over subsequent rounds.
+The sampler comparison slice already suggested that broader or more structured proposals matter: `diversity_shell` and `line_search` both reached mean final CLIP similarity of approximately `0.882`, compared with `0.867` for `exploit_orthogonal` in the same controlled slice. The later method-extension study reinforces this conclusion. `spherical_cover` achieved the strongest final DINOv2 score among new sampler families (`0.668`), while `annealed_shell` and `diversity_shell` both produced larger CLIP deltas (`0.065`) than several earlier local baselines.
 
 <figure>
-  <img src="figures/figure_7_oracle_convergence.svg" alt="Oracle target-recovery convergence curve">
-  <figcaption><strong>Figure 7.</strong> Mean best-candidate similarity to the hidden target image under the oracle target-recovery protocol. The curve shows rapid improvement over the caption-only baseline in the early rounds and then a plateau, suggesting that the current steering loop often finds its best direction quickly under this proxy metric.</figcaption>
+  <img src="figures/figure_13_sampler_extension_curve.svg" alt="Sampler extension comparison">
+  <figcaption><strong>Figure 4.</strong> Sampler extension comparison. Proposal geometry changes the reachable trajectories. Broader coverage-oriented samplers generally preserve more useful challenger diversity than narrowly exploitative local proposals.</figcaption>
 </figure>
+
+This result is conceptually consistent with the search framing. If iterative refinement is treated as local search, then the candidate generator is not a neutral implementation detail. It is the mechanism that defines which corrections are even visible to the preference model at each round.
+
+### 6.3 Preference modeling matters, but not in the same way
+
+Richer feedback modeling does not guarantee uniformly better final scores, but it clearly changes behavior. In the earlier feedback slice, winner-centric updates remained competitive in a small study. In the method-extension comparison, however, `bradley_terry_preference` emerged as the strongest new updater, reaching final CLIP `0.886` and final DINOv2 `0.687`, outperforming `borda_preference`, `score_weighted_preference`, and `softmax_preference` on the combined proxy view.
 
 <figure>
-  <img src="figures/figure_8_oracle_target_recovery_examples.png" alt="Oracle target-recovery examples">
-  <figcaption><strong>Figure 8.</strong> Representative oracle target-recovery examples. For each target, the bundle preserves the hidden real image, the baseline prompt-only render, the first-round best candidate, and the final best candidate found over ten steering rounds.</figcaption>
+  <img src="figures/figure_14_preference_extension_curve.svg" alt="Preference model comparison">
+  <figcaption><strong>Figure 5.</strong> Preference-model extension comparison. Models that use more of the batch than a single winner can materially change the resulting trajectory. In this study, Bradley-Terry-style weighting produced the strongest overall combination of CLIP and DINOv2 recovery.</figcaption>
 </figure>
 
-This study should still be interpreted conservatively. It is a target-recovery proxy task in CLIP space, not a human-quality judgment. Nonetheless, it is important because it shows that the StableSteering formulation can support a measurable iterative-alignment experiment in which progress is quantified round by round rather than only narrated qualitatively.
+The scientific interpretation is not that Bradley-Terry is “the best” preference model for iterative diffusion steering. Rather, the result shows that once candidate diversity is available, the way feedback is aggregated becomes consequential. Winner-only updates discard information that richer models can use.
 
-### 8.4 Repeated-Seed Multi-Metric Oracle Extension
+### 6.4 Plateauing is a real structural failure mode
 
-The next natural question is whether the oracle signal survives two stronger validity checks: repeated seeds and evaluation under an embedding family that is not used to choose winners. The repeated multi-metric extension keeps the hidden-target protocol fixed but runs three seeds per target and reports both CLIP cosine similarity, which still drives oracle selection, and DINOv2 cosine similarity, which serves as an independent image-only evaluation metric. The resulting bundle contains 9 runs, 90 rounds, and 360 candidate rows.
+A recurrent phenomenon in oracle steering is that later rounds stop changing visually. Focused diagnosis experiments show that this is not merely subjective impression. In the compact diagnosis bundles, the baseline oracle policy exhibited high incumbent selection share and high plateau share. For example, the baseline CLIP-oracle policy in the later compact inspired-method study had incumbent selection share `0.73` and plateau share `0.67`.
 
-Aggregated over all targets and repeats, the mean baseline CLIP similarity is `0.828` and the mean final best CLIP similarity is `0.881`, for a mean gain of `0.053` with standard deviation `0.035` across runs. Under DINOv2, the mean baseline similarity is `0.452` and the mean final best similarity is `0.595`, for a mean gain of `0.142` with standard deviation `0.179`. All three targets improve under both metrics on average, though the magnitude differs substantially by target family.
+The diagnosis experiments show that plateauing is created by a three-way interaction:
+
+1. the incumbent is always present,
+2. proposals remain too local, and
+3. winner-centric preference updates reinforce incumbent dominance.
 
 <figure>
-  <img src="figures/figure_11_oracle_multimetric_repeated.svg" alt="Repeated-seed multi-metric oracle convergence curve">
-  <figcaption><strong>Figure 11.</strong> Repeated-seed oracle target-recovery curves evaluated under CLIP and DINOv2. CLIP still drives oracle selection, while DINOv2 provides an independent image-embedding view of progress. Both metrics improve on average over repeated seeds, reducing the risk that the original oracle result was a single-run artifact.</figcaption>
+  <img src="figures/figure_16_oracle_progress_diagnosis.svg" alt="Oracle progress diagnosis">
+  <figcaption><strong>Figure 6.</strong> Focused diagnosis of oracle stagnation. The most useful policies are not simply the ones with the highest final score, but the ones that preserve late-round movement while avoiding destructive over-exploration.</figcaption>
 </figure>
 
-This extension does not remove the proxy nature of the experiment, but it improves its credibility. The repeated seeds reduce sensitivity to one favorable run, and the added DINOv2 readout weakens the concern that progress is visible only in the same embedding family used to choose winners. The correct interpretation remains narrow: the study shows repeatable proxy target recovery under two pretrained image-embedding metrics, not human-evaluated visual superiority.
+This explains why some early anti-stagnation fixes failed. Hard incumbent cooldown almost eliminated visible freezing, but it also harmed final CLIP alignment in matched-budget comparisons. The problem is therefore not just “make the loop move more.” The problem is preserving challenger pressure without discarding useful incumbent information.
 
-The repeated-seed extension also surfaced a concrete failure mode: visible stagnation. In many runs, the carried-forward incumbent kept winning and the selected image stopped changing even though the session continued. Three follow-on oracle comparisons were therefore run to study anti-stagnation behavior directly. The first replaced the older oracle policy with the new `plateau_escape` sampler and `softmax_preference` updater. This improved late-round movement, with six of nine runs still improving after round four, but it did not materially reduce visible freezing in the final three rounds. The second added a harder stagnation-control policy that widened the effective trust radius after repeated incumbent reuse and temporarily excluded the carried-forward incumbent from oracle winner selection. That policy removed last-three-round image plateaus entirely and increased late-round movement further, but it reduced final mean CLIP recovery from `0.886` in the first plateau-escape bundle to `0.869`. The third and most controlled follow-on kept the proposal and update family fixed while comparing three incumbent-handling policies under a compact matched budget: carry-forward baseline, soft incumbent penalty, and hard incumbent cooldown.
+### 6.5 The strongest current behavior comes from balancing diversity and incumbent pressure
+
+The most informative later results come from the inspired-method and progress-diagnosis follow-ups. Quality-diversity-style proposal sets and listwise or pairwise probabilistic preference models reduce plateauing substantially. In the inspired-method comparison, the `quality_diversity_mix + plackett_luce_preference + pareto_frontier_mix` configuration achieved final DINOv2 `0.655`, CLIP delta `0.049`, incumbent selection share `0.20`, and plateau share `0.00`. In the progress follow-up bundle, the `Bradley-Terry progress-aware` policy achieved final CLIP `0.883`, final DINOv2 `0.630`, late improvements `1.33`, incumbent selection share `0.60`, and plateau share `0.33`.
 
 <figure>
-  <img src="figures/figure_12_incumbent_policy_slice.svg" alt="Budget-matched incumbent-policy oracle slice">
-  <figcaption><strong>Figure 12.</strong> Budget-matched incumbent-policy oracle slice under the same proposal and update family. Soft incumbent penalty yields the strongest final proxy recovery in this compact study, while hard cooldown removes late-round sticking at the cost of lower final alignment.</figcaption>
+  <img src="figures/figure_17_oracle_inspired_methods.svg" alt="Inspired oracle methods comparison">
+  <figcaption><strong>Figure 7.</strong> Literature-inspired method variants. The strongest overall behavior does not come from maximal anti-incumbent pressure, but from balancing broader search coverage, richer preference aggregation, and moderate incumbent discouragement.</figcaption>
 </figure>
 
-In that compact slice, the carry-forward baseline reaches mean final CLIP and DINOv2 similarities of `0.884` and `0.583`, respectively. Soft incumbent penalty reaches the strongest final scores, `0.891` and `0.636`, but still shows last-three-round plateaus in `2/3` runs and the lowest unique selected-image ratio (`0.389`). Hard incumbent cooldown removes final three-round plateaus entirely, but drops to `0.856` CLIP and `0.568` DINOv2. The combined evidence therefore sharpens the anti-stagnation story rather than resolving it completely: incumbent-aware exploration can improve late-round motion, and a mild penalty can help under a matched budget, but hard incumbent suppression still over-explores and visible movement is not equivalent to better final recovery.
+Together, these results support a more precise claim than “oracle steering works.” They suggest that the central design problem is not merely how to update \(z_t\), but how to co-design proposal geometry, preference aggregation, and incumbent handling so that the search neither freezes prematurely nor drifts away from the best recovered direction.
 
-### 8.5 Sampler and Feedback-Model Comparison
+### 6.6 What is supported and what is not
 
-The fifth study asks the most explicitly comparative question in the paper: under a fixed small-budget oracle proxy, do proposal policies and preference models materially affect iterative progress? The study is split into two slices. The sampler slice fixes the updater at `linear_preference` with `winner_only` feedback and compares four proposal policies. The feedback-model slice fixes the sampler at `exploit_orthogonal` and compares winner-centric updates against the newly added `score_weighted_preference` and `contrastive_preference` models.
+The evidence supports the following claims.
 
-<figure>
-  <img src="figures/figure_9_sampler_slice_curve.svg" alt="Sampler comparison curve under the oracle proxy">
-  <figcaption><strong>Figure 9.</strong> Oracle target-recovery curves for the sampler slice. The broader exploratory policies, <code>diversity_shell</code> and <code>line_search</code>, reach higher final proxy alignment than the older local baselines under the same five-round budget.</figcaption>
-</figure>
+1. Iterative inference-time steering can produce measurable hidden-target recovery beyond prompt-only initialization.
+2. Sampling, preference modeling, and oracle policy materially change the behavior of the loop.
+3. Plateauing is a structural phenomenon with interpretable causes.
+4. Moderate incumbent discouragement and broader proposal coverage can improve late-round behavior.
 
-<figure>
-  <img src="figures/figure_10_feedback_slice_curve.svg" alt="Feedback-model comparison curve under the oracle proxy">
-  <figcaption><strong>Figure 10.</strong> Oracle target-recovery curves for the feedback-model slice. Richer feedback models remain competitive, but the present small proxy study does not yet show that they dominate winner-centric updates.</figcaption>
-</figure>
+The evidence does **not** support the following stronger claims.
 
-Across three targets, `diversity_shell` and `line_search` each reach a mean final best similarity of approximately `0.882`, corresponding to mean improvements of about `0.053` over their prompt-only baselines. Under the same conditions, `exploit_orthogonal` reaches `0.867` and `random_local` reaches `0.876`. The scientific takeaway is that proposal geometry matters: broader, more intentionally separated candidate sets can improve proxy target recovery even when the update rule is held fixed.
+1. That StableSteering is superior to all prompt-editing or editing-based alternatives.
+2. That the best current policy is settled.
+3. That the oracle results directly translate to human preference.
+4. That the present manuscript satisfies the evidence bar of a large benchmark or user-study paper.
 
-The feedback-model slice is more mixed. `winner_average` with `winner_only` feedback reaches a mean final best similarity of `0.882`, `linear_preference` with `winner_only` reaches `0.885`, `contrastive_preference` with `top_k` reaches `0.873`, and `score_weighted_preference` with `scalar_rating` reaches `0.883`. The main conclusion is therefore not that richer preference models already win. Rather, the result shows that the same steering scaffold can host ranking-aware and score-aware update rules without changing the outer session loop, and that these variants are already competitive enough to justify larger studies.
+## 7. Discussion
 
-These comparisons should still be read narrowly. The slice uses a small target set, the same CLIP family for oracle choice and evaluation, and one five-round budget. The resulting ordering is therefore evidence that sampling and feedback modeling matter, not evidence that one sampler or one preference model should already be treated as universally preferred.
+The main conceptual lesson is that iterative text-to-image refinement should be studied as an interaction model, not only as a model-alignment problem. Even with a fixed diffusion backbone, the system designer has at least three levers: proposal geometry, preference aggregation, and incumbent handling. The experiments show that these levers produce qualitatively different search regimes.
 
-### 8.6 Method Extension Comparison
+This perspective helps reconcile several otherwise puzzling observations. First-round gains can be large because the initial batch already offers useful alternatives to the prompt-only baseline. Later-round gains can disappear not because the task is solved, but because the loop repeatedly reselects a strong incumbent under too-narrow proposals. Hard anti-incumbent interventions can restore motion while harming final alignment. These are characteristic local-search tradeoffs, not merely quirks of a particular script.
 
-The next question is whether the method space can be expanded in a way that produces genuinely different behavior rather than only relabeling existing heuristics. A new method-extension study therefore adds two samplers, two preference models, and three oracle steering policies under one shared hidden-target recovery scaffold. The sampler slice compares `annealed_shell` and `spherical_cover` against the stronger earlier baselines `diversity_shell` and `line_search`, all paired with `softmax_preference`. The preference slice compares `borda_preference` and `bradley_terry_preference` against `score_weighted_preference` and `softmax_preference` under a fixed `diversity_shell` sampler. The oracle slice compares three hidden-target selectors under a fixed `annealed_shell + softmax_preference` steering loop: CLIP-only, CLIP+DINO ensemble, and CLIP-plus-novelty bonus.
+The broader implication is that inference-time steering may deserve a place between prompt engineering and model fine-tuning. Prompt rewriting asks too much linguistic precision from users. Model fine-tuning is too expensive for many interactive settings. Preference-guided local search offers an intermediate regime in which refinement is achieved through repeated judgments over candidate images.
 
-<figure>
-  <img src="figures/figure_13_sampler_extension_curve.svg" alt="Extended sampler comparison under CLIP and DINOv2 evaluation">
-  <figcaption><strong>Figure 13.</strong> Extended sampler comparison under the shared hidden-target protocol. The newly added <code>annealed_shell</code> and <code>spherical_cover</code> samplers are competitive with the earlier diversity-forward baselines and expand the geometric search space studied by the paper.</figcaption>
-</figure>
+## 8. Limitations and Future Work
 
-<figure>
-  <img src="figures/figure_14_preference_extension_curve.svg" alt="Extended preference-model comparison under CLIP and DINOv2 evaluation">
-  <figcaption><strong>Figure 14.</strong> Extended preference-model comparison. The new ordinal models broaden the update family from centroid heuristics toward explicitly ranking-based interpretations of feedback.</figcaption>
-</figure>
+The present paper has four major limitations.
 
-<figure>
-  <img src="figures/figure_15_oracle_policy_curve.svg" alt="Oracle steering-policy comparison under CLIP and DINOv2 evaluation">
-  <figcaption><strong>Figure 15.</strong> Oracle steering-policy comparison. The CLIP+DINO ensemble oracle improves independent DINOv2 recovery most strongly, while CLIP-only and CLIP-plus-novelty retain different tradeoffs between direct target alignment and continued exploration.</figcaption>
-</figure>
+1. **Proxy-heavy evaluation.** The main quantitative studies use oracle similarity in pretrained embedding spaces. This is scientifically useful, but not a substitute for human evaluation.
+2. **Small controlled studies.** The prompt and target sets are still limited. The goal has been mechanism discovery rather than large-scale benchmarking.
+3. **Single generator family.** All reported experiments use one diffusion backbone and a consistent runtime regime. Cross-model generalization remains open.
+4. **Incomplete human evidence.** The human pairwise protocol is prepared but not yet populated with annotations.
 
-The sampler slice is competitive rather than decisive. `spherical_cover` reaches the strongest final CLIP and DINOv2 scores, `0.881` and `0.668`, while `annealed_shell` reaches `0.878` and `0.627`. The older diversity-forward baselines remain close: `diversity_shell` reaches `0.877` and `0.595`, and `line_search` reaches `0.878` and `0.660`. The main scientific takeaway is therefore not that one sampler clearly dominates, but that the geometry of proposal construction remains a real degree of freedom. Angularly separated coverage and schedule-aware shell narrowing both appear to be viable search biases under the same outer loop.
+The next high-value research steps are therefore clear: collect the human pairwise layer, broaden the target and prompt suite, test transfer across diffusion backbones and image-conditioned pipelines, and study adaptive stopping rules that are sensitive to stagnation rather than fixed round budgets alone.
 
-The preference slice is more striking. `bradley_terry_preference` achieves the strongest final results of the four compared update rules, with mean final CLIP `0.886` and DINOv2 `0.687`, while `score_weighted_preference` reaches `0.869` and `0.643`, `softmax_preference` reaches `0.879` and `0.581`, and `borda_preference` reaches `0.877` and `0.535`. The new ordinal models therefore do more than merely add notation: at least one of them, the Bradley-Terry-style updater, appears to extract useful signal from the ranked batch that the simpler winner- or score-centric rules leave unused. At the same time, `borda_preference` underperforms on DINOv2, which is a useful warning that not every richer ordinal model is automatically better.
+## 9. Conclusion
 
-The oracle-policy slice isolates a different scientific axis: what hidden objective is the steering loop effectively optimizing? The CLIP-only oracle remains strongest on direct CLIP delta (`+0.068`), but the CLIP+DINO ensemble oracle achieves the strongest DINOv2 improvement by a wide margin, reaching mean final DINOv2 `0.697` and mean DINOv2 delta `0.267`. The novelty-augmented oracle reaches the highest final CLIP score (`0.883`) but with a smaller CLIP delta because its baselines start from slightly higher-scoring runs. The important result is conceptual: oracle choice is itself part of the steering model. If a hidden-target study is used to validate interactive steering, the paper must state clearly whether it is validating one embedding family, a multi-metric agreement objective, or an explicit exploration-biased proxy.
-
-These new comparisons should again be read with restraint. The target suite is still small, the runs are still single-repeat slices, and the oracle-policy comparison remains a proxy rather than a human study. Even so, the method-extension bundle substantially improves the paper's methodological contribution: the steering loop now supports more interesting sampler geometry, more explicit ranking-based preference models, and multiple oracle definitions that can be compared under one reproducible protocol.
-
-### 8.7 Human Pairwise Evaluation Layer
-
-The manuscript now also includes a small human pairwise evaluation layer intended to support direct judgment collection in a follow-on study. The current package contains six curated pairs drawn from three prompt families and two comparison types: baseline prompt-only versus final StableSteering output, and no-update comparison versus final StableSteering output. Each pair is accompanied by a browser preview, a manifest, and a blank annotation sheet with the allowed responses `left`, `right`, `tie`, and `invalid`.
-
-No human annotations are reported yet, so this layer contributes protocol completeness rather than outcome evidence. Its importance is practical and scientific. Practically, it closes a common submission gap by turning “future human evaluation” into a concrete artifact bundle. Scientifically, it fixes the exact judgment question to be asked next: which image better satisfies the prompt while remaining visually coherent?
-
-### 8.8 What the Results Do and Do Not Show
-
-The executed studies support eight defensible claims. First, the framework can preserve real end-to-end qualitative sessions with replayable artifacts. Second, it can run repeated, multi-cell experiments under fixed protocols. Third, it can support a bounded oracle target-recovery protocol in which iterative steering improves a measurable proxy objective over multiple rounds. Fourth, that proxy trend remains visible under repeated seeds and an independent image-embedding metric. Fifth, anti-stagnation behavior can be studied directly and reveals a real exploration-versus-recovery tradeoff rather than a purely cosmetic UI issue. Sixth, it can support controlled comparisons among proposal policies and richer preference-update models under the same outer loop. Seventh, it can support a second generation of sampler, updater, and oracle methods without changing the underlying session scaffold. Eighth, it can serialize enough information to support post-hoc analysis, figure generation, and a concrete human-evaluation collection layer.
-
-The current results do not show that the steering loop is better than prompt-only iteration in human-perceived quality. They do not show statistical superiority, preference alignment across large prompt suites, or cross-user benefit. They also do not yet show that one sampler, updater, seed policy, oracle policy, or incumbent policy should be preferred on scientific grounds outside the present narrow proxy tasks. Even with the DINOv2 extension, the oracle studies do not substitute for human judgment, and the new anti-stagnation follow-ons show that better late-round motion does not automatically imply better final proxy recovery. That restraint is necessary for journal-quality honesty.
-
-## 9. Reproducibility and Experimental Discipline
-
-The experiments in this paper are intentionally bounded and protocol-driven. Session configuration, sampling rule, update rule, candidate count, steering dimensionality, and seed policy are fixed per run and preserved with the resulting artifacts. This matters because an iterative steering method is otherwise easy to describe loosely and hard to compare fairly.
-
-The strongest reproducibility claim in the current paper is therefore methodological rather than statistical. StableSteering makes it possible to preserve one steering trajectory or one small experiment family as a fully specified sequence of proposals, preferences, updates, and outputs. This does not replace large-scale evaluation, but it does make small controlled studies and qualitative analysis much easier to inspect and reproduce.
-
-## 10. Discussion
-
-StableSteering occupies a useful middle ground between a one-off demonstration and a mature benchmark suite. It already provides a clear conceptual scaffold for future studies: prompt-first initialization, an explicit steering state, modular proposal policies, multiple elicitation modes, and controlled update rules. These ingredients are often implicit in early-stage interactive generation projects, where qualitative examples and quantitative claims are hard to reconcile.
-
-The most important current strength is explicitness. The framework makes it possible to say what was proposed, what was preferred, how that preference was normalized, and how the next state was computed. That explicitness is scientifically useful because iterative prompting is otherwise difficult to formalize or analyze.
-
-The strongest remaining gap is empirical depth. The current studies are still small, prompt coverage is narrow, interaction budgets are only partially normalized, and the human pairwise layer is packaged but not yet populated with judgments. The oracle studies add a stronger proxy outcome than protocol bookkeeping alone and now show that both candidate-sampling and feedback-model choices can matter, while the repeated multi-metric extension reduces the risk that this pattern is a single-seed or single-metric artifact. The new anti-stagnation comparisons sharpen the picture further: later-round freezing is real, can be mitigated, and creates a genuine tradeoff between continued exploration and final proxy recovery. The compact incumbent-policy slice narrows that claim even more usefully: softer incumbent penalties may recover a better tradeoff than hard cooldown, but the problem is not solved. The newest method-extension bundle pushes the scientific story another step forward by showing that more structured samplers, more explicitly ordinal preference models, and alternative oracle definitions all change behavior in measurable ways. Even so, the evidence still falls short of human-perceived quality evaluation or large-scale comparative benchmarking. In its present state, the work is best understood as a conceptually clear and experimentally disciplined early study of interactive preference-guided diffusion steering rather than as a definitive comparative benchmark.
-
-## 11. Limitations
-
-Several limitations remain visible to a critical reviewer.
-
-First, the qualitative case study is a single curated trajectory. It is useful for demonstrating the idea, but it cannot establish general benefit. Second, the minimal baseline matrix compares unequal workflow structures, so it should be interpreted only as a workflow-comparison pilot. Third, the controlled follow-on slices isolate design choices under fixed budgets, but they still report descriptive workflow evidence rather than outcome-quality evidence. Fourth, the oracle bundles remain proxy studies even after the repeated multi-metric extension; CLIP still chooses winners, and DINOv2 is only an auxiliary evaluator. Fifth, the anti-stagnation follow-ons show that reducing visible plateaus is not the same as improving final target-recovery quality, and the new compact incumbent-policy slice suggests that softer incumbent penalties may help without settling the broader tradeoff. Sixth, the sampler, updater, and oracle extension bundle is still a single-repeat comparison on a small target set, so it cannot justify broad model-selection claims. Seventh, the human pairwise layer is protocol-ready but not yet populated with judgments, confidence intervals, or significance tests. Eighth, the results are tied to a small set of prompt families.
-
-These limitations are not hidden because they are central to preserving trust. The goal of the present paper is to report a strong platform contribution with honest evidence boundaries, not to imply that the evidence already supports a larger algorithmic claim.
-
-## 12. Conclusion
-
-StableSteering formulates image steering as an iterative preference-guided process in which a text prompt initializes generation and a compact latent control state carries subsequent refinement. Its main contribution is to make this formulation explicit through concrete sampling rules, preference-normalization schemes, oracle definitions, and update models that can be studied under controlled multi-round protocols. The combination of a preserved five-round qualitative case study, a repeated minimal baseline matrix, two controlled follow-on slices, an oracle-based target-recovery proxy study, a repeated-seed multi-metric oracle extension, anti-stagnation oracle comparisons, a budget-matched incumbent-policy slice, a sampler-and-feedback comparison bundle, and a later method-extension comparison shows that this framing is operationally viable and scientifically inspectable.
-
-The next evidence threshold is clear. A stronger journal submission would broaden the prompt suite, normalize policy budgets more aggressively, and populate the new human pairwise layer with enough judgments to compare conditions directly. Even before those steps, however, StableSteering already offers a useful research artifact: a concrete model of interactive preference-guided diffusion steering that can be instantiated, analyzed, and extended in future work.
+This paper reframed iterative text-to-image refinement as preference-guided local search around a persistent prompt-conditioned steering state. StableSteering serves as a methodological framework for that problem: it holds the generator fixed, exposes candidate batches to human or oracle judgment, and studies how sampling, preference modeling, and incumbent management shape the trajectory. The experiments support a cautious but meaningful conclusion. Iterative steering can produce measurable hidden-target recovery, but its behavior is not governed by one component alone. The quality of the search depends jointly on the diversity of proposals, the fidelity of the preference model, and the policy used to protect or challenge the incumbent. The most interesting scientific outcome is therefore not a single winning heuristic, but a clearer picture of the design space for inference-time preference-guided refinement.
 
 ## Data and Artifact Availability
 
-The materials underlying this manuscript include the application source code, the preserved five-round qualitative case study, the repeated minimal baseline matrix, the seed-policy study, the updater study, the oracle target-recovery study, the repeated multi-metric oracle study, the plateau-escape and stagnation-control oracle follow-ons, the incumbent-policy oracle slice, the sampler-and-feedback comparison study, the method-extension comparison study, the human pairwise evaluation package, and the scripts used to generate the figures and paper-facing summaries. All figures in the manuscript are derived from archived local artifacts preserved with the submission package.
+All figures, preserved HTML reports, experiment summaries, and result tables referenced in this manuscript are archived under the repository paper package. The current manuscript is intentionally paired with an appendix that records the implemented module families and compact controlled slices in greater detail.
 
 ## References
 
-[1] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, “High-Resolution Image Synthesis with Latent Diffusion Models,” in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2022, pp. 10684-10695.
+Bengs, V., Saha, A., and Hüllermeier, E. (2021). Preference-based online learning with dueling bandits: A survey. *Journal of Machine Learning Research*, 22(7), 1-108.
 
-[2] J. Ho and T. Salimans, “Classifier-Free Diffusion Guidance,” *arXiv preprint arXiv:2207.12598*, 2022.
+Black, K., Janner, M., Du, Y., Kostrikov, I., and Levine, S. (2024). Training diffusion models with reinforcement learning. *International Conference on Learning Representations*.
 
-[3] A. Hertz, R. Mokady, J. Tenenbaum, K. Aberman, Y. Pritch, and D. Cohen-Or, “Prompt-to-Prompt Image Editing with Cross-Attention Control,” *arXiv preprint arXiv:2208.01626*, 2022.
+Brack, M., Friedrich, F., Hintersdorf, D., Struppek, L., Schramowski, P., and Kersting, K. (2023). SEGA: Instructing text-to-image models using semantic guidance. *Advances in Neural Information Processing Systems*.
 
-[4] T. Brooks, A. Holynski, and A. A. Efros, “InstructPix2Pix: Learning to Follow Image Editing Instructions,” in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2023, pp. 18392-18402.
+Brooks, T., Holynski, A., and Efros, A. A. (2023). InstructPix2Pix: Learning to follow image editing instructions. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 18392-18402.
 
-[5] G. Kim, T. Kwon, and J. C. Ye, “DiffusionCLIP: Text-Guided Diffusion Models for Robust Image Manipulation,” in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2022, pp. 2426-2435.
+Cheng, J., Yin, B., Cai, K., Huang, M., Li, H., He, Y., Lu, X., Li, Y., Cheng, Y., Yan, Y., and Liang, X. (2024). TheaterGen: Character management with LLM for consistent multi-turn image generation. *arXiv preprint arXiv:2404.18919*.
 
-[6] B. Kawar, O. Tov, R. Mokady, E. Elnekave, K. Aberman, and Y. Pritch, “Imagic: Text-Based Real Image Editing with Diffusion Models,” in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2023, pp. 6007-6017.
+Croitoru, F.-A., Hondru, V., Ionescu, R. T., Sebe, N., and Shah, M. (2025). Curriculum direct preference optimization for diffusion and consistency models. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*.
 
-[7] L. Fan, Y. Liu, Y. Huang, Y. Li, Y. Zhang, M. White, W. Aziz, H. Yao, and others, “DPOK: Reinforcement Learning for Fine-Tuning Text-to-Image Diffusion Models,” *arXiv preprint arXiv:2305.16381*, 2024.
+Fan, L., Liu, Y., Huang, Y., Li, Y., Zhang, Y., White, M., Aziz, W., and Yao, H. (2024). DPOK: Reinforcement learning for fine-tuning text-to-image diffusion models. *arXiv preprint arXiv:2305.16381*.
 
-[8] C. Meng, Y. He, Y. Song, J. Song, J. Wu, J.-Y. Zhu, and S. Ermon, “SDEdit: Guided Image Synthesis and Editing with Stochastic Differential Equations,” in *International Conference on Learning Representations*, 2022.
+Hertz, A., Mokady, R., Tenenbaum, J., Aberman, K., Pritch, Y., and Cohen-Or, D. (2022). Prompt-to-Prompt image editing with cross-attention control. *arXiv preprint arXiv:2208.01626*.
 
-[9] L. Zhang, A. Rao, and M. Agrawala, “Adding Conditional Control to Text-to-Image Diffusion Models,” in *Proceedings of the IEEE/CVF International Conference on Computer Vision*, 2023, pp. 3836-3847.
+Ho, J., and Salimans, T. (2022). Classifier-free diffusion guidance. *arXiv preprint arXiv:2207.12598*.
 
-[10] F.-A. Croitoru, V. Hondru, R. T. Ionescu, N. Sebe, and M. Shah, “Curriculum Direct Preference Optimization for Diffusion and Consistency Models,” in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2025.
+Jaiswal, S., Prabhudesai, M., Bhardwaj, N., Qin, Z., Zadeh, A., Li, C., Fragkiadaki, K., and Pathak, D. (2026). Iterative refinement improves compositional image generation. *arXiv preprint arXiv:2601.15286*.
 
-[11] Z. J. Wang, E. Montoya, D. Munechika, H. Yang, B. Hoover, and D. Horng Chau, “DiffusionDB: A Large-Scale Prompt Gallery Dataset for Text-to-Image Generative Models,” in *Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics*, 2023, pp. 729-758.
+Kawar, B., Tov, O., Mokady, R., Elnekave, E., Aberman, K., and Pritch, Y. (2023). Imagic: Text-based real image editing with diffusion models. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 6007-6017.
 
-[12] J. Cheng, B. Yin, K. Cai, M. Huang, H. Li, Y. He, X. Lu, Y. Li, Y. Cheng, Y. Yan, and X. Liang, “TheaterGen: Character Management with LLM for Consistent Multi-turn Image Generation,” *arXiv preprint arXiv:2404.18919*, 2024.
+Kim, G., Kwon, T., and Ye, J. C. (2022). DiffusionCLIP: Text-guided diffusion models for robust image manipulation. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 2426-2435.
 
-[13] Y. Xian, Z. Xie, P. Zhu, F. Xia, X. Tu, B. Sun, T.-S. Chua, and Q. Dong, “AutoStudio: Crafting Consistent Subjects in Multi-turn Interactive Image Generation,” *arXiv preprint arXiv:2406.04363*, 2024.
+Lian, S., Lin, H., Yue, S., Huang, H., Zhang, H., Zhou, B., and Zhang, W. (2024). T2I-Copilot: Training-free multi-agent text-to-image generation with prompt engineering, model selection, and self-improvement. *arXiv preprint arXiv:2410.03031*.
 
-[14] S. Lian, H. Lin, S. Yue, H. Huang, H. Zhang, B. Zhou, and W. Zhang, “T2I-Copilot: Training-Free Multi-Agent Text-to-Image Generation with Prompt Engineering, Model Selection, and Self-Improvement,” *arXiv preprint arXiv:2410.03031*, 2024.
+Meng, C., He, Y., Song, Y., Song, J., Wu, J., Zhu, J.-Y., and Ermon, S. (2022). SDEdit: Guided image synthesis and editing with stochastic differential equations. *International Conference on Learning Representations*.
 
-[15] Y. Yang, T. Yu, Z. Zhao, D. Wang, H. Su, and J. Zhu, “Using Human Feedback to Fine-Tune Diffusion Models without Any Reward Model,” *arXiv preprint arXiv:2311.13231*, 2023.
+Miao, Z., Wang, J., Wang, Z., Yang, Z., Wang, L., Qiu, Q., and Liu, Z. (2024). Training diffusion models towards diverse image generation with reinforcement learning. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 10844-10853.
 
-[16] S. Jaiswal, M. Prabhudesai, N. Bhardwaj, Z. Qin, A. Zadeh, C. Li, K. Fragkiadaki, and D. Pathak, “Iterative Refinement Improves Compositional Image Generation,” *arXiv preprint arXiv:2601.15286*, 2026.
+Mouret, J.-B., and Clune, J. (2015). Illuminating search spaces by mapping elites. *arXiv preprint arXiv:1504.04909*.
+
+Rocchio, J. J. (1971). Relevance feedback in information retrieval. In G. Salton (Ed.), *The SMART Retrieval System: Experiments in Automatic Document Processing*. Prentice Hall.
+
+Rombach, R., Blattmann, A., Lorenz, D., Esser, P., and Ommer, B. (2022). High-resolution image synthesis with latent diffusion models. *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition*, 10684-10695.
+
+Salton, G., and Buckley, C. (1990). Improving retrieval performance by relevance feedback. *Journal of the American Society for Information Science*, 41(4), 288-297.
+
+Wang, Z. J., Montoya, E., Munechika, D., Yang, H., Hoover, B., and Chau, D. H. (2023). DiffusionDB: A large-scale prompt gallery dataset for text-to-image generative models. *Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics*, 729-758.
+
+Xian, Y., Xie, P., Zhu, P., Xia, F., Tu, X., Sun, B., Chua, T.-S., and Dong, Q. (2024). AutoStudio: Crafting consistent subjects in multi-turn interactive image generation. *arXiv preprint arXiv:2406.04363*.
+
+Xu, J., Liu, X., Wu, Y., Tong, Y., Li, Q., Ding, M., Tang, J., and Dong, Y. (2023). ImageReward: Learning and evaluating human preferences for text-to-image generation. *arXiv preprint arXiv:2304.05977*.
+
+Yang, Y., Yu, T., Zhao, Z., Wang, D., Su, H., and Zhu, J. (2023). Using human feedback to fine-tune diffusion models without any reward model. *arXiv preprint arXiv:2311.13231*.
+
+Zhang, L., Rao, A., and Agrawala, M. (2023). Adding conditional control to text-to-image diffusion models. *Proceedings of the IEEE/CVF International Conference on Computer Vision*, 3836-3847.

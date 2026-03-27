@@ -1,0 +1,72 @@
+suite_name: oracle_progress_diagnosis
+description: Compact real-backend study for diagnosing oracle steering stagnation and testing targeted fixes.
+oracle_model: openai/clip-vit-base-patch32
+evaluation_models:
+  - id: openai/clip-vit-base-patch32
+    short_name: clip
+    label: CLIP cosine
+    kind: clip
+  - id: facebook/dinov2-base
+    short_name: dinov2
+    label: DINOv2 cosine
+    kind: dinov2
+max_rounds: 6
+margin_epsilon: 0.015
+fixed_conditions:
+  sampler: exploit_orthogonal
+  updater: linear_preference
+  feedback_mode: winner_only
+  seed_policy: fixed-per-candidate
+  steering_mode: low_dimensional
+  steering_dimension: 5
+  candidate_count: 5
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 12
+  model_name: runwayml/stable-diffusion-v1-5
+policies:
+  - id: baseline_clip
+    label: Baseline CLIP oracle
+    sampler: exploit_orthogonal
+    updater: linear_preference
+    feedback_mode: winner_only
+    oracle_policy: clip_only
+  - id: sampler_upgrade
+    label: Two-scale cover sampler
+    sampler: two_scale_cover
+    updater: linear_preference
+    feedback_mode: winner_only
+    oracle_policy: clip_only
+  - id: preference_upgrade
+    label: Challenger-mixture updater
+    sampler: two_scale_cover
+    updater: challenger_mixture_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_only
+  - id: full_progress
+    label: Full progress-aware policy
+    sampler: two_scale_cover
+    updater: challenger_mixture_preference
+    feedback_mode: scalar_rating
+    oracle_policy: clip_margin_mix
+targets:
+  - id: mountain_lake
+    label: Mountain lake landscape
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/Mountain%20lake.jpg
+    caption: A serene mountain lake bordered by evergreen forest with snow-capped peaks in the background under clear daylight.
+    negative_prompt: low detail, blurry, distorted mountains, text, watermark, people, buildings
+    attribution: Wikimedia Commons, source page File:Mountain lake.jpg
+  - id: cat_portrait_bw
+    label: Black-and-white cat portrait
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/Cat_portrait_B%26W.JPG
+    caption: A close-up black and white portrait of a bicolor cat with bright eyes against a dark background.
+    negative_prompt: low detail, blur, extra eyes, distorted face, text, watermark, cluttered background
+    attribution: Wikimedia Commons, source page File:Cat portrait B&W.JPG
+  - id: red_bicycle
+    label: Red bicycle street photo
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20Red%20Bicycle.%20%2815655615295%29.jpg
+    caption: A red bicycle parked outdoors on a quiet street in daylight with an urban wall or building nearby.
+    negative_prompt: low detail, blurry, extra wheels, warped frame, text, watermark, crowded scene
+    attribution: Wikimedia Commons, source page File:The Red Bicycle. (15655615295).jpg

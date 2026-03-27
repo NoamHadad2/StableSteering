@@ -12,13 +12,18 @@ from app.samplers.annealed_shell import AnnealedShellSampler
 from app.samplers.diversity_shell import DiversityShellSampler
 from app.samplers.line_search import LineSearchSampler
 from app.samplers.plateau_escape import PlateauEscapeSampler
+from app.samplers.quality_diversity_mix import QualityDiversityMixSampler
 from app.samplers.spherical_cover import SphericalCoverSampler
+from app.samplers.two_scale_cover import TwoScaleCoverSampler
 from app.updaters.borda_pref import BordaPreferenceUpdater
 from app.updaters.bradley_terry_pref import BradleyTerryPreferenceUpdater
+from app.updaters.challenger_mixture import ChallengerMixturePreferenceUpdater
 from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
+from app.updaters.plackett_luce_pref import PlackettLucePreferenceUpdater
 from app.updaters.score_weighted import ScoreWeightedPreferenceUpdater
 from app.updaters.softmax_pref import SoftmaxPreferenceUpdater
 from run_paper_method_extension_comparison import _apply_oracle_policy
+from run_paper_oracle_progress_diagnosis import PolicySpec, _oracle_score_candidates
 from run_paper_oracle_multimetric_repeated import _eligible_oracle_candidates, _oracle_feedback_request
 
 
@@ -132,6 +137,40 @@ def test_spherical_cover_sampler_generates_angularly_separated_probes() -> None:
     assert len(candidates) == 5
     assert all(candidate.sampler_role == "cover_probe" for candidate in candidates)
     assert min_dot < 0.35
+
+
+def test_two_scale_cover_sampler_mixes_near_and_far_radii() -> None:
+    session = _session(trust_radius=0.7, candidate_count=5, current_z=[0.12, 0.04, 0.0, 0.0, 0.0])
+    sampler = TwoScaleCoverSampler()
+
+    candidates = sampler.propose(session, seed=41)
+    deltas = [
+        math.sqrt(sum((value - current) ** 2 for value, current in zip(candidate.z, session.current_z, strict=False)))
+        for candidate in candidates
+    ]
+    near = [distance for candidate, distance in zip(candidates, deltas, strict=True) if candidate.sampler_role == "near_cover_probe"]
+    far = [distance for candidate, distance in zip(candidates, deltas, strict=True) if candidate.sampler_role == "far_cover_probe"]
+
+    assert near and far
+    assert max(near) < min(far)
+    assert len(candidates) == 5
+
+
+def test_quality_diversity_mix_sampler_covers_multiple_emitter_roles() -> None:
+    session = _session(trust_radius=0.7, candidate_count=5, current_z=[0.16, 0.03, 0.0, 0.0, 0.0])
+    sampler = QualityDiversityMixSampler()
+
+    candidates = sampler.propose(session, seed=43)
+    roles = {candidate.sampler_role for candidate in candidates}
+    distances = [
+        math.sqrt(sum((value - current) ** 2 for value, current in zip(candidate.z, session.current_z, strict=False)))
+        for candidate in candidates
+    ]
+
+    assert "qd_refine" in roles
+    assert "qd_forward" in roles
+    assert any(role.startswith("qd_far_cover") for role in roles)
+    assert max(distances) - min(distances) > 0.15
 
 
 def test_score_weighted_preference_uses_ratings_to_form_weighted_centroid() -> None:
@@ -320,6 +359,61 @@ def test_bradley_terry_preference_fits_pairwise_strengths_from_ratings() -> None
     assert updated[1] > -0.05
 
 
+def test_challenger_mixture_preference_lets_near_tie_challenger_pull_state() -> None:
+    session = _session(trust_radius=0.8, current_z=[0.35, 0.0])
+    candidates = [
+        Candidate(
+            id="inc",
+            round_id="rnd_test",
+            candidate_index=0,
+            z=[0.35, 0.0],
+            sampler_role="incumbent",
+            seed=1,
+            generation_params={"carried_forward": True},
+        ),
+        _candidate("challenger_a", [0.44, 0.16]),
+        _candidate("challenger_b", [0.18, 0.22]),
+    ]
+    feedback = normalize_feedback(
+        "rnd_test",
+        FeedbackRequest(
+            feedback_type=FeedbackType.scalar_rating,
+            payload={"ratings": {"inc": 5.0, "challenger_a": 4.8, "challenger_b": 3.5}},
+        ),
+    )
+
+    updated, summary = ChallengerMixturePreferenceUpdater().update(session, candidates, feedback)
+
+    assert summary["updater"] == "challenger_mixture_preference"
+    assert updated[0] > session.current_z[0]
+    assert updated[1] > 0.0
+
+
+def test_plackett_luce_preference_uses_full_ranking_with_nonzero_tail_weights() -> None:
+    session = _session(trust_radius=0.8, current_z=[0.0, 0.0])
+    candidates = [
+        _candidate("c1", [0.62, 0.0]),
+        _candidate("c2", [0.2, 0.48]),
+        _candidate("c3", [-0.35, 0.16]),
+        _candidate("c4", [-0.55, -0.2]),
+    ]
+    feedback = normalize_feedback(
+        "rnd_test",
+        FeedbackRequest(
+            feedback_type=FeedbackType.top_k,
+            payload={"ranking": ["c2", "c1", "c3", "c4"]},
+        ),
+    )
+
+    updated, summary = PlackettLucePreferenceUpdater().update(session, candidates, feedback)
+
+    assert summary["updater"] == "plackett_luce_preference"
+    assert summary["ranking_length"] == 4
+    assert summary["weights"]["c4"] > 0.0
+    assert updated[0] > -0.1
+    assert updated[1] > 0.0
+
+
 def test_oracle_selection_penalty_reweights_carried_forward_incumbent() -> None:
     rows = [
         {
@@ -396,6 +490,38 @@ def test_clip_novelty_bonus_can_favor_more_novel_candidate() -> None:
 
     winner = max(scored, key=lambda row: float(row["oracle_score"]))
     assert winner["candidate_id"] == "challenger"
+
+
+def test_pareto_frontier_oracle_can_choose_balanced_candidate_over_clip_only() -> None:
+    rows = [
+        {
+            "candidate_id": "clip_heavy",
+            "clip_score": 0.93,
+            "dinov2_score": 0.38,
+            "novelty_to_incumbent": 0.02,
+            "carried_forward": True,
+        },
+        {
+            "candidate_id": "balanced",
+            "clip_score": 0.9,
+            "dinov2_score": 0.62,
+            "novelty_to_incumbent": 0.28,
+            "carried_forward": False,
+        },
+    ]
+    policy = PolicySpec(
+        id="pareto_listwise",
+        label="Pareto listwise",
+        sampler="quality_diversity_mix",
+        updater="plackett_luce_preference",
+        feedback_mode="top_k",
+        oracle_policy="pareto_frontier_mix",
+    )
+
+    scored = _oracle_score_candidates(rows, policy=policy, margin_epsilon=0.015)
+
+    winner = max(scored, key=lambda row: float(row["oracle_score"]))
+    assert winner["candidate_id"] == "balanced"
 
 
 def _mean_distance(candidates: list[Candidate], center: list[float]) -> float:

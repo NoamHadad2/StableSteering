@@ -39,14 +39,14 @@ def build_html() -> str:
     <style>
       body {{ margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }}
       main {{ max-width: 960px; margin: 0 auto; padding: 28px 18px 48px; }}
-      article {{ background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }}
+      article {{ background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; hyphens: auto; }}
       h1, h2, h3 {{ line-height: 1.2; }}
       p, li {{ line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }}
       table {{ width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }}
       th, td {{ border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }}
       th {{ background: #f2e8da; }}
-      .equation {{ margin: 1rem 0; padding: 0.8rem 1rem; background: #f8f4ee; border: 1px solid #d9cdbc; border-radius: 14px; overflow-x: auto; }}
-      mjx-container[jax="SVG"] {{ margin: 0.35rem 0 !important; text-align: center !important; }}
+      .equation {{ margin: 1rem 0; padding: 0.95rem 1.1rem; background: #f8f4ee; border: 1px solid #d9cdbc; border-radius: 14px; overflow-x: auto; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }}
+      mjx-container[jax="SVG"] {{ margin: 0.4rem 0 !important; text-align: center !important; font-size: 108% !important; }}
     </style>
   </head>
   <body>

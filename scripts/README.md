@@ -22,11 +22,30 @@ This folder contains developer-facing helper scripts.
 - `run_paper_oracle_target_recovery.py`
   Executes the hidden-target oracle study that starts from manual captions, steers for multiple rounds, and scores progress in CLIP space against the held-out target image.
 
+- `run_paper_oracle_multimetric_repeated.py`
+  Repeats the oracle target-recovery study across multiple seeds per target and writes CLIP- and DINOv2-based summaries under `paper/results/oracle_multimetric_repeated/`.
+
+- `run_paper_oracle_incumbent_policy_slice.py`
+  Executes the compact incumbent-policy comparison for oracle steering, contrasting carry-forward baseline, soft incumbent penalty, and hard incumbent cooldown.
+
 - `run_paper_sampler_feedback_comparison.py`
   Executes the controlled sampler and feedback-model comparison bundle and writes policy summaries, round curves, and paper-facing SVG plots under `paper/results/sampler_feedback_comparison/`.
 
 - `run_paper_method_extension_comparison.py`
   Executes the extended method-comparison bundle for newer samplers, richer preference models, and alternative oracle-selection policies, then writes policy summaries, round curves, and paper-facing SVG plots under `paper/results/method_extension_comparison/`.
+
+- `run_paper_oracle_progress_diagnosis.py`
+  Executes a compact real-backend oracle-stagnation diagnosis study, comparing incumbent-locking baseline behavior against targeted sampler, updater, and oracle-policy fixes, then writes summary tables and a paper-facing SVG plot under `paper/results/oracle_progress_diagnosis/`.
+  The same runner is also used for the newer inspired-methods slice under `paper/results/oracle_inspired_methods/`.
+
+- `build_human_pairwise_eval_pack.py`
+  Builds the curated human pairwise evaluation package, including review HTML and CSV-friendly comparison artifacts under `paper/results/human_pairwise_evaluation/`.
+
+- `create_configuration_samples.py`
+  Writes example YAML configuration bundles for documentation, demos, and controlled experiment setup.
+
+- `preload_experiment_models.py`
+  Scans the paper protocol YAML files, downloads the referenced diffusion and evaluation models once into the local shared caches, and lets later experiment runs reuse them instead of refetching weights.
 
 - `build_paper_baseline_analysis.py`
   Reads repeated experiment CSVs from a chosen `paper/results/.../tables/` directory and writes paper-facing analysis tables plus a short appendix note under the matching `analysis/` directory.
@@ -64,3 +83,13 @@ This folder contains developer-facing helper scripts.
 ## Usage
 
 These scripts are convenience entry points for setup, release packaging, smoke testing, local development, and browser debugging.
+
+To warm the shared model cache before running several paper experiments:
+
+```bash
+python scripts/preload_experiment_models.py --include-default-diffusion
+```
+
+This prepares diffusion snapshots under `models/` and Hugging Face evaluation
+models under `models/hf_cache/` so the oracle and paper runners can reuse them
+across runs.

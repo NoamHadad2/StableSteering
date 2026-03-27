@@ -44,7 +44,7 @@ StableSteering is built around that gap. It turns generation into a feedback loo
 
 That makes the project useful both as:
 
-- a research platform for studying human-in-the-loop steering
+- a research platform for iterative preference-guided steering
 - a concrete prototype for interactive generative workflows
 
 ## Current MVP
