@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Iterative refinement is central to practical text-to-image use, yet current interfaces still rely heavily on prompt rewriting even when users can more easily judge relative visual progress than verbalize the next correction. This paper studies refinement as a preference-guided local-search problem performed at inference time around a fixed generator. StableSteering represents a session by a persistent prompt together with a low-dimensional steering state that is updated through repeated candidate proposal, comparative feedback, preference aggregation, and state revision. This decomposition isolates four methodological axes within one common loop: steering-direction computation, proposal geometry, preference modeling, and incumbent management. Evaluation combines representative archived trajectories with controlled hidden-target studies built from real images and caption-based initialization. In a repeated multi-metric oracle study comprising `9` runs, `90` rounds, and `360` candidate rows, mean best-candidate similarity increases from `0.828` to `0.881` under CLIP and from `0.452` to `0.595` under DINOv2. Controlled slices further show that steering-direction computation is itself a meaningful design axis, broader proposal coverage and richer preference aggregation alter recovery behavior, and incumbent policy largely determines late-round stagnation. A budget-matched comparison against prompt-only and no-update baselines further clarifies the framework's role: it distinguishes framework-level claims from policy-level performance and identifies update efficiency, proposal diversity, and incumbent management as the principal levers for future improvement.
+Iterative refinement is central to practical text-to-image use, yet current interfaces still rely heavily on prompt rewriting even when users can more easily judge relative visual progress than verbalize the next correction. This paper studies refinement as a preference-guided local-search problem performed at inference time around a fixed generator. StableSteering represents a session by a persistent prompt together with a low-dimensional steering state that is updated through repeated candidate proposal, comparative feedback, preference aggregation, and state revision. This decomposition isolates four methodological axes within one common loop: steering-direction computation, proposal geometry, preference modeling, and incumbent management. Evaluation combines representative qualitative trajectories with controlled hidden-target studies built from real images and caption-based initialization. In a repeated multi-metric oracle study comprising `9` runs, `90` rounds, and `360` candidate rows, mean best-candidate similarity increases from `0.828` to `0.881` under CLIP and from `0.452` to `0.595` under DINOv2. Controlled slices further show that steering-direction computation is itself a meaningful design axis, broader proposal coverage and richer preference aggregation alter recovery behavior, and incumbent policy largely determines late-round stagnation. A budget-matched comparison against prompt-only and no-update baselines further clarifies the methodological role of the framework by distinguishing framework-level claims from policy-level performance and by identifying update efficiency, proposal diversity, and incumbent management as the principal levers for future improvement.
 
 <figure>
   <img src="figures/figure_0_visual_abstract.png" alt="Visual abstract summarizing the refinement problem, the StableSteering loop, and representative oracle results">
@@ -30,7 +30,7 @@ The paper makes four contributions.
 3. It introduces a hidden-target oracle protocol, built from real images and caption-based initialization, that turns iterative refinement into a measurable round-by-round target-recovery problem.
 4. It shows empirically that recovery and plateauing are governed by the interaction among steering representation, proposal diversity, preference aggregation, and incumbent policy rather than by any single heuristic in isolation.
 
-The paper's central claim is focused and direct: iterative text-to-image refinement can be treated as a well-defined inference-time process, and that process can be analyzed systematically through controlled comparisons of the modeling choices that shape it. Exact module inventories and full supplementary protocol tables are provided in Appendix A and Appendices D-N.
+The paper's central claim is focused and direct: iterative text-to-image refinement can be treated as a well-defined inference-time process, and that process can be analyzed systematically through controlled comparisons of the modeling choices that shape it. Supporting protocol details and supplementary comparison tables are provided in the appendix.
 
 ## 2. Related Work and Conceptual Positioning
 
@@ -137,7 +137,7 @@ The corresponding conceptual pipeline is shown in Figure 1.
 
 ### 4.1 Rendering model and steering state
 
-The generator remains fixed within a session. The prompt \(p\) is constant, and all iterative behavior is expressed through the steering state \(z_t\), the optional preference-memory state \(m_t\), the proposal set \(s_t^{(j)}\), and the update rule. In the current implementation the steering state modulates prompt embeddings and generation settings at inference time, but the methodological point is more general: StableSteering treats iterative refinement as stateful search over a prompt-conditioned local control manifold.
+The generator remains fixed within a session. The prompt \(p\) is constant, and all iterative behavior is expressed through the steering state \(z_t\), the optional preference-memory state \(m_t\), the proposal set \(s_t^{(j)}\), and the update rule. In the present formulation the steering state modulates prompt-conditioned control at inference time, but the methodological point is more general: StableSteering treats iterative refinement as stateful search over a prompt-conditioned local control manifold.
 
 The initial state is \(z_0 = 0\), which corresponds to a baseline prompt-only render. Round 1 always includes this unmodified baseline candidate. In later rounds, the previously selected winner is carried forward as an incumbent. This choice stabilizes the search but also creates the possibility of late-round stagnation, a phenomenon that becomes important in the experiments. In the SGD analogy, the incumbent is best thought of as a retained checkpoint of the best current iterate rather than as a direct analog of momentum.
 
@@ -187,7 +187,7 @@ $$
 
 where \(c_i \in \mathbb{R}^{L}\) is a learned-free token-profile basis. This is the most expressive of the three reported representations because it allows different prompt tokens to receive different steering perturbations.
 
-The three variants therefore share the same outer optimization loop and the same low-dimensional state \(z_t\). They differ only in how that state is converted into prompt-conditioned directional evidence. This separation is methodologically useful because it allows representational questions to be studied without changing the surrounding refinement loop. Appendix A records the concrete implementation mapping used in the archived codebase.
+The three variants therefore share the same outer optimization loop and the same low-dimensional state \(z_t\). They differ only in how that state is converted into prompt-conditioned directional evidence. This separation is methodologically useful because it allows representational questions to be studied without changing the surrounding refinement loop. Appendix A records the concrete model families used in the reported experiments.
 
 ### 4.3 Candidate-sampling model families
 
@@ -309,11 +309,11 @@ Table 1 summarizes the main empirical layers used in the paper. The table is imp
 
 ### 5.3 Common experimental setting
 
-All reported experiments use one fixed diffusion backbone so that the empirical comparisons isolate inference-time refinement choices rather than differences in model training. Unless otherwise noted, images are generated at `512×512`, each run uses a small candidate budget, and the reported bundles are archived with per-run summaries, round-level tables, and derived figures. The main hidden-target studies use three held-out real-image targets assembled for this study together with manual captions, while the caption-source extension uses a curated Flickr8k test subset (Hodosh et al., 2013). The exact protocol settings for each bundle are reported in the appendix.
+All reported experiments use one fixed diffusion backbone so that the empirical comparisons isolate inference-time refinement choices rather than differences in model training. Unless otherwise noted, images are generated at `512×512`, and each run uses a small candidate budget chosen to keep the controlled slices computationally comparable. The main hidden-target studies use three held-out real-image targets assembled for this study together with manual captions, while the caption-source extension uses a curated Flickr8k test subset (Hodosh et al., 2013). The exact protocol settings for each study are reported in the appendix.
 
 ### 5.4 Representative archived trajectories
 
-The paper includes a small qualitative layer drawn directly from archived experimental runs. Its purpose is illustrative rather than statistical: it shows what best-so-far refinement looks like within the same hidden-target protocol used for the quantitative studies. Figure 2 presents two representative trajectories, one landscape and one portrait, each shown as target, baseline, early best-so-far improvement, mid-run refinement, and final best image.
+The paper includes a small qualitative layer drawn directly from experimental runs. Its purpose is illustrative rather than statistical: it shows what best-so-far refinement looks like within the same hidden-target protocol used for the quantitative studies. Figure 2 presents two representative trajectories, one landscape and one portrait, each shown as target, baseline, early best-so-far improvement, mid-run refinement, and final best image.
 
 <figure>
   <img src="figures/figure_4_case_study_progression.png" alt="Qualitative case study progression">
@@ -333,7 +333,7 @@ The main quantitative protocol uses real images paired with manually written cap
 
 The repeated-seed extension repeats each target 3 times under different deterministic seeds, yielding 9 runs, 90 rounds, and 360 candidate rows. Final evaluation is reported under both CLIP and DINOv2. Exact target-level tables are given in Appendix E.
 
-An additional caption-and-metric extension uses a curated Flickr8k subset to ask two related questions: whether the hidden-target protocol remains informative when initialization comes from an automatically generated rich caption rather than a manual caption, and whether the reported behavior depends strongly on the chosen image-similarity metric. The extension uses 6 selected targets, 36 runs, 144 rounds, and 576 scored candidate rows, compares human captions with BLIP-generated caption variants (Li et al., 2022), and compares CLIP, SigLIP (Zhai et al., 2023), and multi-metric oracle policies together with LPIPS as a supplementary perceptual distance (Zhang et al., 2018). Exact protocol details and confidence-interval tables are given in Appendix N.
+An additional caption-and-metric extension uses a curated Flickr8k subset to ask two related questions: whether the hidden-target protocol remains informative when initialization comes from an automatically generated rich caption rather than a manual caption, and whether the reported behavior depends strongly on the chosen image-similarity metric. The extension uses 6 selected targets, 36 runs, 144 rounds, and 576 scored candidate rows, compares human captions with BLIP-generated caption variants (Li et al., 2022), and compares CLIP, SigLIP (Zhai et al., 2023), and multi-metric oracle policies together with LPIPS as a supplementary perceptual distance (Zhang et al., 2018). Exact protocol details, confidence-interval tables, and representative appendix examples are given in Appendix N.
 
 This protocol is also part of the paper's novelty claim. Prior work often evaluates prompt fidelity, editing quality, or downstream reward scores, but much less often asks whether an iterative refinement loop can recover a hidden real-image target from caption-only initialization under repeated feedback. The protocol is intentionally narrow, but it turns a vague refinement narrative into a measurable round-by-round problem.
 
@@ -357,7 +357,7 @@ The slice provides a direct comparative reference for the main oracle results. T
 
 ### 5.8 Human pairwise layer
 
-The paper package also includes a small human pairwise evaluation protocol with curated pairs and annotation tooling. At present, it is protocol-ready but contains no collected human judgments. It is therefore part of the methodological infrastructure, not of the reported evidence.
+The supplementary materials also include a small human pairwise evaluation protocol with curated pairs and annotation tooling. No direct human judgments are reported in the present study, so this material should be read as a forward path for evaluation rather than as part of the empirical evidence used in the main claims.
 
 ## 6. Results
 
@@ -369,7 +369,7 @@ The most important outcome is that the loop supports measurable target recovery 
 
 <figure>
   <img src="figures/figure_11_oracle_multimetric_repeated.svg" alt="Repeated-seed multi-metric oracle convergence">
-  <figcaption><strong>Figure 3.</strong> Repeated-seed multi-metric oracle target recovery. Improvement is visible under both the oracle metric (CLIP) and an independent evaluation metric (DINOv2), supporting the view that the loop captures consistent signal across rounds. The gains are moderate and align with a local-search interpretation.</figcaption>
+  <figcaption><strong>Figure 3.</strong> Repeated-seed multi-metric oracle target recovery. Shaded bands show 95% bootstrap confidence intervals over repeated runs. Improvement is visible under both the oracle metric (CLIP) and an independent evaluation metric (DINOv2), supporting the view that the loop captures consistent signal across rounds. The gains are moderate and align with a local-search interpretation.</figcaption>
 </figure>
 
 <figure>
@@ -381,7 +381,7 @@ These gains are scientifically meaningful for two reasons. First, they show that
 
 The repeated bundle also reveals meaningful target heterogeneity that is worth stating explicitly in the main text. Recovery is strongest for the red-bicycle target (`0.916` final CLIP, `0.715` final DINOv2), weaker for the mountain-lake target (`0.844`, `0.505`), and intermediate for the cat portrait (`0.883`, `0.565`). This pattern suggests that the framework is not merely producing one uniform effect size; target structure and prompt-image ambiguity materially influence how much iterative steering can recover under a fixed loop.
 
-A complementary caption-source and oracle-metric extension on a curated Flickr8k subset indicates that the protocol does not depend on manual prompts alone. The BLIP-selected detailed caption condition reaches final CLIP `0.810` (95% bootstrap CI `[0.773, 0.845]`), final SigLIP `0.786` (`[0.728, 0.841]`), final DINOv2 `0.478` (`[0.256, 0.693]`), and final LPIPS `0.676` (`[0.619, 0.737]`), slightly improving on the human-caption condition on CLIP, SigLIP, and LPIPS while essentially matching it on DINOv2. Across oracle policies, CLIP selection gives the strongest final CLIP score (`0.834`, `[0.808, 0.860]`), SigLIP selection gives the strongest final SigLIP (`0.789`, `[0.725, 0.853]`) and DINOv2 (`0.476`, `[0.258, 0.631]`) endpoints, and the multi-metric oracle remains an intermediate compromise. The combined result suggests that richer automated captions broaden the feasible initialization space while the oracle metric still determines which notion of similarity is emphasized; Appendix N provides the exact numeric tables.
+A complementary caption-source and oracle-metric extension on a curated Flickr8k subset indicates that the protocol does not depend on manual prompts alone. The BLIP-selected detailed caption condition reaches final CLIP `0.810` (95% bootstrap CI `[0.773, 0.845]`), final SigLIP `0.786` (`[0.728, 0.841]`), final DINOv2 `0.478` (`[0.256, 0.693]`), and final LPIPS `0.676` (`[0.619, 0.737]`), slightly improving on the human-caption condition on CLIP, SigLIP, and LPIPS while essentially matching it on DINOv2. Across oracle policies, CLIP selection gives the strongest final CLIP score (`0.834`, `[0.808, 0.860]`), SigLIP selection gives the strongest final SigLIP (`0.789`, `[0.725, 0.853]`) and DINOv2 (`0.476`, `[0.258, 0.631]`) endpoints, and the multi-metric oracle remains an intermediate compromise. The combined result suggests that richer automated captions broaden the feasible initialization space while the oracle metric still determines which notion of similarity is emphasized; Appendix N provides the exact numeric tables together with representative visual examples.
 
 Table 2 collects the most decision-relevant quantitative comparisons from the main text. The purpose is not to collapse the paper into one scalar ranking, but to make the evidence hierarchy explicit: the repeated oracle study establishes the core effect, while later rows identify which modeling choices most strongly shape that effect.
 
@@ -404,7 +404,7 @@ The compact matched-budget protocol yields a competitive set of methods with dis
 
 <figure>
   <img src="figures/figure_21_budget_matched_direct_baselines_curve.svg" alt="Budget-matched direct baseline checkpoints">
-  <figcaption><strong>Figure 5.</strong> Budget-matched direct baseline comparison at selected checkpoints on the hidden-target task. Bars show mean best-so-far recovery at baseline, round 1, round 3, and final under the same `5 × 4` visible-candidate budget. The checkpoint view makes the comparison easy to read at meaningful points in the search: no-update resampling is strongest on final CLIP, prompt-only best-of-budget is strongest on final DINOv2, and StableSteering remains competitive while exposing a richer refinement process to analysis.</figcaption>
+  <figcaption><strong>Figure 5.</strong> Budget-matched direct baseline comparison at selected checkpoints on the hidden-target task. Bars show mean best-so-far recovery at baseline, round 1, round 3, and final under the same `5 × 4` visible-candidate budget, and error bars show 95% bootstrap confidence intervals across runs. The checkpoint view makes the comparison easy to read at meaningful points in the search: no-update resampling is strongest on final CLIP, prompt-only best-of-budget is strongest on final DINOv2, and StableSteering remains competitive while exposing a richer refinement process to analysis.</figcaption>
 </figure>
 
 This comparison refines the paper’s interpretation in three ways. First, it separates a claim about the framework from a claim about the present policy. Second, it shows that a substantial portion of hidden-target recovery is achievable through budgeted candidate exposure alone. Third, it identifies update efficiency and incumbent management as the central methodological questions for future refinement policies.
@@ -417,7 +417,7 @@ The steering-mode slice asks whether it matters how the steering state is transl
 
 <figure>
   <img src="figures/figure_19_steering_mode_curve.svg" alt="Steering-mode comparison curve">
-  <figcaption><strong>Figure 6.</strong> Steering-direction computation comparison summarized at final recovery. The four-way slice shows that several steering-direction models are viable, but greater representational freedom does not automatically produce stronger recovery. Content-masked steering gives the strongest final CLIP score in this compact comparison, while the shared-token and token-factorized variants remain competitive on DINOv2.</figcaption>
+  <figcaption><strong>Figure 6.</strong> Steering-direction computation comparison summarized at final recovery. Bars show mean final recovery and error bars show 95% bootstrap confidence intervals across targets. The four-way slice shows that several steering-direction models are viable, but greater representational freedom does not automatically produce stronger recovery. Content-masked steering gives the strongest final CLIP score in this compact comparison, while the shared-token and token-factorized variants remain competitive on DINOv2.</figcaption>
 </figure>
 
 <figure>
@@ -433,7 +433,7 @@ The sampler comparison slice already suggested that broader or more structured p
 
 <figure>
   <img src="figures/figure_13_sampler_extension_curve.svg" alt="Sampler extension comparison">
-  <figcaption><strong>Figure 8.</strong> Sampler extension comparison summarized at final recovery. Proposal geometry changes the reachable search behavior. Broader coverage-oriented samplers generally preserve more useful challenger diversity than narrowly exploitative local proposals.</figcaption>
+  <figcaption><strong>Figure 8.</strong> Sampler extension comparison summarized at final recovery. Bars show mean final recovery and error bars show 95% bootstrap confidence intervals across targets. Proposal geometry changes the reachable search behavior. Broader coverage-oriented samplers generally preserve more useful challenger diversity than narrowly exploitative local proposals.</figcaption>
 </figure>
 
 This result is consistent with the local-search view of refinement. The proposal policy determines which alternatives are visible to the preference model at each round, and therefore shapes both the attainable corrections and the likelihood of later-round stagnation. Supplementary proposal slices are reported in Appendices H-I.
@@ -444,7 +444,7 @@ Richer feedback modeling does not guarantee uniformly better final scores, but i
 
 <figure>
   <img src="figures/figure_14_preference_extension_curve.svg" alt="Preference model comparison">
-  <figcaption><strong>Figure 9.</strong> Preference-model extension comparison summarized at final recovery. Models that use more of the batch than a single winner can materially change the resulting search behavior. In this study, Bradley-Terry-style weighting produced the strongest overall combination of CLIP and DINOv2 recovery.</figcaption>
+  <figcaption><strong>Figure 9.</strong> Preference-model extension comparison summarized at final recovery. Bars show mean final recovery and error bars show 95% bootstrap confidence intervals across targets. Models that use more of the batch than a single winner can materially change the resulting search behavior. In this study, Bradley-Terry-style weighting produced the strongest overall combination of CLIP and DINOv2 recovery.</figcaption>
 </figure>
 
 The main scientific implication is that once candidate diversity is available, the way feedback is aggregated becomes consequential. Winner-only updates use only a narrow fraction of the available comparative signal, whereas richer pairwise or listwise models can alter both recovery and stagnation behavior. Appendix A.3 and Appendices H-I give the full updater inventory and supplementary comparison tables.
@@ -461,7 +461,7 @@ The diagnosis experiments indicate that plateauing is created by a three-way int
 
 <figure>
   <img src="figures/figure_16_oracle_progress_diagnosis.svg" alt="Oracle progress diagnosis">
-  <figcaption><strong>Figure 10.</strong> Focused diagnosis of oracle stagnation, shown as a compact metric summary. The most useful policies are not simply the ones with the highest final score, but the ones that preserve late-round movement while avoiding destructive over-exploration.</figcaption>
+  <figcaption><strong>Figure 10.</strong> Focused diagnosis of oracle stagnation, shown as a compact metric summary. Bars show run-level means and error bars show 95% bootstrap confidence intervals. The most useful policies are not simply the ones with the highest final score, but the ones that preserve late-round movement while avoiding destructive over-exploration.</figcaption>
 </figure>
 
 The resulting picture is mechanistic rather than anecdotal. Later-round stagnation is not simply a visual impression; it is a reproducible property of the interaction among proposal locality, incumbent carry-forward, and preference aggregation.
@@ -474,18 +474,18 @@ The later exploratory bundles sharpen the same point from a wider design perspec
 
 <figure>
   <img src="figures/figure_17_oracle_inspired_methods.svg" alt="Inspired oracle methods comparison">
-  <figcaption><strong>Figure 11.</strong> Literature-inspired method variants, summarized across final alignment and progress metrics. The strongest overall behavior does not come from maximal anti-incumbent pressure, but from balancing broader search coverage, richer preference aggregation, and moderate incumbent discouragement.</figcaption>
+  <figcaption><strong>Figure 11.</strong> Literature-inspired method variants, summarized across final alignment and progress metrics. Bars show run-level means and error bars show 95% bootstrap confidence intervals. The strongest overall behavior does not come from maximal anti-incumbent pressure, but from balancing broader search coverage, richer preference aggregation, and moderate incumbent discouragement.</figcaption>
 </figure>
 
 Together, these results support a precise methodological conclusion: proposal geometry, preference aggregation, and incumbent handling must be designed jointly so that the search neither settles too early nor loses the best recovered direction. The compact incumbent-policy slice is especially useful because it turns that claim into a direct controlled comparison. Supplementary details are provided in Appendix E.
 
 ### 6.8 Restart-style formulations make the plateau tradeoff more explicit
 
-The newest compact reformulation bundle asks a slightly different question: can plateauing be reduced by changing the task formulation itself rather than only widening the local challenger set? Two restart-style variants were therefore introduced. `restart_directional` combines a restart-bridge sampler with a directional oracle that rewards movement toward the hidden target from the current incumbent. `restart_advantage` uses the same restart-style sampler with an incumbent-aware softmax updater and an oracle that mixes absolute CLIP score, challenger advantage over the incumbent, and novelty.
+A restart-style reformulation study asks a slightly different question: can plateauing be reduced by changing the task formulation itself rather than only widening the local challenger set? Two restart-style variants were therefore introduced. `restart_directional` combines a restart-bridge sampler with a directional oracle that rewards movement toward the hidden target from the current incumbent. `restart_advantage` uses the same restart-style sampler with an incumbent-aware softmax updater and an oracle that mixes absolute CLIP score, challenger advantage over the incumbent, and novelty.
 
 <figure>
   <img src="figures/figure_18_oracle_plateau_reformulation.svg" alt="Restart-style oracle reformulation comparison">
-  <figcaption><strong>Figure 12.</strong> Restart-style oracle reformulations, summarized across final alignment and progress metrics. The most informative outcome is not a universal winner but a clarified tradeoff: directional restart removes plateauing and maximizes late-round movement, whereas advantage-aware restart gives the strongest final CLIP recovery in the same compact slice.</figcaption>
+  <figcaption><strong>Figure 12.</strong> Restart-style oracle reformulations, summarized across final alignment and progress metrics. Bars show run-level means and error bars show 95% bootstrap confidence intervals. The most informative outcome is not a universal winner but a clarified tradeoff: directional restart removes plateauing and maximizes late-round movement, whereas advantage-aware restart gives the strongest final CLIP recovery in the same compact slice.</figcaption>
 </figure>
 
 The restart-style comparison is informative because it clarifies the tradeoff rather than collapsing to one universally dominant policy. In the compact slice, a directional-restart formulation reduces incumbent selection share to `0.00`, plateau share to `0.00`, and yields the strongest DINOv2 recovery among the compared policies (`0.582`). An advantage-aware restart formulation yields the strongest final CLIP score (`0.894`) and the largest CLIP improvement (`0.069`), while retaining some incumbent reuse. The baseline CLIP policy remains competitive on final CLIP (`0.891`), but does so with heavier incumbent lock-in (`0.73`) and residual plateau share (`0.33`).
@@ -512,7 +512,7 @@ The present studies also locate the main open frontiers for the framework.
 
 The main conceptual lesson is that iterative text-to-image refinement is best studied as an interaction process with its own optimization geometry. Even with a fixed diffusion backbone, steering representation, proposal geometry, preference aggregation, and incumbent handling define distinct search regimes and distinct failure modes.
 
-This perspective explains several otherwise puzzling empirical patterns. Large first-round gains are unsurprising because the initial batch already exposes useful alternatives to the prompt-only baseline. Later-round stagnation does not necessarily imply that the task is solved; it can arise because the incumbent is repeatedly reselected under proposals that are too local or under updates that discard most of the batch. Hard anti-incumbent interventions restore motion but can overshoot. Richer proposal and preference models can restore motion more selectively, but they also make the search more sensitive to how the steering state itself is represented. These are not accidental implementation quirks. They are the defining tradeoffs of preference-guided local search under a latent generative model.
+This perspective explains several otherwise puzzling empirical patterns. Large first-round gains are unsurprising because the initial batch already exposes useful alternatives to the prompt-only baseline. Later-round stagnation does not necessarily imply that the task is solved; it can arise because the incumbent is repeatedly reselected under proposals that are too local or under updates that discard most of the batch. Hard anti-incumbent interventions restore motion but can overshoot. Richer proposal and preference models can restore motion more selectively, but they also make the search more sensitive to how the steering state itself is represented. These tradeoffs are intrinsic to preference-guided local search under a latent generative model.
 
 The broader implication is that inference-time steering occupies a middle ground between prompt rewriting and model adaptation. In that regime, refinement proceeds through repeated judgments over candidate images, and the search policy absorbs part of the burden that would otherwise fall on manual prompt revision or parameter updating.
 
@@ -526,9 +526,9 @@ The present study is bounded in several clear ways.
 2. **Compact controlled studies.** The prompt and target sets are intentionally small because the goal is mechanism identification rather than large-scale benchmarking.
 3. **A limited direct prompt baseline.** The budget-matched slice includes a direct prompt-editing comparator, but not a stronger language-model prompt optimizer.
 4. **One generator family.** All reported experiments use one diffusion backbone under a fixed runtime regime.
-5. **A prepared but unpopulated human-evaluation layer.** The human pairwise protocol is included, but no human judgments are reported in the present manuscript.
+5. **No direct human-judgment study.** The supplementary pairwise protocol is included, but the present manuscript reports only the oracle-based and controlled comparison results.
 
-These boundaries suggest a natural continuation of the present work: broader prompt and target suites, stronger prompt-optimization baselines, cross-backbone evaluation, populated human pairwise studies, and adaptive stopping rules informed by stagnation rather than fixed round budgets. The appendix records the supporting protocols already prepared for these extensions and separates exact protocol inventories from the conceptual argument developed in the main text.
+These boundaries suggest several natural continuations of the present work: broader prompt and target suites, stronger prompt-optimization baselines, cross-backbone evaluation, direct human pairwise studies, and adaptive stopping rules informed by stagnation rather than fixed round budgets. The appendix complements the main text by separating detailed study definitions and supplementary comparisons from the conceptual argument developed in the manuscript.
 
 ## 9. Conclusion
 
@@ -538,7 +538,7 @@ The strongest claim of the paper is methodological. StableSteering provides a fr
 
 ## Data and Artifact Availability
 
-All figures, preserved reports, experiment summaries, and result tables referenced in this manuscript are archived under the repository paper package. The appendix extends the main text by providing implementation inventories, exact protocol tables, confidence-interval summaries, and supplementary comparison results that are only summarized in the body of the paper.
+All figures, experiment summaries, and result tables referenced in this manuscript are provided in the supplementary materials accompanying the paper. The appendix extends the main text by providing study definitions, exact protocol tables, confidence-interval summaries, and supplementary comparison results that are only summarized in the body of the paper.
 
 ## References
 

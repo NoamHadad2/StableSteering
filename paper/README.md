@@ -93,6 +93,7 @@ Paper figures generated for the journal manuscript:
 - [figure_20_steering_mode_examples.png](E:\Projects\StableSteering\paper\figures\figure_20_steering_mode_examples.png)
 - [figure_21_budget_matched_direct_baselines_curve.svg](E:\Projects\StableSteering\paper\figures\figure_21_budget_matched_direct_baselines_curve.svg)
 - [figure_22_budget_matched_direct_baselines_examples.png](E:\Projects\StableSteering\paper\figures\figure_22_budget_matched_direct_baselines_examples.png)
+- [figure_23_caption_metric_examples.png](E:\Projects\StableSteering\paper\figures\figure_23_caption_metric_examples.png)
 
 Paper support docs:
 
@@ -128,7 +129,7 @@ Current evidence boundary:
 
 Current verification snapshot cited by the package:
 
-- `python -m pytest -q` -> `64 passed`
+- `python -m pytest -q` -> `93 passed`
 - `npm run test:e2e:chrome` -> `8 passed`, `1 skipped`
 
 Internal planning docs remain in this folder, but the files above are the main submission-facing path.

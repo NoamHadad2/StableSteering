@@ -2,7 +2,7 @@
 
 ## Appendix A. Sampling, Feedback, and Update Modules
 
-The main manuscript develops the refinement framework at the level of concepts, equations, and experimental questions. This appendix complements that presentation by recording the concrete module families used in the archived repository snapshot and by collecting protocol tables and supplementary comparisons that are only summarized in the main text.
+The main manuscript develops the refinement framework at the level of concepts, equations, and experimental questions. This appendix complements that presentation by recording the concrete module families used in the reported studies and by collecting protocol tables and supplementary comparisons that are only summarized in the main text.
 
 ### A.1 Implemented Sampler Families
 
@@ -527,7 +527,7 @@ The submission package rests on repository-contained artifacts:
 15. A caption-source and multi-metric oracle extension with BLIP-generated captions, SigLIP, LPIPS, and preserved summary tables.
 16. Generated paper figures copied or built from repository-contained assets.
 
-The core reproducibility claim is artifact traceability. Each experimental bundle preserves runs, rounds, candidate rows, summaries, and derived analysis outputs under fixed protocols. The present appendix therefore supports the main text by documenting controlled evidence and submission packaging, not by introducing new scientific claims.
+The core reproducibility claim is traceability of the reported studies. Each experiment preserves run-level summaries, round-level tables, candidate rows, and derived analysis outputs under fixed protocols. The appendix therefore supports the main text by documenting controlled evidence in detail rather than by introducing additional scientific claims.
 
 ## Appendix N. Caption-Source and Multi-Metric Oracle Extension
 
@@ -566,7 +566,16 @@ The protocol starts from a curated Flickr8k subset. A BLIP captioning model is a
 | Multi-metric oracle | 0.825 [0.792, 0.862] | 0.772 [0.717, 0.824] | 0.458 [0.255, 0.662] | 0.708 [0.670, 0.740] |
 | SigLIP oracle | 0.796 [0.761, 0.831] | 0.789 [0.725, 0.853] | 0.476 [0.258, 0.631] | 0.718 [0.681, 0.757] |
 
-### N.4 Interpretation
+### N.4 Representative Visual Examples
+
+The extension also benefits from a compact qualitative panel because the caption-source and oracle-policy slices make slightly different claims. The caption-source rows show that richer automated initialization can recover structure that is hard to reach from a shorter caption alone, while the oracle-policy rows show that different similarity metrics can favor visibly different endpoints on the same hidden target.
+
+<figure>
+  <img src="figures/figure_23_caption_metric_examples.png" alt="Representative examples from the caption-source and oracle-policy extension">
+  <figcaption><strong>Appendix Figure N1.</strong> Representative outcomes from the caption-and-metric oracle extension. The top two rows compare caption-source conditions on two Flickr8k targets; the bottom two rows compare oracle policies on two targets from the same curated subset. The figure is illustrative rather than aggregate: its role is to make the caption-source and metric-choice effects visually concrete while the tables above remain the primary evidence.</figcaption>
+</figure>
+
+### N.5 Interpretation
 
 Three aspects of the result are relevant to the main paper.
 
@@ -574,7 +583,7 @@ Three aspects of the result are relevant to the main paper.
 2. Caption richness matters more than simply replacing the human prompt with any machine-generated caption. The richer selected BLIP caption is clearly stronger than the shorter standard BLIP caption across all four reported metrics.
 3. Oracle choice changes what the loop optimizes. CLIP-only selection gives the strongest final CLIP score, SigLIP-only selection gives the strongest final SigLIP and DINOv2 endpoints, and the multi-metric oracle remains an intermediate compromise rather than dominating both single-metric policies.
 
-### N.5 Interpretation Boundary
+### N.6 Interpretation Boundary
 
 1. The extension uses a compact six-target subset and should therefore be read as a controlled probe rather than a full benchmark.
 2. The caption model is used only to generate initialization text. It is not adapted or fine-tuned for this task.
