@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StableSteering</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">StableSteering</p>
+        <h1>Interactive prompt-embedding steering research prototype</h1>
+        <p class="lede">Start from a user text prompt, generate steerable image candidates, capture feedback, and replay the resulting search trajectory.</p>
+        <div class="actions">
+          <a class="button" href="/setup">Start a session</a>
+          <a class="button secondary" href="/diagnostics/view">Runtime diagnostics</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="section-head">
+          <h2>Resume sessions</h2>
+          <span>{{ sessions|length }} recent</span>
+        </div>
+        {% if sessions %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Prompt</th>
+                <th>Status</th>
+                <th>Round</th>
+                <th>Continue</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for session in sessions %}
+              <tr>
+                <td>{{ session.prompt }}</td>
+                <td>{{ humanize_session_status(session.status) }}</td>
+                <td>{% if session.current_round == 0 %}Not started yet{% else %}Round {{ session.current_round }}{% endif %}</td>
+                <td>
+                  <div class="actions inline-actions">
+                    <a class="button secondary" href="/sessions/{{ session.id }}/view">Resume session</a>
+                    <a class="button secondary" href="/sessions/{{ session.id }}/replay-view">Replay</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No sessions yet. Create your first session to make it resumable from this dashboard.</p>
+        {% endif %}
+      </section>
+      <section class="card">
+        <div class="section-head">
+          <h2>Experiments</h2>
+          <span>{{ experiments|length }} shown · {{ experiment_count }} total</span>
+        </div>
+        {% if experiments %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Sampler</th>
+                <th>Updater</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for experiment in experiments %}
+              <tr>
+                <td>{{ experiment.name }}</td>
+                <td>{{ humanize_token(experiment.config.sampler) }}</td>
+                <td>{{ humanize_token(experiment.config.updater) }}</td>
+                <td>{{ humanize_feedback_mode(experiment.config.feedback_mode) }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>No experiments yet. Use the setup page to create one and start a session.</p>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

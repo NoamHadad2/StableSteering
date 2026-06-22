@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Method Extension Comparison Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Method Extension Comparison Analysis</h1>
+<h2>Sampler methods</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">clip final</th>
+<th style="text-align: right;">clip delta</th>
+<th style="text-align: right;">dinov2 final</th>
+<th style="text-align: right;">dinov2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Annealed shell</td>
+<td style="text-align: right;">0.878</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">0.627</td>
+<td style="text-align: right;">0.110</td>
+</tr>
+<tr>
+<td>Diversity shell</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.065</td>
+<td style="text-align: right;">0.595</td>
+<td style="text-align: right;">0.127</td>
+</tr>
+<tr>
+<td>Line search</td>
+<td style="text-align: right;">0.878</td>
+<td style="text-align: right;">0.052</td>
+<td style="text-align: right;">0.660</td>
+<td style="text-align: right;">0.095</td>
+</tr>
+<tr>
+<td>Spherical cover</td>
+<td style="text-align: right;">0.881</td>
+<td style="text-align: right;">0.041</td>
+<td style="text-align: right;">0.668</td>
+<td style="text-align: right;">0.109</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Sampler methods" src="sampler_slice_curve.svg"></p>
+<h2>Preference models</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">clip final</th>
+<th style="text-align: right;">clip delta</th>
+<th style="text-align: right;">dinov2 final</th>
+<th style="text-align: right;">dinov2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Borda preference</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.535</td>
+<td style="text-align: right;">-0.007</td>
+</tr>
+<tr>
+<td>Bradley-Terry preference</td>
+<td style="text-align: right;">0.886</td>
+<td style="text-align: right;">0.088</td>
+<td style="text-align: right;">0.687</td>
+<td style="text-align: right;">0.150</td>
+</tr>
+<tr>
+<td>Score-weighted preference</td>
+<td style="text-align: right;">0.869</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.643</td>
+<td style="text-align: right;">0.180</td>
+</tr>
+<tr>
+<td>Softmax preference</td>
+<td style="text-align: right;">0.879</td>
+<td style="text-align: right;">0.033</td>
+<td style="text-align: right;">0.581</td>
+<td style="text-align: right;">0.026</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Preference models" src="preference_slice_curve.svg"></p>
+<h2>Oracle steering policies</h2>
+<table>
+<thead>
+<tr>
+<th>policy</th>
+<th style="text-align: right;">clip final</th>
+<th style="text-align: right;">clip delta</th>
+<th style="text-align: right;">dinov2 final</th>
+<th style="text-align: right;">dinov2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLIP + DINO ensemble</td>
+<td style="text-align: right;">0.874</td>
+<td style="text-align: right;">0.063</td>
+<td style="text-align: right;">0.697</td>
+<td style="text-align: right;">0.267</td>
+</tr>
+<tr>
+<td>CLIP + novelty bonus</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.047</td>
+<td style="text-align: right;">0.670</td>
+<td style="text-align: right;">0.113</td>
+</tr>
+<tr>
+<td>CLIP oracle</td>
+<td style="text-align: right;">0.877</td>
+<td style="text-align: right;">0.068</td>
+<td style="text-align: right;">0.659</td>
+<td style="text-align: right;">0.188</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Oracle steering policies" src="oracle_slice_curve.svg"></p></article></main>
+  </body>
+</html>

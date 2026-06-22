@@ -1,0 +1,70 @@
+suite_name: oracle_caption_metric_extension
+description: >
+  Oracle target-recovery extension on a curated Flickr8k test subset. The study compares
+  human captions against AI-generated captions and compares single-metric versus multi-metric
+  oracle feedback policies under a fixed image-generation budget.
+dataset_manifest: E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/manifest.json
+caption_artifact: E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/generated_captions/blip_large_captions.json
+caption_model:
+  id: Salesforce/blip-image-captioning-large
+  label: BLIP image-captioning large
+target_ids:
+  - flickr8k_01_the_dogs_are_in_the_snow_in_front_of_a_fence
+  - flickr8k_02_a_girl_wearing_a_brown_cap_red_sneakers_and_a_da
+  - flickr8k_03_a_black_and_brown_dog_is_walking_in_the_water_an
+  - flickr8k_04_a_basketball_player_preparing_to_shoot_the_ball
+  - flickr8k_05_a_little_boy_with_a_blue_shirt_is_wearing_a_helm
+  - flickr8k_08_a_car_is_driven_on_a_dusty_track
+caption_source_labels:
+  human_caption: Human caption
+  blip_standard_caption: BLIP caption
+  blip_detailed_caption: BLIP selected detailed caption
+oracle_policy_labels:
+  clip_only: CLIP oracle
+  siglip_only: SigLIP oracle
+  multimetric_mix: Multi-metric oracle
+evaluation_models:
+  - id: openai/clip-vit-base-patch32
+    short_name: clip
+    label: CLIP cosine
+    kind: clip
+  - id: google/siglip-base-patch16-224
+    short_name: siglip
+    label: SigLIP cosine
+    kind: siglip
+  - id: facebook/dinov2-base
+    short_name: dinov2
+    label: DINOv2 cosine
+    kind: dinov2
+  - id: lpips-alex
+    short_name: lpips
+    label: LPIPS distance
+    kind: lpips
+caption_source_slice:
+  max_rounds: 4
+  caption_sources:
+    - human_caption
+    - blip_standard_caption
+    - blip_detailed_caption
+  oracle_policy: multimetric_mix
+oracle_metric_slice:
+  max_rounds: 4
+  caption_source: blip_detailed_caption
+  oracle_policies:
+    - clip_only
+    - siglip_only
+    - multimetric_mix
+fixed_conditions:
+  sampler: exploit_orthogonal
+  updater: linear_preference
+  feedback_mode: winner_only
+  seed_policy: fixed-per-candidate
+  steering_mode: content_masked
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5

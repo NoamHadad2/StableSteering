@@ -1,0 +1,109 @@
+suite_name: oracle_multimetric_repeated_flickr8k
+description: Repeated-seed multi-metric oracle study on a deterministic Flickr8k test
+  subset.
+oracle_model: openai/clip-vit-base-patch32
+evaluation_models:
+- id: openai/clip-vit-base-patch32
+  short_name: clip
+  label: CLIP cosine
+  kind: clip
+- id: facebook/dinov2-base
+  short_name: dinov2
+  label: DINOv2 cosine
+  kind: dinov2
+repeats_per_target: 2
+max_rounds: 5
+fixed_conditions:
+  sampler: exploit_orthogonal
+  updater: linear_preference
+  feedback_mode: winner_only
+  seed_policy: fixed-per-candidate
+  steering_mode: low_dimensional
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+targets:
+- id: flickr8k_01_a_child_in_a_black_shirt_standing_on_a_wooden_do
+  label: A child in a black shirt standing on a wooden dock near a picnic table .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_01_a_child_in_a_black_shirt_standing_on_a_wooden_do.jpg
+  caption: A child in a black shirt standing on a wooden dock near a picnic table
+    .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 61; caption_0 used as the prompt.
+- id: flickr8k_02_three_children_are_playing_in_sand_near_to_the_b
+  label: Three children are playing in sand near to the beach .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_02_three_children_are_playing_in_sand_near_to_the_b.jpg
+  caption: Three children are playing in sand near to the beach .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 78; caption_0 used as the prompt.
+- id: flickr8k_03_a_man_in_blue_pants_repels_off_a_cliff_over_wate
+  label: A man in blue pants repels off a cliff over water .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_03_a_man_in_blue_pants_repels_off_a_cliff_over_wate.jpg
+  caption: A man in blue pants repels off a cliff over water .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 101; caption_0 used as the prompt.
+- id: flickr8k_04_a_shirtless_man_with_a_brown_and_white_dog_looki
+  label: A shirtless man with a brown and white dog looking at a woman in jeans and
+    a bikini top who is r
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_04_a_shirtless_man_with_a_brown_and_white_dog_looki.jpg
+  caption: A shirtless man with a brown and white dog looking at a woman in jeans
+    and a bikini top who is relaxing on a bench .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 337; caption_0 used as the prompt.
+- id: flickr8k_05_a_man_in_a_green_shirt_climbs_an_indoor_climbing
+  label: A man in a green shirt climbs an indoor climbing wall .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_05_a_man_in_a_green_shirt_climbs_an_indoor_climbing.jpg
+  caption: A man in a green shirt climbs an indoor climbing wall .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 563; caption_0 used as the prompt.
+- id: flickr8k_06_a_brown_dog_holding_something_purple_and_black_i
+  label: A brown dog holding something purple and black in its mouth .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_06_a_brown_dog_holding_something_purple_and_black_i.jpg
+  caption: A brown dog holding something purple and black in its mouth .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 678; caption_0 used as the prompt.
+- id: flickr8k_07_a_bird_eating
+  label: A bird eating .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_07_a_bird_eating.jpg
+  caption: A bird eating .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 736; caption_0 used as the prompt.
+- id: flickr8k_08_a_dark_haired_man_wearing_a_brown_shirt_is_free_
+  label: A dark-haired man wearing a brown shirt is free-climbing a grey stone wall
+    .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_eval/images/flickr8k_08_a_dark_haired_man_wearing_a_brown_shirt_is_free_.jpg
+  caption: A dark-haired man wearing a brown shirt is free-climbing a grey stone wall
+    .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 963; caption_0 used as the prompt.
+dataset:
+  name: Flickr8k
+  source: jxie/flickr8k
+  split: test
+  selection_seed: 20260327
+  selected_target_count: 8
+  total_available_in_split: 1000
+  caption_field: caption_0
+  selection_note: Deterministic random subset drawn from the test split for paper
+    evaluation.

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Steering Mode Comparison Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Steering Mode Comparison Analysis</h1>
+<p>This compact bundle keeps the outer steering loop fixed and compares how the low-dimensional direction is injected into prompt embeddings.</p>
+<table>
+<thead>
+<tr>
+<th>steering mode</th>
+<th style="text-align: right;">clip final</th>
+<th style="text-align: right;">clip delta</th>
+<th style="text-align: right;">dinov2 final</th>
+<th style="text-align: right;">dinov2 delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Content-masked offset</td>
+<td style="text-align: right;">0.839</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: right;">0.501</td>
+<td style="text-align: right;">0.187</td>
+</tr>
+<tr>
+<td>Shared-token offset</td>
+<td style="text-align: right;">0.854</td>
+<td style="text-align: right;">0.102</td>
+<td style="text-align: right;">0.456</td>
+<td style="text-align: right;">0.310</td>
+</tr>
+<tr>
+<td>Token-factorized offset</td>
+<td style="text-align: right;">0.827</td>
+<td style="text-align: right;">0.039</td>
+<td style="text-align: right;">0.573</td>
+<td style="text-align: right;">0.188</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Steering mode curve" src="steering_mode_curve.svg"></p>
+<p><img alt="Steering mode examples" src="steering_mode_examples.png"></p></article></main>
+  </body>
+</html>

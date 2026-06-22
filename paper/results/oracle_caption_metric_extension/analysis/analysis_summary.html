@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>oracle_caption_metric_extension</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 1020px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      p, li { line-height: 1.65; font-size: 1.02rem; text-align: justify; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+      code { font-family: "Consolas", monospace; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>oracle_caption_metric_extension</h1>
+<p>Oracle target-recovery extension on a curated Flickr8k test subset. The study compares human captions against AI-generated captions and compares single-metric versus multi-metric oracle feedback policies under a fixed image-generation budget.</p>
+<h2>Dataset and Caption Artifact</h2>
+<ul>
+<li>Caption artifact images: <code>8</code> curated Flickr8k test examples</li>
+<li>Experiment subset: <code>6</code> selected target images</li>
+<li>Total runs: <code>36</code></li>
+<li>Total rounds: <code>144</code></li>
+<li>Total scored candidate rows: <code>576</code></li>
+<li>Caption model: <code>Salesforce/blip-image-captioning-large</code></li>
+<li>Mean human prompt length: <code>13.0</code> words</li>
+<li>Mean selected AI prompt length: <code>14.625</code> words</li>
+</ul>
+<h2>Caption-Source Slice</h2>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th style="text-align: right;">Final CLIP</th>
+<th style="text-align: right;">Final SigLIP</th>
+<th style="text-align: right;">Final DINOv2</th>
+<th style="text-align: right;">Final LPIPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLIP selected detailed caption</td>
+<td style="text-align: right;">0.810 ([0.773, 0.845])</td>
+<td style="text-align: right;">0.786 ([0.728, 0.841])</td>
+<td style="text-align: right;">0.478 ([0.256, 0.693])</td>
+<td style="text-align: right;">0.676 ([0.619, 0.737])</td>
+</tr>
+<tr>
+<td>BLIP caption</td>
+<td style="text-align: right;">0.786 ([0.735, 0.832])</td>
+<td style="text-align: right;">0.750 ([0.698, 0.801])</td>
+<td style="text-align: right;">0.391 ([0.168, 0.621])</td>
+<td style="text-align: right;">0.692 ([0.642, 0.733])</td>
+</tr>
+<tr>
+<td>Human caption</td>
+<td style="text-align: right;">0.798 ([0.735, 0.854])</td>
+<td style="text-align: right;">0.785 ([0.729, 0.842])</td>
+<td style="text-align: right;">0.476 ([0.255, 0.686])</td>
+<td style="text-align: right;">0.686 ([0.647, 0.725])</td>
+</tr>
+</tbody>
+</table>
+<h2>Oracle-Metric Slice</h2>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th style="text-align: right;">Final CLIP</th>
+<th style="text-align: right;">Final SigLIP</th>
+<th style="text-align: right;">Final DINOv2</th>
+<th style="text-align: right;">Final LPIPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLIP oracle</td>
+<td style="text-align: right;">0.834 ([0.808, 0.860])</td>
+<td style="text-align: right;">0.778 ([0.727, 0.827])</td>
+<td style="text-align: right;">0.473 ([0.273, 0.653])</td>
+<td style="text-align: right;">0.686 ([0.645, 0.730])</td>
+</tr>
+<tr>
+<td>Multi-metric oracle</td>
+<td style="text-align: right;">0.825 ([0.792, 0.862])</td>
+<td style="text-align: right;">0.772 ([0.717, 0.824])</td>
+<td style="text-align: right;">0.458 ([0.255, 0.662])</td>
+<td style="text-align: right;">0.708 ([0.670, 0.740])</td>
+</tr>
+<tr>
+<td>SigLIP oracle</td>
+<td style="text-align: right;">0.796 ([0.761, 0.831])</td>
+<td style="text-align: right;">0.789 ([0.725, 0.853])</td>
+<td style="text-align: right;">0.476 ([0.258, 0.631])</td>
+<td style="text-align: right;">0.718 ([0.681, 0.757])</td>
+</tr>
+</tbody>
+</table>
+<h2>Notes</h2>
+<ul>
+<li>Higher is better for CLIP, SigLIP, and DINOv2.</li>
+<li>Lower is better for LPIPS.</li>
+<li>Confidence intervals are nonparametric bootstrap intervals over run-level means.</li>
+</ul></article></main>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Replay {{ session.id }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero compact">
+        <p class="eyebrow">Replay</p>
+        <h1>{{ session.prompt }}</h1>
+        <p class="lede">Review the session trajectory round by round.</p>
+        <div class="actions">
+          <a class="button secondary" href="/sessions/{{ session.id }}/view">Back to session</a>
+          <a class="button secondary" href="/sessions/{{ session.id }}/trace-report">Open trace report</a>
+        </div>
+      </section>
+      {% for round in rounds %}
+        <section class="card">
+          <div class="section-head">
+            <h2>Round {{ round.round_index }}</h2>
+            <span>{{ humanize_token(round.render_status) }} · {{ round.candidates|length }} candidates</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Winner</span>
+              <strong>{{ round.update_summary.winner_candidate_id if round.update_summary else "Not selected yet" }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Feedback events</span>
+              <strong>{{ round.feedback_events|length }}</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Seed policy</span>
+              <strong>{{ humanize_token(round.seed_policy) }}</strong>
+            </div>
+          </div>
+          <div class="image-grid">
+            {% for candidate in round.candidates %}
+              <article class="image-card compact-card">
+                <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
+                <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
+                <p class="candidate-subtitle">{{ candidate.id }}</p>
+                <p><strong>{{ humanize_token(candidate.sampler_role) }}</strong></p>
+              </article>
+            {% endfor %}
+          </div>
+          <details class="details-block">
+            <summary>Round update summary</summary>
+            <pre class="code-block">{{ round.update_summary | tojson(indent=2) }}</pre>
+          </details>
+        </section>
+      {% else %}
+        <section class="card"><p>No rounds recorded yet.</p></section>
+      {% endfor %}
+    </main>
+  </body>
+</html>

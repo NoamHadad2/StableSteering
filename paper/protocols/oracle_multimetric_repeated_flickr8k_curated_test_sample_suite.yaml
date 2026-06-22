@@ -1,0 +1,108 @@
+suite_name: oracle_multimetric_repeated_flickr8k_curated_test_sample
+description: Repeated-seed multi-metric oracle study on the Flickr8k test subset 'flickr8k_curated_test_sample'.
+oracle_model: openai/clip-vit-base-patch32
+evaluation_models:
+- id: openai/clip-vit-base-patch32
+  short_name: clip
+  label: CLIP cosine
+  kind: clip
+- id: facebook/dinov2-base
+  short_name: dinov2
+  label: DINOv2 cosine
+  kind: dinov2
+repeats_per_target: 2
+max_rounds: 5
+fixed_conditions:
+  sampler: exploit_orthogonal
+  updater: linear_preference
+  feedback_mode: winner_only
+  seed_policy: fixed-per-candidate
+  steering_mode: low_dimensional
+  steering_dimension: 5
+  candidate_count: 4
+  image_size: 512x512
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 15
+  model_name: runwayml/stable-diffusion-v1-5
+targets:
+- id: flickr8k_01_the_dogs_are_in_the_snow_in_front_of_a_fence
+  label: The dogs are in the snow in front of a fence .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_01_the_dogs_are_in_the_snow_in_front_of_a_fence.jpg
+  caption: The dogs are in the snow in front of a fence .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 0; caption_0 used as the prompt.
+- id: flickr8k_02_a_girl_wearing_a_brown_cap_red_sneakers_and_a_da
+  label: A girl wearing a brown cap , red sneakers , and a dark green coat sits on
+    a rock bench .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_02_a_girl_wearing_a_brown_cap_red_sneakers_and_a_da.jpg
+  caption: A girl wearing a brown cap , red sneakers , and a dark green coat sits
+    on a rock bench .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 14; caption_0 used as the prompt.
+- id: flickr8k_03_a_black_and_brown_dog_is_walking_in_the_water_an
+  label: A black and brown dog is walking in the water and looking at the camera .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_03_a_black_and_brown_dog_is_walking_in_the_water_an.jpg
+  caption: A black and brown dog is walking in the water and looking at the camera
+    .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 48; caption_0 used as the prompt.
+- id: flickr8k_04_a_basketball_player_preparing_to_shoot_the_ball
+  label: A basketball player preparing to shoot the ball
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_04_a_basketball_player_preparing_to_shoot_the_ball.jpg
+  caption: A basketball player preparing to shoot the ball
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 94; caption_0 used as the prompt.
+- id: flickr8k_05_a_little_boy_with_a_blue_shirt_is_wearing_a_helm
+  label: A little boy with a blue shirt is wearing a helmet and riding a two wheeled
+    bike .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_05_a_little_boy_with_a_blue_shirt_is_wearing_a_helm.jpg
+  caption: A little boy with a blue shirt is wearing a helmet and riding a two wheeled
+    bike .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 142; caption_0 used as the prompt.
+- id: flickr8k_06_a_man_in_a_brown_jacket_is_leading_a_black_shire
+  label: A man in a brown jacket is leading a black shire horse .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_06_a_man_in_a_brown_jacket_is_leading_a_black_shire.jpg
+  caption: A man in a brown jacket is leading a black shire horse .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 175; caption_0 used as the prompt.
+- id: flickr8k_07_a_bird_flies_above_the_water
+  label: A bird flies above the water .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_07_a_bird_flies_above_the_water.jpg
+  caption: A bird flies above the water .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 699; caption_0 used as the prompt.
+- id: flickr8k_08_a_car_is_driven_on_a_dusty_track
+  label: A car is driven on a dusty track .
+  image_url: file:///E:/Projects/StableSteering/paper/data/flickr8k_curated_test_sample/images/flickr8k_08_a_car_is_driven_on_a_dusty_track.jpg
+  caption: A car is driven on a dusty track .
+  negative_prompt: low detail, blur, distorted anatomy, extra limbs, malformed objects,
+    text, watermark, logo, collage, frame
+  attribution: Flickr8k test split via Hugging Face dataset jxie/flickr8k; dataset
+    index 905; caption_0 used as the prompt.
+dataset:
+  name: Flickr8k
+  source: jxie/flickr8k
+  split: test
+  selection_seed: 20260327
+  selected_target_count: 8
+  total_available_in_split: 1000
+  caption_field: caption_0
+  selection_note: Deterministic random subset drawn from the test split for paper
+    evaluation.

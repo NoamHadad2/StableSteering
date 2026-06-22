@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session Setup</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page narrow">
+      <section class="hero compact">
+        <p class="eyebrow">Setup</p>
+        <h1>Start from your text prompt</h1>
+        <p class="lede">Describe the image you want first, keep the YAML defaults if you are unsure, and create a session to begin steering.</p>
+        <div class="setup-steps">
+          <div class="mini-step">
+            <strong>1. Describe the target</strong>
+            <span>Write the scene, object, or style you want to explore.</span>
+          </div>
+          <div class="mini-step">
+            <strong>2. Keep or edit the YAML</strong>
+            <span>Defaults are safe. Edit only if you want a different sampler, feedback mode, or image settings.</span>
+          </div>
+          <div class="mini-step">
+            <strong>3. Create the session</strong>
+            <span>The first round includes one unmodified baseline from your prompt.</span>
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <form id="setup-form" class="form-grid">
+          <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
+          <label>
+            <span class="field-label">Prompt <span class="help-tip" tabindex="0" role="note" aria-label="Prompt help" data-tooltip="Start with the main scene or subject you want. The first round includes one unmodified baseline from this prompt.">?</span></span>
+            <textarea name="prompt" required autofocus>A cinematic mountain road at sunrise</textarea>
+          </label>
+          <label>
+            <span class="field-label">Negative prompt <span class="help-tip" tabindex="0" role="note" aria-label="Negative prompt help" data-tooltip="List traits to avoid, such as blurry, distorted, low contrast, or extra objects.">?</span></span>
+            <textarea name="negative_prompt">blurry, distorted</textarea>
+          </label>
+          <label>
+            <span class="field-label">Experiment name <span class="help-tip" tabindex="0" role="note" aria-label="Experiment name help" data-tooltip="Use a short label that helps you recognize this run later in replay, traces, and the experiment list.">?</span></span>
+            <input name="experiment_name" value="Baseline experiment" required>
+          </label>
+          <label>
+            <span class="field-label">Description <span class="help-tip" tabindex="0" role="note" aria-label="Description help" data-tooltip="Optional notes about the goal, comparison, or research intent for this session.">?</span></span>
+            <input name="description" value="Initial real generation workflow">
+          </label>
+          <label>
+            <span class="field-label">Session configuration (YAML) <span class="help-tip" tabindex="0" role="note" aria-label="YAML configuration help" data-tooltip="This YAML controls sampler, updater, feedback mode, seeds, candidate count, and generation settings for this one session.">?</span> <a href="https://apartsinprojects.github.io/StableSteering/docs/configuration_manual.html" target="_blank" rel="noopener noreferrer">Open configuration manual</a></span>
+            <textarea name="config_yaml" id="config-yaml-editor" class="yaml-editor" spellcheck="false">{{ config_yaml }}</textarea>
+          </label>
+          <p class="hint">All per-session strategy values live in this YAML document. Edit it before creating a session, or reload the default template.</p>
+          <div class="soft-callout">
+            <strong>Good first-run defaults</strong>
+            <p>Leave the YAML as-is for a more diversity-forward first round, then use the visible feedback mode controls to guide the search toward the direction you prefer.</p>
+          </div>
+          <div class="actions">
+            <button class="button secondary" type="button" id="reload-config-button" title="Replace your edits with the backend's default YAML template.">Reload default YAML</button>
+            <button class="button" type="submit" id="setup-submit-button" title="Create the experiment and session, then open the interactive session view.">Create and open session</button>
+            <a class="button secondary" href="/">Back</a>
+          </div>
+        </form>
+      </section>
+      <section class="card trace-card">
+        <div class="section-head">
+          <h2>Frontend Trace</h2>
+          <span>browser + server</span>
+        </div>
+        <ul id="trace-log" class="trace-log"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

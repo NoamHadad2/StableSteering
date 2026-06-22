@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime Diagnostics</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page narrow">
+      <section class="hero compact">
+        <p class="eyebrow">Diagnostics</p>
+        <h1>Runtime backend status</h1>
+        <p class="lede">Use this page to confirm which backend is active, which model source is configured, and whether GPU execution is actually available.</p>
+        <div class="actions">
+          <a class="button secondary" href="/">Back home</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Summary</h2>
+          <span>{{ diagnostics.backend }}</span>
+        </div>
+        <table class="table">
+          <tbody>
+            <tr><th>Resolved backend</th><td><code>{{ diagnostics.backend }}</code></td></tr>
+            <tr><th>Configured model source</th><td><code>{{ diagnostics.model_source }}</code></td></tr>
+            <tr><th>Configured device</th><td><code>{{ diagnostics.configured_device }}</code></td></tr>
+            <tr><th>Active device</th><td><code>{{ diagnostics.active_device }}</code></td></tr>
+            <tr><th>CUDA available</th><td><strong>{{ diagnostics.cuda_available }}</strong></td></tr>
+            <tr><th>Pipeline loaded</th><td><strong>{{ diagnostics.pipeline_loaded }}</strong></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Full payload</h2>
+          <span>JSON-style</span>
+        </div>
+        <pre class="code-block">{{ diagnostics }}</pre>
+      </section>
+    </main>
+  </body>
+</html>

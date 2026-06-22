@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>system_spec_legacy_combined | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../paper/caption_style_guide.html">caption_style_guide</a></li><li><a href="../paper/case_study_summary.html">case_study_summary</a></li><li><a href="../paper/claim_audit.html">claim_audit</a></li><li><a href="../paper/claim_evidence_matrix.html">claim_evidence_matrix</a></li><li><a href="../paper/contribution_statement.html">contribution_statement</a></li><li><a href="../paper/evidence_inventory.html">evidence_inventory</a></li><li><a href="../paper/experiment_execution_queue.html">experiment_execution_queue</a></li><li><a href="../paper/experiment_matrix.html">experiment_matrix</a></li><li><a href="../paper/figure_table_inventory.html">figure_table_inventory</a></li><li><a href="../paper/improvement_log.html">improvement_log</a></li><li><a href="../paper/journal_appendix.html">journal_appendix</a></li><li><a href="../paper/journal_manuscript.html">journal_manuscript</a></li><li><a href="../paper/manuscript_draft.html">manuscript_draft</a></li><li><a href="../paper/manuscript_outline.html">manuscript_outline</a></li><li><a href="../paper/paper_improvement_cycles.html">paper_improvement_cycles</a></li><li><a href="../paper/paper_package_inventory.html">paper_package_inventory</a></li><li><a href="../paper/paper_readiness_map.html">paper_readiness_map</a></li><li><a href="../paper/protocols/budget_normalized_seed_policy_protocol.html">budget_normalized_seed_policy_protocol</a></li><li><a href="../paper/protocols/human_pairwise_evaluation_protocol.html">human_pairwise_evaluation_protocol</a></li><li><a href="../paper/protocols/minimal_baseline_protocol.html">minimal_baseline_protocol</a></li><li><a href="../paper/protocols/oracle_target_recovery_protocol.html">oracle_target_recovery_protocol</a></li><li><a href="../paper/protocols/updater_ablation_protocol.html">updater_ablation_protocol</a></li><li><a href="../paper/publication_plan.html">publication_plan</a></li><li><a href="../paper/reader_confusion_notes.html">reader_confusion_notes</a></li><li><a href="../paper/index.html">paper</a></li><li><a href="../paper/related_work_draft.html">related_work_draft</a></li><li><a href="../paper/related_work_scaffold.html">related_work_scaffold</a></li><li><a href="../paper/reproducibility_checklist.html">reproducibility_checklist</a></li><li><a href="../paper/results/baseline_matrix/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_summary.html">pilot_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_table.html">pilot_table</a></li><li><a href="../paper/results/baseline_matrix/index.html">baseline_matrix</a></li><li><a href="../paper/results/baseline_matrix/seed_robustness.html">seed_robustness</a></li><li><a href="../paper/results/budget_matched_direct_baselines/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/budget_matched_direct_baselines/index.html">budget_matched_direct_baselines</a></li><li><a href="../paper/results/human_pairwise_evaluation/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/human_pairwise_evaluation/index.html">human_pairwise_evaluation</a></li><li><a href="../paper/results/method_extension_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/method_extension_comparison/index.html">method_extension_comparison</a></li><li><a href="../paper/results/oracle_caption_metric_extension/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_caption_metric_extension/index.html">oracle_caption_metric_extension</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/index.html">oracle_incumbent_policy_compact</a></li><li><a href="../paper/results/oracle_inspired_methods/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_inspired_methods/index.html">oracle_inspired_methods</a></li><li><a href="../paper/results/oracle_multimetric_repeated/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_multimetric_repeated/index.html">oracle_multimetric_repeated</a></li><li><a href="../paper/results/oracle_plateau_escape/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape/index.html">oracle_plateau_escape</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/index.html">oracle_plateau_escape_soft_control</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/index.html">oracle_plateau_escape_stagnation_control</a></li><li><a href="../paper/results/oracle_plateau_reformulation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_reformulation/index.html">oracle_plateau_reformulation</a></li><li><a href="../paper/results/oracle_progress_diagnosis/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_diagnosis/index.html">oracle_progress_diagnosis</a></li><li><a href="../paper/results/oracle_progress_followup/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_followup/index.html">oracle_progress_followup</a></li><li><a href="../paper/results/oracle_target_recovery/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_target_recovery/index.html">oracle_target_recovery</a></li><li><a href="../paper/results/sampler_feedback_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/sampler_feedback_comparison/index.html">sampler_feedback_comparison</a></li><li><a href="../paper/results/seed_policy_slice/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/seed_policy_slice/index.html">seed_policy_slice</a></li><li><a href="../paper/results/steering_mode_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison/index.html">steering_mode_comparison</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/index.html">steering_mode_comparison_smoke</a></li><li><a href="../paper/results/updater_ablation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/updater_ablation/index.html">updater_ablation</a></li><li><a href="../paper/terminology_ledger.html">terminology_ledger</a></li><li><a href="../paper/title_abstract_variants.html">title_abstract_variants</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/system_spec_legacy_combined.md">View source Markdown</a></p>
+        <h1 id="research-system-specification-interactive-prompt-embedding-steering-for-stable-diffusion">Research System Specification: Interactive Prompt-Embedding Steering for Stable Diffusion</h1>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This document specifies a research system for studying <strong>human-in-the-loop steering of text-to-image diffusion models</strong> by modifying prompt-conditioning embeddings rather than only rewriting the visible text prompt.</p>
+<p>The system is intended for research, not production. It must make it easy to compare:</p>
+<ul>
+<li>different <strong>candidate sampling policies</strong></li>
+<li>different <strong>user feedback mechanisms</strong></li>
+<li>different <strong>preference learning and update rules</strong></li>
+<li>different <strong>trust-region and anchoring strategies</strong></li>
+<li>different <strong>seed-control and robustness-validation procedures</strong></li>
+</ul>
+<p>The system should expose these choices through a simple HTML interface and a modular backend so that experiments can be repeated, logged, and compared.</p>
+<hr>
+<h2 id="2-motivation">2. Motivation</h2>
+<h3 id="21-problem">2.1 Problem</h3>
+<p>Text-to-image diffusion models such as Stable Diffusion are highly sensitive to prompt wording, negative prompts, seed, guidance scale, scheduler, and other generation parameters. Small changes in wording can cause discontinuous changes in output. This makes user steering difficult:</p>
+<ul>
+<li>prompt editing is discrete rather than continuous</li>
+<li>many useful changes are hard to describe precisely in words</li>
+<li>user intent often evolves after seeing generated images</li>
+<li>the effect of a prompt change is mixed with seed variation</li>
+<li>naive trial-and-error wastes time and user attention</li>
+</ul>
+<h3 id="22-central-research-idea">2.2 Central research idea</h3>
+<p>Instead of treating the user prompt as a fixed string, the system treats the prompt-conditioned embedding as a <strong>searchable control object</strong>. It then performs an iterative loop:</p>
+<ol>
+<li>start from the initial prompt embedding</li>
+<li>generate several modified embedding candidates</li>
+<li>generate images for those candidates</li>
+<li>collect user feedback</li>
+<li>estimate a preferred direction or region in embedding space</li>
+<li>update the steering state</li>
+<li>repeat</li>
+</ol>
+<p>This enables a controlled study of whether user preference can be learned through local search in a low-dimensional steering space.</p>
+<h3 id="23-research-value">2.3 Research value</h3>
+<p>This system supports research questions such as:</p>
+<ul>
+<li>Does local exploration in prompt-embedding space produce semantically meaningful visual changes?</li>
+<li>Which feedback type is most informative: scalar rating, pairwise comparison, ranking, critique text, or mixed feedback?</li>
+<li>Which sampling strategy best balances exploitation and discovery?</li>
+<li>How much does seed variation confound learned preference?</li>
+<li>Do users prefer global embedding movement or semantically separated subspaces such as style, composition, and realism?</li>
+<li>Can a lightweight preference model personalize generation faster than manual prompt rewriting?</li>
+</ul>
+<h3 id="24-why-a-research-platform-is-needed">2.4 Why a research platform is needed</h3>
+<p>Most image-generation interfaces optimize for convenience, not controlled experimentation. A research platform must instead provide:</p>
+<ul>
+<li>exact reproducibility</li>
+<li>pluggable exploration policies</li>
+<li>pluggable update mechanisms</li>
+<li>strong logging and replay</li>
+<li>support for A/B evaluation of interaction loops</li>
+<li>exportable experiment traces</li>
+</ul>
+<hr>
+<h2 id="3-theoretical-background">3. Theoretical Background</h2>
+<p>This section is self-contained and written for readers who understand machine learning at a basic level but do not necessarily specialize in diffusion models.</p>
+<h3 id="31-how-text-to-image-diffusion-works-at-a-high-level">3.1 How text-to-image diffusion works at a high level</h3>
+<p>A text-to-image diffusion model learns to generate an image by progressively denoising a random latent representation while being conditioned on a text prompt.</p>
+<p>A simplified pipeline is:</p>
+<ol>
+<li>tokenize the text prompt</li>
+<li>encode the tokens into text embeddings</li>
+<li>sample a random latent noise tensor</li>
+<li>iteratively denoise the latent using a U-Net conditioned on the text embeddings</li>
+<li>decode the final latent into an image using a VAE decoder</li>
+</ol>
+<p>The important point for this system is that the text prompt does not directly control the image. The model actually consumes a <strong>tensor of embeddings</strong> derived from the prompt.</p>
+<h3 id="32-prompt-text-versus-prompt-embedding">3.2 Prompt text versus prompt embedding</h3>
+<p>The visible prompt string is discrete. The embedding is continuous.</p>
+<p>That distinction matters:</p>
+<ul>
+<li>editing text changes the embedding indirectly and often non-smoothly</li>
+<li>editing the embedding allows continuous local movement</li>
+<li>continuous movement makes optimization and controlled experimentation easier</li>
+</ul>
+<p>A prompt embedding is typically a sequence of token-level vectors, not a single vector. For research purposes, the system may work with:</p>
+<ul>
+<li>the full token embedding tensor</li>
+<li>a pooled vector representation</li>
+<li>a low-rank parameterization of embedding offsets</li>
+</ul>
+<h3 id="33-why-low-dimensional-steering-is-useful">3.3 Why low-dimensional steering is useful</h3>
+<p>Directly searching the full embedding tensor is high-dimensional, expensive, and unstable. A better approach is to define a low-dimensional steering code:</p>
+<ul>
+<li>let <code>E0</code> be the original prompt embedding tensor</li>
+<li>let <code>U</code> be a learned or predefined basis of steering directions</li>
+<li>let <code>z</code> be a low-dimensional steering code</li>
+<li>define the active embedding as <code>E(z) = E0 + U z</code></li>
+</ul>
+<p>Now the system searches over <code>z</code> rather than over the full embedding space.</p>
+<p>Advantages:</p>
+<ul>
+<li>easier optimization</li>
+<li>easier uncertainty estimation</li>
+<li>better interpretability</li>
+<li>easier comparison of update policies</li>
+</ul>
+<h3 id="34-human-preference-learning">3.4 Human preference learning</h3>
+<p>The system is not trying to predict a ground-truth target image. It is trying to infer what the user prefers.</p>
+<p>This is a preference-learning problem. A preference model estimates a hidden reward or utility function from observed feedback.</p>
+<p>Examples:</p>
+<ul>
+<li>scalar rating: image gets a score from 1 to 5</li>
+<li>pairwise feedback: image A is preferred over image B</li>
+<li>ranking: sort images from best to worst</li>
+<li>critique text: “keep composition, make it more realistic”</li>
+</ul>
+<p>The reward function is not directly known. It is inferred from user responses.</p>
+<h3 id="35-exploration-versus-exploitation">3.5 Exploration versus exploitation</h3>
+<p>This is the core sequential decision problem.</p>
+<ul>
+<li><strong>Exploitation</strong> means sampling near the currently estimated best direction.</li>
+<li><strong>Exploration</strong> means sampling directions that reduce uncertainty or test alternative hypotheses.</li>
+</ul>
+<p>If the system only exploits, it may converge too early to a mediocre local optimum.
+If it only explores, it wastes user effort and does not improve quickly.</p>
+<p>A research goal of the platform is to compare policies for balancing the two.</p>
+<h3 id="36-seed-sensitivity">3.6 Seed sensitivity</h3>
+<p>Text-to-image diffusion is stochastic. The random seed can change image content substantially even when the prompt embedding stays fixed.</p>
+<p>Therefore, preference learning must separate:</p>
+<ul>
+<li>change caused by embedding movement
+n- change caused by random seed</li>
+</ul>
+<p>The system must support explicit seed-control policies:</p>
+<ul>
+<li>same-seed comparison within a round</li>
+<li>multi-seed validation of promising candidates</li>
+<li>robustness metrics across seeds</li>
+</ul>
+<h3 id="37-trust-region-and-anchoring">3.7 Trust region and anchoring</h3>
+<p>Large moves in embedding space may drift away from the user’s initial intention. The system therefore uses two stabilizers:</p>
+<ul>
+<li><strong>trust region</strong>: restrict step size per round</li>
+<li><strong>anchor to original prompt</strong>: penalize excessive drift from <code>z = 0</code></li>
+</ul>
+<p>This lets the system search locally without losing semantic coherence.</p>
+<h3 id="38-why-multiple-update-mechanisms-should-be-compared">3.8 Why multiple update mechanisms should be compared</h3>
+<p>There is no reason to assume one update rule is best. A research platform should compare:</p>
+<ul>
+<li>direct winner averaging</li>
+<li>linear preference models</li>
+<li>pairwise Bradley-Terry style models</li>
+<li>Bayesian preference models</li>
+<li>bandit-style updates</li>
+<li>critique-conditioned updates</li>
+<li>hybrid updates using both explicit and implicit feedback</li>
+</ul>
+<hr>
+<h2 id="4-research-goals-and-non-goals">4. Research Goals and Non-Goals</h2>
+<h3 id="41-goals">4.1 Goals</h3>
+<p>The system must support controlled experiments on:</p>
+<ul>
+<li>embedding-space candidate generation</li>
+<li>user feedback collection</li>
+<li>user-preference inference</li>
+<li>iterative update policies</li>
+<li>robustness to randomness</li>
+<li>reproducibility and traceability</li>
+</ul>
+<h3 id="42-non-goals">4.2 Non-goals</h3>
+<p>The initial version is not required to:</p>
+<ul>
+<li>provide best-in-class image quality</li>
+<li>support multi-user concurrent production traffic</li>
+<li>provide full model fine-tuning</li>
+<li>support every diffusion family</li>
+<li>optimize GPU throughput aggressively</li>
+<li>provide advanced authentication or billing</li>
+</ul>
+<hr>
+<h2 id="5-high-level-system-overview">5. High-Level System Overview</h2>
+<p>The system consists of six major parts:</p>
+<ol>
+<li><strong>Frontend</strong>: simple HTML interface for prompt entry, image display, feedback collection, and experiment controls</li>
+<li><strong>Experiment Controller</strong>: orchestrates rounds, policies, and logs</li>
+<li><strong>Generation Engine</strong>: calls the diffusion pipeline and handles prompt embeddings</li>
+<li><strong>Sampling Module</strong>: proposes candidate steering codes or embedding offsets</li>
+<li><strong>Preference / Update Module</strong>: learns from feedback and computes the next state</li>
+<li><strong>Storage and Evaluation Layer</strong>: records experiments, metrics, artifacts, and replays</li>
+</ol>
+<p>Data flow:</p>
+<ol>
+<li>user creates or loads an experiment</li>
+<li>prompt is encoded to base embedding</li>
+<li>current strategy proposes candidates</li>
+<li>engine generates images</li>
+<li>frontend displays them</li>
+<li>user provides feedback</li>
+<li>backend updates preference state</li>
+<li>next round starts</li>
+</ol>
+<hr>
+<h2 id="6-core-research-abstractions">6. Core Research Abstractions</h2>
+<h3 id="61-experiment">6.1 Experiment</h3>
+<p>An experiment is a fully specified configuration and all data generated under it.</p>
+<p>Fields:</p>
+<ul>
+<li>experiment ID</li>
+<li>title</li>
+<li>description</li>
+<li>date/time</li>
+<li>model checkpoint</li>
+<li>sampler strategy</li>
+<li>feedback strategy</li>
+<li>update strategy</li>
+<li>random seed policy</li>
+<li>number of rounds</li>
+<li>current status</li>
+<li>user notes</li>
+</ul>
+<h3 id="62-session">6.2 Session</h3>
+<p>A session is one interactive run of one experiment with one prompt and one user.</p>
+<p>Fields:</p>
+<ul>
+<li>session ID</li>
+<li>experiment ID</li>
+<li>prompt text</li>
+<li>negative prompt text</li>
+<li>base embedding cache key</li>
+<li>steering basis configuration</li>
+<li>current state <code>z_t</code></li>
+<li>round count</li>
+<li>final selected candidate</li>
+</ul>
+<h3 id="63-round">6.3 Round</h3>
+<p>A round is one propose-generate-display-feedback-update cycle.</p>
+<p>Fields:</p>
+<ul>
+<li>round index</li>
+<li>incumbent <code>z_t</code></li>
+<li>sampled candidate list</li>
+<li>seed policy used</li>
+<li>rendered images</li>
+<li>user feedback</li>
+<li>updated model state summary</li>
+<li>latency metrics</li>
+</ul>
+<h3 id="64-candidate">6.4 Candidate</h3>
+<p>A candidate is one proposed point in steering space.</p>
+<p>Fields:</p>
+<ul>
+<li>candidate ID</li>
+<li>round index</li>
+<li>steering vector <code>z</code></li>
+<li>embedding offset metadata</li>
+<li>generation parameters</li>
+<li>seed</li>
+<li>image path</li>
+<li>sampler tag (<code>exploit</code>, <code>explore</code>, <code>mirror</code>, <code>validation</code>, etc.)</li>
+<li>predicted score and uncertainty</li>
+</ul>
+<h3 id="65-feedback-event">6.5 Feedback event</h3>
+<p>A feedback event records one user action.</p>
+<p>Fields:</p>
+<ul>
+<li>feedback ID</li>
+<li>candidate IDs involved</li>
+<li>feedback type</li>
+<li>timestamp</li>
+<li>payload</li>
+<li>optional natural-language critique</li>
+</ul>
+<hr>
+<h2 id="7-frontend-specification-simple-html-interface">7. Frontend Specification (Simple HTML Interface)</h2>
+<h3 id="71-design-principles">7.1 Design principles</h3>
+<p>The interface should be intentionally simple:</p>
+<ul>
+<li>plain HTML + minimal JavaScript</li>
+<li>no heavy front-end framework required for v1</li>
+<li>fast iteration over UX for research tasks</li>
+<li>easy to inspect DOM and debug</li>
+<li>accessible layout that keeps the experiment state visible</li>
+</ul>
+<h3 id="72-main-pages">7.2 Main pages</h3>
+<h4 id="a-home-experiment-dashboard">A. Home / Experiment Dashboard</h4>
+<p>Purpose:</p>
+<ul>
+<li>create a new experiment</li>
+<li>list previous experiments</li>
+<li>resume a session</li>
+<li>compare results</li>
+</ul>
+<p>Main elements:</p>
+<ul>
+<li>experiment list table</li>
+<li>“new experiment” button</li>
+<li>filters by model, strategy, date</li>
+<li>quick links to export logs</li>
+</ul>
+<h4 id="b-session-setup-page">B. Session Setup Page</h4>
+<p>Inputs:</p>
+<ul>
+<li>prompt text</li>
+<li>negative prompt text</li>
+<li>model checkpoint selector</li>
+<li>image size</li>
+<li>number of candidates per round</li>
+<li>seed policy selector</li>
+<li>sampler strategy selector</li>
+<li>feedback mechanism selector</li>
+<li>update mechanism selector</li>
+<li>trust-region parameters</li>
+<li>anchor strength</li>
+</ul>
+<p>Actions:</p>
+<ul>
+<li>start session</li>
+<li>save config template</li>
+<li>load preset</li>
+</ul>
+<h4 id="c-interactive-steering-page">C. Interactive Steering Page</h4>
+<p>Main layout:</p>
+<ul>
+<li>header with current experiment and round</li>
+<li>left control panel</li>
+<li>center image grid</li>
+<li>right state summary panel</li>
+</ul>
+<p>Controls:</p>
+<ul>
+<li>next round</li>
+<li>regenerate round</li>
+<li>pause session</li>
+<li>revert to previous round</li>
+<li>pin candidate as incumbent</li>
+<li>mark candidate as favorite</li>
+<li>export round</li>
+</ul>
+<p>Image grid requirements:</p>
+<ul>
+<li>show 4 to 12 images per round</li>
+<li>consistent labeling: A, B, C, ... or numeric IDs</li>
+<li>display candidate metadata on demand</li>
+<li>allow image zoom</li>
+<li>allow fixed layout across rounds</li>
+</ul>
+<p>Feedback widgets must be switchable by experiment mode:</p>
+<ul>
+<li>scalar rating controls</li>
+<li>rank ordering drag-and-drop</li>
+<li>pairwise winner buttons</li>
+<li>top-k selection</li>
+<li>checkbox shortlist</li>
+<li>text critique box</li>
+</ul>
+<h4 id="d-replay-analysis-page">D. Replay / Analysis Page</h4>
+<p>Purpose:</p>
+<ul>
+<li>replay rounds in order</li>
+<li>inspect generated images and feedback</li>
+<li>compare update trajectories</li>
+<li>see metric summaries</li>
+</ul>
+<h3 id="73-frontend-state-model">7.3 Frontend state model</h3>
+<p>The frontend should maintain:</p>
+<ul>
+<li>active experiment config</li>
+<li>current session ID</li>
+<li>current round number</li>
+<li>displayed candidates</li>
+<li>local unsaved feedback state</li>
+<li>pending request status</li>
+<li>error messages</li>
+</ul>
+<h3 id="74-accessibility-requirements">7.4 Accessibility requirements</h3>
+<ul>
+<li>keyboard navigation for candidate selection</li>
+<li>screen-readable labels</li>
+<li>non-color-only visual distinctions</li>
+<li>image labels visible without hover</li>
+</ul>
+<h3 id="75-frontend-technology-recommendation">7.5 Frontend technology recommendation</h3>
+<p>Preferred initial stack:</p>
+<ul>
+<li>HTML5</li>
+<li>CSS with simple modular stylesheet</li>
+<li>vanilla JavaScript or lightweight TypeScript</li>
+<li>fetch-based REST calls</li>
+<li>no build step required in the first prototype if possible</li>
+</ul>
+<hr>
+<h2 id="8-backend-specification">8. Backend Specification</h2>
+<h3 id="81-recommended-stack">8.1 Recommended stack</h3>
+<p>A suitable baseline stack:</p>
+<ul>
+<li>Python 3.11+</li>
+<li>FastAPI backend</li>
+<li>Diffusers-based generation engine</li>
+<li>SQLite for local experimentation, PostgreSQL optional later</li>
+<li>filesystem or object storage for images and logs</li>
+<li>Pydantic models for API contracts</li>
+</ul>
+<h3 id="82-backend-modules">8.2 Backend modules</h3>
+<h4 id="a-api-layer">A. API layer</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>session management</li>
+<li>round generation endpoints</li>
+<li>feedback submission</li>
+<li>experiment listing</li>
+<li>replay and export endpoints</li>
+</ul>
+<h4 id="b-orchestrator">B. Orchestrator</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>create session state</li>
+<li>call sampler</li>
+<li>call generation engine</li>
+<li>persist round data</li>
+<li>invoke updater after feedback</li>
+</ul>
+<h4 id="c-embedding-manager">C. Embedding manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>encode prompts</li>
+<li>cache text embeddings</li>
+<li>construct steering basis</li>
+<li>apply steering vector <code>z</code></li>
+<li>manage pooled versus token-level modes</li>
+</ul>
+<h4 id="d-sampling-manager">D. Sampling manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>sample candidate points under configured policy</li>
+<li>label candidates by role</li>
+<li>obey trust region and diversity constraints</li>
+</ul>
+<h4 id="e-generation-manager">E. Generation manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>generate images from embeddings</li>
+<li>manage seed policy</li>
+<li>record latency and failures</li>
+<li>retry or surface errors cleanly</li>
+</ul>
+<h4 id="f-preferenceupdate-manager">F. Preference/update manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>normalize feedback into internal format</li>
+<li>fit or update preference model</li>
+<li>compute incumbent state update</li>
+<li>adjust trust radius or uncertainty state</li>
+</ul>
+<h4 id="g-evaluation-manager">G. Evaluation manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>compute online metrics</li>
+<li>compute cross-session summaries</li>
+<li>generate exports and plots</li>
+</ul>
+<hr>
+<h2 id="9-data-model-specification">9. Data Model Specification</h2>
+<h3 id="91-core-tables-or-collections">9.1 Core tables or collections</h3>
+<h4 id="experiments">experiments</h4>
+<ul>
+<li>id</li>
+<li>created_at</li>
+<li>name</li>
+<li>description</li>
+<li>config_json</li>
+</ul>
+<h4 id="sessions">sessions</h4>
+<ul>
+<li>id</li>
+<li>experiment_id</li>
+<li>prompt</li>
+<li>negative_prompt</li>
+<li>model_name</li>
+<li>created_at</li>
+<li>status</li>
+<li>basis_type</li>
+<li>current_round</li>
+<li>current_z_json</li>
+</ul>
+<h4 id="rounds">rounds</h4>
+<ul>
+<li>id</li>
+<li>session_id</li>
+<li>round_index</li>
+<li>incumbent_z_json</li>
+<li>trust_radius</li>
+<li>seed_policy</li>
+<li>created_at</li>
+<li>update_summary_json</li>
+</ul>
+<h4 id="candidates">candidates</h4>
+<ul>
+<li>id</li>
+<li>round_id</li>
+<li>candidate_index</li>
+<li>z_json</li>
+<li>sampler_role</li>
+<li>predicted_score</li>
+<li>predicted_uncertainty</li>
+<li>seed</li>
+<li>image_path</li>
+<li>generation_params_json</li>
+</ul>
+<h4 id="feedback_events">feedback_events</h4>
+<ul>
+<li>id</li>
+<li>round_id</li>
+<li>type</li>
+<li>payload_json</li>
+<li>critique_text</li>
+<li>created_at</li>
+</ul>
+<h4 id="artifacts">artifacts</h4>
+<ul>
+<li>id</li>
+<li>session_id</li>
+<li>type</li>
+<li>path</li>
+<li>metadata_json</li>
+</ul>
+<h3 id="92-file-artifacts">9.2 File artifacts</h3>
+<p>Artifacts to store:</p>
+<ul>
+<li>generated images</li>
+<li>round manifests</li>
+<li>session config snapshots</li>
+<li>evaluation reports</li>
+<li>exported CSV / JSON traces</li>
+</ul>
+<hr>
+<h2 id="10-api-specification">10. API Specification</h2>
+<h3 id="101-example-rest-endpoints">10.1 Example REST endpoints</h3>
+<h4 id="post-experiments">POST /experiments</h4>
+<p>Create a new experiment.</p>
+<p>Request body:
+- name
+- description
+- config</p>
+<p>Response:
+- experiment ID</p>
+<h4 id="get-experiments">GET /experiments</h4>
+<p>List experiments.</p>
+<h4 id="post-sessions">POST /sessions</h4>
+<p>Create a session from an experiment config.</p>
+<p>Request body:
+- experiment ID or full config
+- prompt
+- negative prompt</p>
+<p>Response:
+- session ID
+- initial state</p>
+<h4 id="post-sessionssession_idroundsnext">POST /sessions/{session_id}/rounds/next</h4>
+<p>Generate the next round of candidates.</p>
+<p>Response:
+- round ID
+- candidate metadata
+- image URLs
+- state summary</p>
+<h4 id="post-roundsround_idfeedback">POST /rounds/{round_id}/feedback</h4>
+<p>Submit feedback for the round.</p>
+<p>Request body:
+- feedback type
+- payload
+- optional critique text</p>
+<p>Response:
+- update summary
+- next incumbent state</p>
+<h4 id="get-sessionssession_id">GET /sessions/{session_id}</h4>
+<p>Get full session summary.</p>
+<h4 id="get-sessionssession_idreplay">GET /sessions/{session_id}/replay</h4>
+<p>Get ordered rounds and artifacts.</p>
+<h4 id="get-sessionssession_idexport">GET /sessions/{session_id}/export</h4>
+<p>Export logs, metrics, and artifacts manifest.</p>
+<hr>
+<h2 id="11-steering-representation-specification">11. Steering Representation Specification</h2>
+<h3 id="111-required-modes">11.1 Required modes</h3>
+<p>The system must support at least three steering representations.</p>
+<h4 id="mode-a-low-dimensional-latent-code">Mode A: Low-dimensional latent code</h4>
+<p><code>E(z) = E0 + U z</code></p>
+<p>Recommended default for research.</p>
+<h4 id="mode-b-token-level-offset-mode">Mode B: Token-level offset mode</h4>
+<p>Apply learned or sampled offsets to selected token embeddings.</p>
+<p>Useful for analyzing more local control.</p>
+<h4 id="mode-c-pooled-embedding-mode">Mode C: Pooled embedding mode</h4>
+<p>Apply a simplified offset to a pooled representation.</p>
+<p>Useful as a baseline, even if weaker.</p>
+<h3 id="112-basis-construction-strategies">11.2 Basis construction strategies</h3>
+<p>The system should support:</p>
+<ul>
+<li>random orthonormal basis</li>
+<li>PCA basis from prior accepted moves</li>
+<li>hand-defined semantic basis</li>
+<li>basis from prompt rewrite differences</li>
+<li>hybrid basis</li>
+</ul>
+<h3 id="113-constraints">11.3 Constraints</h3>
+<p>Steering representation must support:</p>
+<ul>
+<li>trust-region clipping</li>
+<li>optional anchor-to-origin penalty</li>
+<li>optional subspace masks</li>
+<li>diversity computation between candidates</li>
+</ul>
+<hr>
+<h2 id="12-sampling-strategy-specification">12. Sampling Strategy Specification</h2>
+<p>This is a main experimental axis. The system must make samplers plug-in based.</p>
+<h3 id="121-sampler-interface">12.1 Sampler interface</h3>
+<p>Each sampler must implement:</p>
+<ul>
+<li><code>propose(state, config, preference_model) -&gt; list[candidate]</code></li>
+<li>candidate role tags</li>
+<li>reproducible sampling under fixed RNG state</li>
+</ul>
+<h3 id="122-required-baseline-samplers">12.2 Required baseline samplers</h3>
+<h4 id="a-random-local-sampler">A. Random local sampler</h4>
+<p>Sample directions uniformly or Gaussian within a trust ball.</p>
+<p>Purpose:
+- sanity baseline</p>
+<h4 id="b-exploit-plus-orthogonal-sampler">B. Exploit-plus-orthogonal sampler</h4>
+<p>Batch composition:
+- exploit near estimated best direction
+- refine around that direction
+- explore orthogonal directions
+- optional mirror check</p>
+<p>Purpose:
+- strong baseline for interactive search</p>
+<h4 id="c-uncertainty-guided-sampler">C. Uncertainty-guided sampler</h4>
+<p>Prefer candidates with high estimated uncertainty and adequate predicted utility.</p>
+<p>Purpose:
+- active learning baseline</p>
+<h4 id="d-thompson-style-sampler">D. Thompson-style sampler</h4>
+<p>Sample from the posterior over reward parameters, then optimize under that sample.</p>
+<p>Purpose:
+- principled exploration/exploitation tradeoff</p>
+<h4 id="e-quality-diversity-sampler">E. Quality-diversity sampler</h4>
+<p>Generate candidates that are both strong and diverse across simple descriptors.</p>
+<p>Purpose:
+- preserve multiple promising modes</p>
+<h3 id="123-optional-advanced-samplers">12.3 Optional advanced samplers</h3>
+<ul>
+<li>CMA-ES style covariance adaptation sampler</li>
+<li>dueling-bandit comparison sampler</li>
+<li>critique-conditioned sampler</li>
+<li>subspace-adaptive sampler</li>
+</ul>
+<h3 id="124-batch-composition-controls">12.4 Batch composition controls</h3>
+<p>Per round, the system should log and optionally enforce:</p>
+<ul>
+<li>number of exploit candidates</li>
+<li>number of explore candidates</li>
+<li>number of validation candidates</li>
+<li>number of mirror candidates</li>
+<li>number of replay candidates from previous rounds</li>
+</ul>
+<hr>
+<h2 id="13-feedback-mechanism-specification">13. Feedback Mechanism Specification</h2>
+<p>This is another major experimental axis.</p>
+<h3 id="131-unified-internal-feedback-schema">13.1 Unified internal feedback schema</h3>
+<p>All feedback must be normalized to a common event format. Even if the frontend collects ratings or rankings, the backend should be able to derive pairwise comparisons when useful.</p>
+<h3 id="132-required-feedback-modes">13.2 Required feedback modes</h3>
+<h4 id="a-scalar-ratings">A. Scalar ratings</h4>
+<p>User rates each image on a fixed scale.</p>
+<p>Pros:
+- easy to collect</p>
+<p>Cons:
+- noisy calibration</p>
+<h4 id="b-pairwise-comparison">B. Pairwise comparison</h4>
+<p>User chooses preferred image between two candidates.</p>
+<p>Pros:
+- clean signal</p>
+<p>Cons:
+- may require many comparisons</p>
+<h4 id="c-partial-ranking">C. Partial ranking</h4>
+<p>User ranks top-k candidates.</p>
+<p>Pros:
+- more informative than single winner</p>
+<h4 id="d-winner-critique">D. Winner + critique</h4>
+<p>User selects best candidate and provides a short natural-language reason.</p>
+<p>Pros:
+- can support directional interpretation later</p>
+<h4 id="e-select-all-that-fit">E. Select-all-that-fit</h4>
+<p>User marks all acceptable candidates.</p>
+<p>Pros:
+- useful when multiple modes are valid</p>
+<h3 id="133-feedback-quality-controls">13.3 Feedback quality controls</h3>
+<p>The platform should support:</p>
+<ul>
+<li>repeated hidden comparison for consistency measurement</li>
+<li>confidence self-report by user</li>
+<li>optional time-to-decision logging</li>
+<li>optional skip / uncertain action</li>
+</ul>
+<hr>
+<h2 id="14-update-mechanism-specification">14. Update Mechanism Specification</h2>
+<p>The update module takes session state and normalized feedback, and computes the next incumbent and preference state.</p>
+<h3 id="141-update-interface">14.1 Update interface</h3>
+<p>Each updater must implement:</p>
+<ul>
+<li><code>update(state, candidates, feedback, model) -&gt; new_state, update_summary</code></li>
+</ul>
+<h3 id="142-required-baseline-updaters">14.2 Required baseline updaters</h3>
+<h4 id="a-winner-copy-updater">A. Winner-copy updater</h4>
+<p>Set next incumbent to the winning candidate.</p>
+<p>Purpose:
+- simplest baseline</p>
+<h4 id="b-winner-average-updater">B. Winner-average updater</h4>
+<p>Move partially toward top-rated or top-ranked candidates.</p>
+<p>Purpose:
+- simple smooth update baseline</p>
+<h4 id="c-linear-preference-model-updater">C. Linear preference model updater</h4>
+<p>Fit a linear model on steering features and move along estimated reward gradient.</p>
+<p>Purpose:
+- practical baseline</p>
+<h4 id="d-bradley-terry-pairwise-logistic-updater">D. Bradley-Terry / pairwise logistic updater</h4>
+<p>Fit pairwise preference probabilities and derive next step from estimated utility.</p>
+<p>Purpose:
+- strong baseline for pairwise data</p>
+<h4 id="e-bayesian-updater">E. Bayesian updater</h4>
+<p>Maintain posterior uncertainty and update using preference observations.</p>
+<p>Purpose:
+- enables uncertainty-based sampling</p>
+<h3 id="143-optional-advanced-updaters">14.3 Optional advanced updaters</h3>
+<ul>
+<li>contextual bandit updater</li>
+<li>critique-conditioned latent editing updater</li>
+<li>trust-region policy optimization updater</li>
+<li>multi-subspace independent updater</li>
+</ul>
+<h3 id="144-stabilization-controls">14.4 Stabilization controls</h3>
+<p>Each updater should optionally support:</p>
+<ul>
+<li>trust-region clipping</li>
+<li>anchor regularization</li>
+<li>momentum across rounds</li>
+<li>rollback on confidence drop</li>
+<li>incumbent preservation if uncertainty rises sharply</li>
+</ul>
+<hr>
+<h2 id="15-seed-policy-specification">15. Seed Policy Specification</h2>
+<h3 id="151-required-seed-modes">15.1 Required seed modes</h3>
+<h4 id="a-fixed-per-round">A. Fixed-per-round</h4>
+<p>All candidates in the round share the same seed.</p>
+<p>Purpose:
+- isolate embedding effect</p>
+<h4 id="b-fixed-per-candidate-role">B. Fixed-per-candidate-role</h4>
+<p>Validation candidates use alternate seeds while main comparison candidates remain fixed.</p>
+<h4 id="c-multi-seed-averaging">C. Multi-seed averaging</h4>
+<p>A candidate is rendered under multiple seeds and summarized.</p>
+<p>Purpose:
+- robustness analysis</p>
+<h3 id="152-seed-logging-requirements">15.2 Seed logging requirements</h3>
+<p>For every candidate, log:</p>
+<ul>
+<li>seed</li>
+<li>scheduler settings</li>
+<li>inference step count</li>
+<li>guidance scale</li>
+<li>image resolution</li>
+</ul>
+<hr>
+<h2 id="16-evaluation-and-metrics-specification">16. Evaluation and Metrics Specification</h2>
+<p>The platform must support both online and offline evaluation.</p>
+<h3 id="161-interaction-level-metrics">16.1 Interaction-level metrics</h3>
+<ul>
+<li>average time per round</li>
+<li>average time per feedback action</li>
+<li>number of rounds until user stops</li>
+<li>number of generated images per session</li>
+<li>user consistency score</li>
+</ul>
+<h3 id="162-optimization-metrics">16.2 Optimization metrics</h3>
+<ul>
+<li>improvement in user preference score over rounds</li>
+<li>incumbent win rate against earlier incumbents</li>
+<li>regret proxy relative to best observed candidate</li>
+<li>preference-model calibration where applicable</li>
+</ul>
+<h3 id="163-robustness-metrics">16.3 Robustness metrics</h3>
+<ul>
+<li>performance under alternate seeds</li>
+<li>rank stability across seeds</li>
+<li>variance of score estimates</li>
+</ul>
+<h3 id="164-diversity-metrics">16.4 Diversity metrics</h3>
+<ul>
+<li>pairwise embedding distance among candidates</li>
+<li>pairwise perceptual image distance</li>
+<li>mode coverage proxy</li>
+</ul>
+<h3 id="165-drift-metrics">16.5 Drift metrics</h3>
+<ul>
+<li>distance of current <code>z_t</code> from origin</li>
+<li>distance from previous incumbent</li>
+<li>semantic drift notes if critique text is used</li>
+</ul>
+<h3 id="166-human-centered-metrics">16.6 Human-centered metrics</h3>
+<ul>
+<li>perceived controllability</li>
+<li>perceived usefulness of feedback mechanism</li>
+<li>fatigue level after session</li>
+<li>subjective satisfaction with final image</li>
+</ul>
+<hr>
+<h2 id="17-logging-and-reproducibility-specification">17. Logging and Reproducibility Specification</h2>
+<h3 id="171-mandatory-logging">17.1 Mandatory logging</h3>
+<p>Every experiment must log:</p>
+<ul>
+<li>full config snapshot</li>
+<li>random seeds</li>
+<li>software version</li>
+<li>model checkpoint identifier</li>
+<li>hardware metadata</li>
+<li>API request/response manifests for each round</li>
+<li>serialized feedback events</li>
+</ul>
+<h3 id="172-replay-requirements">17.2 Replay requirements</h3>
+<p>A session replay must reconstruct:</p>
+<ul>
+<li>prompt and config</li>
+<li>round order</li>
+<li>candidate images</li>
+<li>feedback timeline</li>
+<li>updater summaries</li>
+</ul>
+<h3 id="173-versioning">17.3 Versioning</h3>
+<p>Version the following independently:</p>
+<ul>
+<li>frontend version</li>
+<li>backend version</li>
+<li>model wrapper version</li>
+<li>sampler version</li>
+<li>updater version</li>
+<li>schema version</li>
+</ul>
+<hr>
+<h2 id="18-error-handling-and-fault-tolerance">18. Error Handling and Fault Tolerance</h2>
+<p>The system must handle:</p>
+<ul>
+<li>generation failure for one candidate</li>
+<li>timeout during image generation</li>
+<li>partial round completion</li>
+<li>duplicate feedback submissions</li>
+<li>invalid ranking payload</li>
+<li>GPU out-of-memory conditions</li>
+<li>experiment resume after crash</li>
+</ul>
+<p>Behavioral requirements:</p>
+<ul>
+<li>failures should be surfaced in the UI clearly</li>
+<li>one failed candidate should not invalidate the whole session unless configured</li>
+<li>session state should be durable after each completed round and feedback submission</li>
+</ul>
+<hr>
+<h2 id="19-security-and-privacy-notes">19. Security and Privacy Notes</h2>
+<p>Because this is a research prototype, security requirements are modest but should not be ignored.</p>
+<p>Minimum requirements:</p>
+<ul>
+<li>no arbitrary file path input from frontend</li>
+<li>input validation on all API endpoints</li>
+<li>optional session isolation if multiple users are supported later</li>
+<li>stored critique text treated as user data</li>
+<li>experiment exports should not leak server-local paths</li>
+</ul>
+<hr>
+<h2 id="20-suggested-project-structure">20. Suggested Project Structure</h2>
+<pre><code class="language-text">project/
+  app/
+    api/
+      routes_experiments.py
+      routes_sessions.py
+      routes_rounds.py
+      routes_exports.py
+    core/
+      config.py
+      logging.py
+      schema.py
+    engine/
+      prompt_encoder.py
+      steering_basis.py
+      generation.py
+      seeds.py
+    samplers/
+      base.py
+      random_local.py
+      exploit_orthogonal.py
+      uncertainty.py
+      thompson.py
+      quality_diversity.py
+    feedback/
+      normalization.py
+      validation.py
+    updaters/
+      base.py
+      winner_copy.py
+      winner_average.py
+      linear_pref.py
+      bradley_terry.py
+      bayesian.py
+    evaluation/
+      metrics.py
+      replay.py
+      reports.py
+    storage/
+      db.py
+      models.py
+      repository.py
+    frontend/
+      templates/
+        index.html
+        setup.html
+        session.html
+        replay.html
+      static/
+        styles.css
+        app.js
+  tests/
+    unit/
+    integration/
+    e2e/
+    fixtures/
+  scripts/
+    run_dev.py
+    export_session.py
+    replay_session.py
+  docs/
+    specification.md
+</code></pre>
+<hr>
+<h2 id="21-test-suite-specification">21. Test Suite Specification</h2>
+<p>The test suite is a required part of the research platform because correctness, comparability, and reproducibility are central.</p>
+<h3 id="211-test-categories">21.1 Test categories</h3>
+<p>The system must include:</p>
+<ul>
+<li>unit tests</li>
+<li>integration tests</li>
+<li>end-to-end tests</li>
+<li>deterministic replay tests</li>
+<li>regression tests for experiment schemas</li>
+</ul>
+<h3 id="212-unit-tests">21.2 Unit tests</h3>
+<h4 id="a-steering-representation-tests">A. Steering representation tests</h4>
+<p>Verify:</p>
+<ul>
+<li>prompt encoding returns expected shape</li>
+<li>basis construction returns correct dimensions</li>
+<li><code>E(z) = E0 + U z</code> applies correct tensor shape rules</li>
+<li>trust-region clipping works</li>
+<li>anchor penalty reduces drift</li>
+</ul>
+<h4 id="b-sampler-tests">B. Sampler tests</h4>
+<p>Verify:</p>
+<ul>
+<li>sampler returns correct number of candidates</li>
+<li>candidates respect trust radius</li>
+<li>orthogonal sampler reduces alignment with exploit direction</li>
+<li>deterministic sampling under fixed RNG state</li>
+<li>diversity filter removes near duplicates</li>
+</ul>
+<h4 id="c-feedback-normalization-tests">C. Feedback normalization tests</h4>
+<p>Verify:</p>
+<ul>
+<li>ratings convert to normalized internal events</li>
+<li>rankings convert to pairwise preferences correctly</li>
+<li>invalid ranking payloads are rejected</li>
+<li>duplicate selections are rejected where required</li>
+</ul>
+<h4 id="d-updater-tests">D. Updater tests</h4>
+<p>Verify:</p>
+<ul>
+<li>winner-copy selects winning candidate exactly</li>
+<li>averaging updater interpolates correctly</li>
+<li>linear updater produces gradient-shaped move in expected direction</li>
+<li>pairwise updater handles symmetric cases correctly</li>
+<li>Bayesian updater updates uncertainty monotonically under repeated evidence where expected</li>
+</ul>
+<h4 id="e-seed-policy-tests">E. Seed policy tests</h4>
+<p>Verify:</p>
+<ul>
+<li>fixed-per-round uses same seed</li>
+<li>validation candidates get alternate seeds when configured</li>
+<li>seed manifest is saved for all candidates</li>
+</ul>
+<h3 id="213-integration-tests">21.3 Integration tests</h3>
+<h4 id="a-session-lifecycle-test">A. Session lifecycle test</h4>
+<p>Flow:</p>
+<ol>
+<li>create experiment</li>
+<li>create session</li>
+<li>request first round</li>
+<li>submit feedback</li>
+<li>request next round</li>
+<li>verify state progression and persistence</li>
+</ol>
+<h4 id="b-generation-pipeline-test">B. Generation pipeline test</h4>
+<p>Use a lightweight mock or tiny test pipeline when full image generation is too expensive.</p>
+<p>Verify:</p>
+<ul>
+<li>embeddings flow from encoder through steering to generator</li>
+<li>generation failures are captured and surfaced</li>
+</ul>
+<h4 id="c-replay-integrity-test">C. Replay integrity test</h4>
+<p>Verify:</p>
+<ul>
+<li>exported replay matches stored rounds and feedback</li>
+<li>images and metadata align correctly</li>
+</ul>
+<h4 id="d-strategy-plug-in-test">D. Strategy plug-in test</h4>
+<p>Verify:</p>
+<ul>
+<li>samplers and updaters can be swapped without breaking controller logic</li>
+</ul>
+<h3 id="214-end-to-end-tests">21.4 End-to-end tests</h3>
+<p>Using browser automation or HTTP-level testing, verify:</p>
+<ul>
+<li>user can create experiment from UI</li>
+<li>user can start session</li>
+<li>user can rate, rank, or compare candidates</li>
+<li>user can move to next round</li>
+<li>replay page renders completed session correctly</li>
+</ul>
+<h3 id="215-deterministic-replay-tests">21.5 Deterministic replay tests</h3>
+<p>These tests are critical.</p>
+<p>Given:</p>
+<ul>
+<li>fixed prompt</li>
+<li>fixed experiment config</li>
+<li>fixed RNG seeds</li>
+<li>mocked or deterministic generation backend</li>
+</ul>
+<p>The replay must reproduce:</p>
+<ul>
+<li>same candidate proposals</li>
+<li>same order of candidates</li>
+<li>same update steps</li>
+<li>same stored metrics</li>
+</ul>
+<h3 id="216-schema-regression-tests">21.6 Schema regression tests</h3>
+<p>Verify that old experiment exports can still be loaded or migrated.</p>
+<h3 id="217-test-fixtures">21.7 Test fixtures</h3>
+<p>Required fixtures:</p>
+<ul>
+<li>deterministic prompt embedding fixture</li>
+<li>synthetic candidate set fixture</li>
+<li>fake user feedback fixture</li>
+<li>mock image generator fixture</li>
+<li>small replay log fixture</li>
+</ul>
+<h3 id="218-acceptance-test-criteria">21.8 Acceptance test criteria</h3>
+<p>The prototype is acceptable when:</p>
+<ul>
+<li>all unit tests pass</li>
+<li>main session lifecycle integration test passes</li>
+<li>deterministic replay test passes</li>
+<li>at least one sampler and one updater can be swapped by config only</li>
+<li>UI supports at least two feedback modes</li>
+<li>logs can be exported and replayed</li>
+</ul>
+<hr>
+<h2 id="22-minimal-viable-research-prototype">22. Minimal Viable Research Prototype</h2>
+<p>The first working version should include only the following mandatory features.</p>
+<h3 id="221-mandatory-capabilities">22.1 Mandatory capabilities</h3>
+<ul>
+<li>Stable Diffusion or SDXL backend through Diffusers</li>
+<li>low-dimensional steering code mode</li>
+<li>one HTML interactive session page</li>
+<li>one replay page</li>
+<li>at least three samplers:</li>
+<li>random local</li>
+<li>exploit-plus-orthogonal</li>
+<li>uncertainty-guided</li>
+<li>at least three feedback modes:</li>
+<li>scalar rating</li>
+<li>pairwise comparison</li>
+<li>top-k ranking</li>
+<li>at least three updaters:</li>
+<li>winner-copy</li>
+<li>winner-average</li>
+<li>linear preference updater</li>
+<li>fixed-per-round seed mode</li>
+<li>basic experiment export</li>
+<li>deterministic replay support</li>
+</ul>
+<h3 id="222-nice-to-have-but-optional-for-v1">22.2 Nice-to-have but optional for v1</h3>
+<ul>
+<li>critique text conditioning</li>
+<li>Bayesian preference model</li>
+<li>multi-seed validation mode</li>
+<li>quality-diversity archive</li>
+<li>user study report generator</li>
+</ul>
+<hr>
+<h2 id="23-example-experimental-matrix">23. Example Experimental Matrix</h2>
+<p>A useful first matrix for research comparison:</p>
+<h3 id="axis-1-sampling">Axis 1: Sampling</h3>
+<ul>
+<li>random local</li>
+<li>exploit-plus-orthogonal</li>
+<li>uncertainty-guided</li>
+</ul>
+<h3 id="axis-2-feedback">Axis 2: Feedback</h3>
+<ul>
+<li>scalar rating</li>
+<li>pairwise comparison</li>
+<li>top-3 ranking</li>
+</ul>
+<h3 id="axis-3-update">Axis 3: Update</h3>
+<ul>
+<li>winner-average</li>
+<li>linear preference update</li>
+<li>pairwise logistic update</li>
+</ul>
+<h3 id="axis-4-seed-policy">Axis 4: Seed policy</h3>
+<ul>
+<li>fixed-per-round</li>
+<li>fixed-per-round + periodic validation seeds</li>
+</ul>
+<p>This creates a manageable but meaningful comparison grid.</p>
+<hr>
+<h2 id="24-research-risks-and-confounds">24. Research Risks and Confounds</h2>
+<p>The system specification must explicitly acknowledge the main risks.</p>
+<h3 id="241-seed-confounding">24.1 Seed confounding</h3>
+<p>A candidate may look best because of seed luck rather than embedding quality.</p>
+<h3 id="242-human-inconsistency">24.2 Human inconsistency</h3>
+<p>User preference may change or become inconsistent as they see more options.</p>
+<h3 id="243-entangled-directions">24.3 Entangled directions</h3>
+<p>One steering move may affect multiple visual properties at once.</p>
+<h3 id="244-interface-bias">24.4 Interface bias</h3>
+<p>The layout or labeling of images may influence choice.</p>
+<h3 id="245-fatigue-effects">24.5 Fatigue effects</h3>
+<p>Long sessions may reduce feedback quality.</p>
+<p>The system should log enough metadata to study these confounds later.</p>
+<hr>
+<h2 id="25-deliverables-for-ai-generated-implementation">25. Deliverables for AI-Generated Implementation</h2>
+<p>An AI code generator receiving this specification should produce:</p>
+<ol>
+<li>a Python FastAPI backend</li>
+<li>a simple HTML/CSS/JS frontend</li>
+<li>modular sampler and updater interfaces</li>
+<li>one working diffusion generation wrapper</li>
+<li>experiment persistence layer</li>
+<li>replay/export support</li>
+<li>a complete automated test suite following Section 21</li>
+<li>documentation for local setup and running experiments</li>
+</ol>
+<h3 id="251-code-generation-constraints">25.1 Code-generation constraints</h3>
+<p>Generated code should:</p>
+<ul>
+<li>prioritize clarity over framework complexity</li>
+<li>keep modules small and replaceable</li>
+<li>avoid unnecessary abstractions in v1</li>
+<li>separate research logic from web route logic</li>
+<li>include docstrings and type hints</li>
+<li>include configuration presets for quick experiments</li>
+</ul>
+<h3 id="252-output-artifacts-expected-from-implementation">25.2 Output artifacts expected from implementation</h3>
+<ul>
+<li>runnable application</li>
+<li>sample config presets</li>
+<li>sample replay export</li>
+<li>test report output</li>
+<li>developer README</li>
+</ul>
+<hr>
+<h2 id="26-final-summary">26. Final Summary</h2>
+<p>This system is a controlled research platform for studying iterative user-guided image generation by steering prompt embeddings in a diffusion model.</p>
+<p>Its core design principles are:</p>
+<ul>
+<li>low-dimensional controllable steering representation</li>
+<li>explicit comparison of sampling policies</li>
+<li>explicit comparison of feedback mechanisms</li>
+<li>explicit comparison of update mechanisms</li>
+<li>strong logging and replay</li>
+<li>simple HTML interface for rapid experimentation</li>
+<li>reproducible testable architecture</li>
+</ul>
+<p>The platform is valuable not because it assumes one best method, but because it creates a clean environment for discovering which combinations of steering representation, candidate sampling, feedback collection, and update logic actually work.</p>
+      </main>
+    </div>
+  </body>
+</html>

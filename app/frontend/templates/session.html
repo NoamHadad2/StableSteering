@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session {{ session.id }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero compact">
+        <p class="eyebrow">Session</p>
+        <h1>{{ session.prompt }}</h1>
+        <p class="lede">Sampler: {{ humanize_token(session.config.sampler) }} | Updater: {{ humanize_token(session.config.updater) }} | Feedback: {{ humanize_feedback_mode(session.config.feedback_mode) }}</p>
+        <div class="badge-row">
+          <span class="status-badge" title="The resolved generation backend for this session.">Backend: {{ runtime_diagnostics.backend }}</span>
+          <span class="status-badge" title="The device currently used for inference.">Device: {{ runtime_diagnostics.active_device or runtime_diagnostics.configured_device or "n/a" }}</span>
+          <span class="status-badge" title="Whether CUDA is available to the runtime on this machine.">CUDA: {{ runtime_diagnostics.cuda_available }}</span>
+        </div>
+        <div class="actions">
+          <a class="button secondary" href="/" title="Leave this session view and return to the main dashboard.">Back to main</a>
+          <a class="button secondary" href="/sessions/{{ session.id }}/replay-view" title="Inspect persisted rounds, winners, and update summaries for this session.">Open replay</a>
+          <a class="button secondary" href="/sessions/{{ session.id }}/trace-report" title="Open the backend-saved HTML run report with images, events, and preference history.">Open trace report</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Current state</h2>
+          <span>{% if session.current_round == 0 %}Not started yet{% else %}Round {{ session.current_round }}{% endif %}</span>
+        </div>
+        <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
+        <div id="progress-panel" class="progress-panel" hidden>
+          <div class="progress-head">
+            <strong id="progress-label">Working...</strong>
+            <span id="progress-value">0%</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Session status <span class="help-tip inline" tabindex="0" role="note" aria-label="Session status help" data-tooltip="Ready means you can generate a round. Awaiting feedback means the current round must be reviewed before continuing.">?</span></span>
+            <strong>{% if session.status == "awaiting_feedback" %}Waiting for your feedback{% elif session.current_round == 0 %}Ready to start{% else %}Ready for another round{% endif %}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Feedback mode <span class="help-tip inline" tabindex="0" role="note" aria-label="Feedback mode help" data-tooltip="This controls which feedback widget appears on each candidate card and how your selection is interpreted.">?</span></span>
+            <strong>{{ humanize_feedback_mode(session.config.feedback_mode) }}</strong>
+          </div>
+        </div>
+        <p class="hint">{% if session.current_round == 0 %}Start by generating the first round. You will see one raw prompt baseline plus additional sampled variants.{% elif session.status == "awaiting_feedback" %}Review this round and submit feedback to unlock the next one.{% else %}Feedback is complete for the current round. You can continue exploring or open replay to review the history.{% endif %}</p>
+
+        {% if convergence and convergence.rounds_completed > 0 %}
+        <div class="convergence-banner {% if convergence.converged %}convergence-done{% else %}convergence-progress{% endif %}">
+          {% if convergence.converged %}
+            <span class="convergence-icon">✓</span>
+            <strong>Steering converged</strong> at round {{ convergence.rounds_to_convergence }} — the steering vector has settled.
+          {% else %}
+            <span class="convergence-icon">◎</span>
+            <strong>Converging…</strong>
+            Quiet rounds: {{ convergence.quiet_streak }}/{{ convergence.patience }} &nbsp;·&nbsp;
+            Step size: {{ "%.3f"|format(convergence.latest_step) }} &nbsp;·&nbsp;
+            Threshold: {{ "%.3f"|format(convergence.min_delta * 0.55) }}
+          {% endif %}
+          <a class="convergence-link" href="/sessions/{{ session.id }}/convergence" target="_blank">Full report →</a>
+        </div>
+        {% endif %}
+      </section>
+
+      <section class="card" id="round-container">
+        <div class="section-head">
+          <h2>Round history</h2>
+          <span>{{ rounds|length }} recorded</span>
+        </div>
+        {% if rounds %}
+          {% for round in rounds %}
+            {% set is_current_round = loop.last %}
+            <details class="round-block" {% if loop.last %}open{% endif %}>
+              <summary class="round-summary">
+                <span class="round-summary-title">Round {{ round.round_index }}</span>
+                <span class="round-summary-meta">{{ round.candidates|length }} candidates{% if round.feedback_events %} · feedback recorded{% else %} · awaiting feedback{% endif %}</span>
+              </summary>
+              <div class="round-body">
+                <div class="image-grid">
+                  {% for candidate in round.candidates %}
+                    <article class="image-card">
+                      <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
+                      <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
+                      <p class="candidate-subtitle">{{ candidate.id }}</p>
+                      <div class="candidate-meta">
+                        <p>Role <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate role help" data-tooltip="Baseline is the raw prompt, incumbent is the previous winner, and sampler roles describe how other candidates were proposed.">?</span>: <strong>{{ candidate.sampler_role }}</strong></p>
+                      </div>
+                      {% if is_current_round and not round.feedback_events %}
+                        <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode.value }}">
+                          {% if session.config.feedback_mode.value == "scalar_rating" %}
+                            <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
+                              <span class="rating-label">Rating</span>
+                              <div class="star-rating" role="radiogroup" aria-label="Rate candidate {{ candidate.id }}">
+                                {% for star in [1, 2, 3, 4, 5] %}
+                                  <button
+                                    type="button"
+                                    class="star-button"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-rating-value="{{ star }}"
+                                    aria-label="{{ star }} star{% if star > 1 %}s{% endif %}"
+                                    aria-pressed="false"
+                                  >★</button>
+                                {% endfor %}
+                              </div>
+                              <input type="hidden" class="rating-input" data-candidate-id="{{ candidate.id }}" value="0">
+                              <p class="star-rating-caption" data-candidate-id="{{ candidate.id }}">No rating selected yet</p>
+                            </div>
+                          {% elif session.config.feedback_mode.value == "pairwise" %}
+                            <label class="choice-row">
+                              <input type="radio" name="pairwise_winner" class="pairwise-winner-input" data-candidate-id="{{ candidate.id }}">
+                              <span>Winner</span>
+                            </label>
+                            <label class="choice-row">
+                              <input type="radio" name="pairwise_loser" class="pairwise-loser-input" data-candidate-id="{{ candidate.id }}">
+                              <span>Loser</span>
+                            </label>
+                          {% elif session.config.feedback_mode.value == "winner_only" %}
+                            <label class="choice-row">
+                              <input type="radio" name="winner_only" class="winner-only-input" data-candidate-id="{{ candidate.id }}">
+                              <span>Select as winner</span>
+                            </label>
+                          {% elif session.config.feedback_mode.value == "approve_reject" %}
+                            <label class="choice-row">
+                              <input type="checkbox" class="approve-checkbox" data-candidate-id="{{ candidate.id }}">
+                              <span>Approved</span>
+                            </label>
+                            <label class="choice-row">
+                              <input type="radio" name="approve_reject_winner" class="approve-winner-input" data-candidate-id="{{ candidate.id }}">
+                              <span>Preferred approved winner</span>
+                            </label>
+                          {% elif session.config.feedback_mode.value == "top_k" %}
+                            <label>Rank
+                              <input type="number" min="1" max="{{ round.candidates|length }}" class="rank-input" data-candidate-id="{{ candidate.id }}" inputmode="numeric">
+                            </label>
+                          {% elif session.config.feedback_mode.value == "critique_rating" %}
+                            <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
+                              <span class="rating-label">Rating</span>
+                              <div class="star-rating" role="radiogroup" aria-label="Rate candidate {{ candidate.id }}">
+                                {% for star in [1, 2, 3, 4, 5] %}
+                                  <button
+                                    type="button"
+                                    class="star-button"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-rating-value="{{ star }}"
+                                    aria-label="{{ star }} star{% if star > 1 %}s{% endif %}"
+                                    aria-pressed="false"
+                                  >★</button>
+                                {% endfor %}
+                              </div>
+                              <input type="hidden" class="rating-input" data-candidate-id="{{ candidate.id }}" value="0">
+                              <p class="star-rating-caption" data-candidate-id="{{ candidate.id }}">No rating selected yet</p>
+                              <div class="critique-tags" data-candidate-id="{{ candidate.id }}">
+                                {% for tag in critique_tags %}
+                                  <button
+                                    type="button"
+                                    class="critique-tag-pill {% if tag.startswith('good_') %}positive{% else %}negative{% endif %}"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-tag="{{ tag }}"
+                                    aria-pressed="false"
+                                  >{{ tag.replace('_', ' ') }}</button>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </article>
+                  {% endfor %}
+                </div>
+                {% if loop.last and not round.feedback_events %}
+                  <p class="hint">
+                    {% if session.config.feedback_mode.value == "scalar_rating" %}
+                      Click one to five stars on any candidates you want to rate. Higher stars mean stronger preference.
+                    {% elif session.config.feedback_mode.value == "pairwise" %}
+                      Choose one winner and one loser.
+                    {% elif session.config.feedback_mode.value == "winner_only" %}
+                      Choose a single winner.
+                    {% elif session.config.feedback_mode.value == "approve_reject" %}
+                      Mark approved candidates, then choose the preferred winner from the approved set.
+                    {% elif session.config.feedback_mode.value == "top_k" %}
+                      Assign unique ranks starting at 1. Lower numbers mean better preference.
+                    {% elif session.config.feedback_mode.value == "critique_rating" %}
+                      Rate each candidate with stars, then optionally tag what you liked or disliked. Pair it with the <code>critique_weighted_preference</code> updater to let the tags steer the next round.
+                    {% endif %}
+                  </p>
+                  <div class="actions">
+                    <button class="button" id="submit-feedback-button" data-round-id="{{ round.id }}" data-feedback-mode="{{ session.config.feedback_mode.value }}" data-session-id="{{ session.id }}" title="Apply your current preference selections and immediately generate the next round.">Submit feedback and generate next round</button>
+                  </div>
+                {% elif round.feedback_events %}
+                  <div class="soft-callout">
+                    <strong>Feedback recorded</strong>
+                    <p>Winner: <code>{{ round.update_summary.winner_candidate_id }}</code>.</p>
+                  </div>
+                  {% if loop.last and session.status != "awaiting_feedback" %}
+                    <div class="actions round-footer-actions">
+                      <button class="button" data-session-id="{{ session.id }}" id="next-round-button" title="Generate the next candidate batch. In round 1 this includes the raw prompt baseline; later rounds include the previous winner.">Generate next round</button>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </details>
+          {% endfor %}
+        {% else %}
+          <div class="soft-callout">
+            <strong>No rounds yet</strong>
+            <p>Generate the first round to see the raw prompt baseline and the first sampled variations side by side.</p>
+          </div>
+          <div class="actions round-footer-actions">
+            <button class="button" data-session-id="{{ session.id }}" id="next-round-button" title="Generate the first candidate batch from your current prompt and configuration.">Generate first round</button>
+          </div>
+        {% endif %}
+      </section>
+      <section class="card trace-card">
+        <div class="section-head">
+          <h2>Frontend Trace</h2>
+          <span>{{ session.id }}</span>
+        </div>
+        <ul id="trace-log" class="trace-log"></ul>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

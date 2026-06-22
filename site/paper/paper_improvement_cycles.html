@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>paper_improvement_cycles | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="../docs/configuration_manual.html">configuration_manual</a></li><li><a href="../docs/developer_guide.html">developer_guide</a></li><li><a href="../docs/document_audit.html">document_audit</a></li><li><a href="../docs/faq.html">faq</a></li><li><a href="../docs/motivation.html">motivation</a></li><li><a href="../docs/pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="../docs/quick_start.html">quick_start</a></li><li><a href="../docs/index.html">docs</a></li><li><a href="../docs/research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="../docs/student_tutorial.html">student_tutorial</a></li><li><a href="../docs/system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="../docs/system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="../docs/system_specification.html">system_specification</a></li><li><a href="../docs/system_test_specification.html">system_test_specification</a></li><li><a href="../docs/theoretical_background.html">theoretical_background</a></li><li><a href="../docs/user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="caption_style_guide.html">caption_style_guide</a></li><li><a href="case_study_summary.html">case_study_summary</a></li><li><a href="claim_audit.html">claim_audit</a></li><li><a href="claim_evidence_matrix.html">claim_evidence_matrix</a></li><li><a href="contribution_statement.html">contribution_statement</a></li><li><a href="evidence_inventory.html">evidence_inventory</a></li><li><a href="experiment_execution_queue.html">experiment_execution_queue</a></li><li><a href="experiment_matrix.html">experiment_matrix</a></li><li><a href="figure_table_inventory.html">figure_table_inventory</a></li><li><a href="improvement_log.html">improvement_log</a></li><li><a href="journal_appendix.html">journal_appendix</a></li><li><a href="journal_manuscript.html">journal_manuscript</a></li><li><a href="manuscript_draft.html">manuscript_draft</a></li><li><a href="manuscript_outline.html">manuscript_outline</a></li><li><a href="paper_improvement_cycles.html">paper_improvement_cycles</a></li><li><a href="paper_package_inventory.html">paper_package_inventory</a></li><li><a href="paper_readiness_map.html">paper_readiness_map</a></li><li><a href="protocols/budget_normalized_seed_policy_protocol.html">budget_normalized_seed_policy_protocol</a></li><li><a href="protocols/human_pairwise_evaluation_protocol.html">human_pairwise_evaluation_protocol</a></li><li><a href="protocols/minimal_baseline_protocol.html">minimal_baseline_protocol</a></li><li><a href="protocols/oracle_target_recovery_protocol.html">oracle_target_recovery_protocol</a></li><li><a href="protocols/updater_ablation_protocol.html">updater_ablation_protocol</a></li><li><a href="publication_plan.html">publication_plan</a></li><li><a href="reader_confusion_notes.html">reader_confusion_notes</a></li><li><a href="index.html">paper</a></li><li><a href="related_work_draft.html">related_work_draft</a></li><li><a href="related_work_scaffold.html">related_work_scaffold</a></li><li><a href="reproducibility_checklist.html">reproducibility_checklist</a></li><li><a href="results/baseline_matrix/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/baseline_matrix/pilot_summary.html">pilot_summary</a></li><li><a href="results/baseline_matrix/pilot_table.html">pilot_table</a></li><li><a href="results/baseline_matrix/index.html">baseline_matrix</a></li><li><a href="results/baseline_matrix/seed_robustness.html">seed_robustness</a></li><li><a href="results/budget_matched_direct_baselines/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/budget_matched_direct_baselines/index.html">budget_matched_direct_baselines</a></li><li><a href="results/human_pairwise_evaluation/analysis_summary.html">analysis_summary</a></li><li><a href="results/human_pairwise_evaluation/index.html">human_pairwise_evaluation</a></li><li><a href="results/method_extension_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/method_extension_comparison/index.html">method_extension_comparison</a></li><li><a href="results/oracle_caption_metric_extension/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_caption_metric_extension/index.html">oracle_caption_metric_extension</a></li><li><a href="results/oracle_incumbent_policy_compact/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_incumbent_policy_compact/index.html">oracle_incumbent_policy_compact</a></li><li><a href="results/oracle_inspired_methods/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_inspired_methods/index.html">oracle_inspired_methods</a></li><li><a href="results/oracle_multimetric_repeated/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_multimetric_repeated/index.html">oracle_multimetric_repeated</a></li><li><a href="results/oracle_plateau_escape/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_plateau_escape/index.html">oracle_plateau_escape</a></li><li><a href="results/oracle_plateau_escape_soft_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_plateau_escape_soft_control/index.html">oracle_plateau_escape_soft_control</a></li><li><a href="results/oracle_plateau_escape_stagnation_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_plateau_escape_stagnation_control/index.html">oracle_plateau_escape_stagnation_control</a></li><li><a href="results/oracle_plateau_reformulation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_plateau_reformulation/index.html">oracle_plateau_reformulation</a></li><li><a href="results/oracle_progress_diagnosis/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_progress_diagnosis/index.html">oracle_progress_diagnosis</a></li><li><a href="results/oracle_progress_followup/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_progress_followup/index.html">oracle_progress_followup</a></li><li><a href="results/oracle_target_recovery/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/oracle_target_recovery/index.html">oracle_target_recovery</a></li><li><a href="results/sampler_feedback_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/sampler_feedback_comparison/index.html">sampler_feedback_comparison</a></li><li><a href="results/seed_policy_slice/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/seed_policy_slice/index.html">seed_policy_slice</a></li><li><a href="results/steering_mode_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/steering_mode_comparison/index.html">steering_mode_comparison</a></li><li><a href="results/steering_mode_comparison_smoke/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/steering_mode_comparison_smoke/index.html">steering_mode_comparison_smoke</a></li><li><a href="results/updater_ablation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="results/updater_ablation/index.html">updater_ablation</a></li><li><a href="terminology_ledger.html">terminology_ledger</a></li><li><a href="title_abstract_variants.html">title_abstract_variants</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/paper/paper_improvement_cycles.md">View source Markdown</a></p>
+        <h1 id="ten-paper-improvement-cycles">Ten Paper-Improvement Cycles</h1>
+<p>This file records the repeated paper workflow:</p>
+<ol>
+<li>evaluate the current paper state</li>
+<li>select the best 3 agents for that stage</li>
+<li>run the agents</li>
+<li>update the paper package</li>
+</ol>
+<h2 id="cycle-1">Cycle 1</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>claim_evidence_mapper</code></li>
+<li><code>reader_confusion_detector</code></li>
+<li><code>storyline_architect</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>strengthened the first-page contribution boundary</li>
+<li>clarified the steering-state explanation</li>
+<li>centered the argument on one prompt -&gt; candidates -&gt; preferences -&gt; update -&gt; replay loop</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>contribution_statement.md</code></li>
+<li><code>reader_confusion_notes.md</code></li>
+</ul>
+<h2 id="cycle-2">Cycle 2</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>contribution_distiller</code></li>
+<li><code>novelty_positioner</code></li>
+<li><code>terminology_notation_keeper</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>distilled the paper identity toward a replayable steering loop</li>
+<li>tightened novelty language</li>
+<li>created canonical terminology</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>contribution_statement.md</code></li>
+<li><code>terminology_ledger.md</code></li>
+<li><code>paper_readiness_map.md</code></li>
+</ul>
+<h2 id="cycle-3">Cycle 3</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>related_work_synthesizer</code></li>
+<li><code>title_abstract_optimizer</code></li>
+<li><code>camera_ready_polisher</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>made related work more thematic and less list-like</li>
+<li>improved title/abstract focus</li>
+<li>identified near-camera-ready manuscript cleanup targets</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>related_work_draft.md</code></li>
+<li><code>title_abstract_variants.md</code></li>
+</ul>
+<h2 id="cycle-4">Cycle 4</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>ablation_designer</code></li>
+<li><code>experiment_queue_manager</code></li>
+<li><code>config_sweep_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>replaced the overly broad experiment grid with a small controlled baseline matrix and sweep plan</li>
+<li>ranked the next experiments by paper value versus compute cost</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>experiment_matrix.md</code></li>
+<li><code>experiment_execution_queue.md</code></li>
+</ul>
+<h2 id="cycle-5">Cycle 5</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>figure_narrative_agent</code></li>
+<li><code>visual_consistency_agent</code></li>
+<li><code>table_compression_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>sharpened figure messages</li>
+<li>standardized caption policy</li>
+<li>kept the table plan compact and argument-driven</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>figure_table_inventory.md</code></li>
+<li><code>caption_style_guide.md</code></li>
+</ul>
+<h2 id="cycle-6">Cycle 6</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>statistical_validity_auditor</code></li>
+<li><code>failure_analysis_agent</code></li>
+<li><code>reviewer_simulator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>expanded limitations around evidence gaps, instability, and reproducibility boundaries</li>
+<li>made the paper more honest about what is software validation versus research validation</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>reproducibility_checklist.md</code></li>
+</ul>
+<h2 id="cycle-7">Cycle 7</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>reproducibility_packager</code></li>
+<li><code>artifact_curator</code></li>
+<li><code>experiment_operator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>defined the next missing package pieces needed for a stronger research artifact</li>
+<li>outlined the future script bundle for paper-facing experiments</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>paper_package_inventory.md</code></li>
+<li><code>README.md</code></li>
+</ul>
+<h2 id="cycle-8">Cycle 8</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>reader_confusion_detector</code></li>
+<li><code>camera_ready_polisher</code></li>
+<li><code>storyline_architect</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>identified the remaining confusion points around <code>z</code>, paper genre, and interaction model</li>
+<li>tightened the manuscript around the platform-versus-case-study split</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>README.md</code></li>
+</ul>
+<h2 id="cycle-9">Cycle 9</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>claim_evidence_mapper</code></li>
+<li><code>novelty_positioner</code></li>
+<li><code>contribution_distiller</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>confirmed there were no remaining major claim/evidence mismatches</li>
+<li>finalized a one-sentence contribution framing for the current evidence level</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>contribution_statement.md</code></li>
+<li><code>manuscript_draft.md</code></li>
+</ul>
+<h2 id="cycle-10">Cycle 10</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>title_abstract_optimizer</code></li>
+<li><code>terminology_notation_keeper</code></li>
+<li><code>camera_ready_polisher</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>finalized the preferred title</li>
+<li>cleaned the remaining terminology drift</li>
+<li>fixed README reading order and archival status of the related-work scaffold</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>README.md</code></li>
+<li><code>title_abstract_variants.md</code></li>
+</ul>
+<h2 id="outcome-after-10-cycles">Outcome after 10 cycles</h2>
+<p>The paper package is now substantially stronger as:</p>
+<ul>
+<li>a traceable research platform paper</li>
+<li>a replayable qualitative case-study package</li>
+<li>a paper scaffold with a clear next-step empirical execution plan</li>
+</ul>
+<p>It is still not a completed comparative benchmark paper, and the remaining biggest gap is the missing baseline matrix and results corpus.</p>
+<h2 id="cycle-11">Cycle 11</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>reviewer_simulator</code></li>
+<li><code>storyline_architect</code></li>
+<li><code>claim_evidence_mapper</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>moved the paper closer to submission style by reducing repo-like structure and repeated caveats</li>
+<li>relocated related-work positioning earlier in the manuscript</li>
+<li>standardized the checked-in run as a single curated qualitative case study</li>
+<li>replaced the draft-ending author note with a real conclusion and future-work section</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>manuscript_outline.md</code></li>
+<li><code>contribution_statement.md</code></li>
+<li><code>improvement_log.md</code></li>
+</ul>
+<h2 id="cycle-12">Cycle 12</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>repo-paper-planner</code></li>
+<li><code>section-writer</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>materialized the minimal baseline protocol bundle as concrete paper artifacts</li>
+<li>added a paper-facing results scaffold and runner for the baseline matrix path</li>
+<li>updated the paper package index and reproducibility notes so the new path is visible and honest about what is still missing</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>protocols/minimal_baseline_protocol.md</code></li>
+<li><code>protocols/minimal_baseline_prompt_suite.yaml</code></li>
+<li><code>results/baseline_matrix/README.md</code></li>
+<li><code>results/baseline_matrix/manifest.json</code></li>
+<li><code>results/baseline_matrix/protocol_snapshot.yaml</code></li>
+<li><code>scripts/run_paper_minimal_baseline_matrix.py</code></li>
+<li><code>README.md</code></li>
+<li><code>experiment_matrix.md</code></li>
+<li><code>experiment_execution_queue.md</code></li>
+<li><code>reproducibility_checklist.md</code></li>
+<li><code>paper_package_inventory.md</code></li>
+</ul>
+<h2 id="cycle-13">Cycle 13</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>experiment_queue_manager</code></li>
+<li><code>config_sweep_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>locked the baseline-comparison question to a tiny 3-prompt x 3-policy matrix</li>
+<li>prevented the paper from drifting into an uncontrolled benchmark plan</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>protocols/minimal_baseline_prompt_suite.yaml</code></li>
+<li><code>protocols/minimal_baseline_protocol.md</code></li>
+</ul>
+<h2 id="cycle-14">Cycle 14</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>artifact_curator</code></li>
+<li><code>reproducibility_packager</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>implemented a bounded runner that writes paper-facing manifests and CSV tables</li>
+<li>preserved each run under an isolated runtime directory</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/run_paper_minimal_baseline_matrix.py</code></li>
+<li><code>results/baseline_matrix/README.md</code></li>
+</ul>
+<h2 id="cycle-15">Cycle 15</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>artifact_curator</code></li>
+<li><code>figure_narrative_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>executed the full pilot matrix on the real Diffusers backend</li>
+<li>populated the results bundle with 9 runs, 12 rounds, and 48 candidate images</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>results/baseline_matrix/manifest.json</code></li>
+<li><code>results/baseline_matrix/tables/prompts.csv</code></li>
+<li><code>results/baseline_matrix/tables/runs.csv</code></li>
+<li><code>results/baseline_matrix/tables/rounds.csv</code></li>
+<li><code>results/baseline_matrix/tables/candidates.csv</code></li>
+</ul>
+<h2 id="cycle-16">Cycle 16</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>artifact_curator</code></li>
+<li><code>claim_evidence_mapper</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>preserved per-run runtime bundles, summaries, and trace reports as inspectable evidence</li>
+<li>turned the matrix from a planned artifact into a paper-citable bundle</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>results/baseline_matrix/runs/*</code></li>
+<li><code>results/baseline_matrix/manifest.json</code></li>
+</ul>
+<h2 id="cycle-17">Cycle 17</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>statistical_validity_auditor</code></li>
+<li><code>camera_ready_polisher</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>found and fixed the aggregate manifest bug that incorrectly counted all candidates as failed</li>
+<li>rebuilt the bundle metadata from the existing pilot outputs</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/run_paper_minimal_baseline_matrix.py</code></li>
+<li><code>results/baseline_matrix/manifest.json</code></li>
+<li><code>results/baseline_matrix/README.md</code></li>
+</ul>
+<h2 id="cycle-18">Cycle 18</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>table_compression_agent</code></li>
+<li><code>artifact_curator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>added a compact baseline-summary CSV for paper-facing reading</li>
+<li>summarized the pilot outcome without forcing readers through raw candidate tables first</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>results/baseline_matrix/tables/baseline_summary.csv</code></li>
+<li><code>results/baseline_matrix/pilot_summary.md</code></li>
+</ul>
+<h2 id="cycle-19">Cycle 19</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>section_writer</code></li>
+<li><code>claim_evidence_mapper</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>updated the manuscript so it now cites the executed pilot matrix conservatively</li>
+<li>changed the limitation language from "no protocol exists" to "pilot exists but broad evidence is still missing"</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+</ul>
+<h2 id="cycle-20">Cycle 20</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>reproducibility_packager</code></li>
+<li><code>artifact_curator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>synced the paper package index and reproducibility docs to the executed pilot bundle</li>
+<li>made the new evidence path easy to discover from the paper folder itself</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>README.md</code></li>
+<li><code>reproducibility_checklist.md</code></li>
+<li><code>paper_package_inventory.md</code></li>
+<li><code>experiment_matrix.md</code></li>
+<li><code>experiment_execution_queue.md</code></li>
+</ul>
+<h2 id="cycle-21">Cycle 21</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>camera_ready_polisher</code></li>
+<li><code>artifact_curator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>regenerated the standalone HTML manuscript</li>
+<li>recorded the ten-cycle student-builder loop as part of the paper artifact history</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.html</code></li>
+<li><code>improvement_log.md</code></li>
+</ul>
+<h2 id="outcome-after-the-ten-cycle-student-builder-loop">Outcome after the ten-cycle student-builder loop</h2>
+<p>The paper package now contains:</p>
+<ul>
+<li>a locked minimal baseline protocol</li>
+<li>an executable baseline runner</li>
+<li>an executed 9-run pilot matrix on the real backend</li>
+<li>paper-facing CSV tables and pilot summaries</li>
+<li>manuscript language that cites the pilot honestly without overstating it</li>
+</ul>
+<p>The remaining top gap is no longer "missing baseline path." It is now "expand the pilot into a stronger comparative evaluation with broader prompt coverage and stronger paper-facing analysis."</p>
+<h2 id="cycle-22">Cycle 22</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>reviewer_simulator</code></li>
+<li><code>evidence_auditor</code></li>
+<li><code>figure_narrative_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>promoted the executed pilot from a hidden bundle to a first-class manuscript subsection</li>
+<li>added a compact paper-ready pilot table</li>
+<li>clarified that the pilot is a bounded workflow comparison, not a normalized benchmark</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>results/baseline_matrix/pilot_table.md</code></li>
+<li><code>figure_table_inventory.md</code></li>
+<li><code>claim_evidence_matrix.md</code></li>
+<li><code>README.md</code></li>
+<li><code>improvement_log.md</code></li>
+</ul>
+<h2 id="cycle-23">Cycle 23</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>experiment-runner</code></li>
+<li><code>statistical_validity_auditor</code></li>
+<li><code>figure_narrative_agent</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>extended the pilot to three independent repeats per prompt-policy cell</li>
+<li>added workflow-level repeat summaries instead of one-shot-only pilot reporting</li>
+<li>tightened the manuscript so the new evidence supports only narrow repeatability claims</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/run_paper_minimal_baseline_matrix.py</code></li>
+<li><code>results/baseline_matrix/manifest.json</code></li>
+<li><code>results/baseline_matrix/tables/repeat_summary.csv</code></li>
+<li><code>results/baseline_matrix/pilot_summary.md</code></li>
+<li><code>results/baseline_matrix/pilot_table.md</code></li>
+<li><code>results/baseline_matrix/seed_robustness.md</code></li>
+<li><code>manuscript_draft.md</code></li>
+<li><code>claim_evidence_matrix.md</code></li>
+<li><code>figure_table_inventory.md</code></li>
+<li><code>README.md</code></li>
+<li><code>improvement_log.md</code></li>
+</ul>
+<h2 id="cycle-24">Cycle 24</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>reader_confusion_detector</code></li>
+<li><code>camera_ready_polisher</code></li>
+<li><code>related_work_synthesizer</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>clarified the paper identity as a traceable platform with two bounded artifact-based evaluations</li>
+<li>made the steering state operationally explicit</li>
+<li>separated the qualitative case study from the workflow pilot more clearly</li>
+<li>rebuilt related work around comparison axes and added missing citation anchors</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>manuscript_draft.md</code></li>
+<li><code>related_work_draft.md</code></li>
+<li><code>references.bib</code></li>
+<li><code>contribution_statement.md</code></li>
+<li><code>title_abstract_variants.md</code></li>
+<li><code>figure_table_inventory.md</code></li>
+<li><code>improvement_log.md</code></li>
+</ul>
+<h2 id="cycle-25">Cycle 25</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>statistical_validity_auditor</code></li>
+<li><code>experiment_queue_manager</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>added a paper-facing analysis layer over the repeated pilot bundle</li>
+<li>updated the manuscript to cite normalized workflow summaries rather than only raw CSV tables</li>
+<li>tightened the execution queue around the two lowest-cost empirical additions with the highest publishability value</li>
+<li>simplified the paper-package README into a submission-facing guide</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/build_paper_baseline_analysis.py</code></li>
+<li><code>paper/results/baseline_matrix/analysis/cell_summary.csv</code></li>
+<li><code>paper/results/baseline_matrix/analysis/policy_summary.csv</code></li>
+<li><code>paper/results/baseline_matrix/analysis/analysis_summary.md</code></li>
+<li><code>paper/results/baseline_matrix/analysis/analysis_summary.html</code></li>
+<li><code>paper/manuscript_draft.md</code></li>
+<li><code>paper/results/baseline_matrix/README.md</code></li>
+<li><code>paper/results/baseline_matrix/pilot_summary.md</code></li>
+<li><code>paper/results/baseline_matrix/seed_robustness.md</code></li>
+<li><code>paper/experiment_execution_queue.md</code></li>
+<li><code>paper/README.md</code></li>
+<li><code>paper/claim_evidence_matrix.md</code></li>
+<li><code>paper/improvement_log.md</code></li>
+</ul>
+<h2 id="cycle-26">Cycle 26</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>experiment-runner</code></li>
+<li><code>statistical_validity_auditor</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>generalized the paper runner to support protocol-defined bounded bundles</li>
+<li>created and executed the budget-normalized seed-policy slice</li>
+<li>generated a derived analysis layer for that slice</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/run_paper_minimal_baseline_matrix.py</code></li>
+<li><code>scripts/build_paper_baseline_analysis.py</code></li>
+<li><code>paper/protocols/budget_normalized_seed_policy_suite.yaml</code></li>
+<li><code>paper/protocols/budget_normalized_seed_policy_protocol.md</code></li>
+<li><code>paper/results/seed_policy_slice/</code></li>
+</ul>
+<h2 id="cycle-27">Cycle 27</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>student_builder</code></li>
+<li><code>experiment-runner</code></li>
+<li><code>statistical_validity_auditor</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>created and executed the fixed-sampler updater ablation</li>
+<li>generated a derived analysis layer for that ablation</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>paper/protocols/updater_ablation_suite.yaml</code></li>
+<li><code>paper/protocols/updater_ablation_protocol.md</code></li>
+<li><code>paper/results/updater_ablation/</code></li>
+</ul>
+<h2 id="cycle-28">Cycle 28</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>camera_ready_polisher</code></li>
+<li><code>statistical_validity_auditor</code></li>
+<li><code>storyline_architect</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>integrated the two new controlled bundles into the manuscript conservatively</li>
+<li>updated the evidence boundary and next-step language</li>
+<li>converted the experiment queue from planned items into completed items plus the next highest-value task</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>paper/manuscript_draft.md</code></li>
+<li><code>paper/experiment_execution_queue.md</code></li>
+<li><code>paper/README.md</code></li>
+</ul>
+<h2 id="cycle-29">Cycle 29</h2>
+<p>Selected agents:</p>
+<ul>
+<li><code>camera_ready_polisher</code></li>
+<li><code>consistency-checker</code></li>
+<li><code>artifact_curator</code></li>
+</ul>
+<p>Main result:</p>
+<ul>
+<li>synced the claim map, script index, logs, and paper package after the new experiment bundles landed</li>
+<li>rebuilt the HTML manuscript and refreshed appendix-style analysis summaries</li>
+</ul>
+<p>Updated artifacts:</p>
+<ul>
+<li><code>scripts/README.md</code></li>
+<li><code>paper/claim_evidence_matrix.md</code></li>
+<li><code>paper/improvement_log.md</code></li>
+<li><code>paper/paper_improvement_cycles.md</code></li>
+<li><code>paper/manuscript_draft.html</code></li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

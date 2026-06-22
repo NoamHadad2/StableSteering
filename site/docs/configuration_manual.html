@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>configuration_manual | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../paper/caption_style_guide.html">caption_style_guide</a></li><li><a href="../paper/case_study_summary.html">case_study_summary</a></li><li><a href="../paper/claim_audit.html">claim_audit</a></li><li><a href="../paper/claim_evidence_matrix.html">claim_evidence_matrix</a></li><li><a href="../paper/contribution_statement.html">contribution_statement</a></li><li><a href="../paper/evidence_inventory.html">evidence_inventory</a></li><li><a href="../paper/experiment_execution_queue.html">experiment_execution_queue</a></li><li><a href="../paper/experiment_matrix.html">experiment_matrix</a></li><li><a href="../paper/figure_table_inventory.html">figure_table_inventory</a></li><li><a href="../paper/improvement_log.html">improvement_log</a></li><li><a href="../paper/journal_appendix.html">journal_appendix</a></li><li><a href="../paper/journal_manuscript.html">journal_manuscript</a></li><li><a href="../paper/manuscript_draft.html">manuscript_draft</a></li><li><a href="../paper/manuscript_outline.html">manuscript_outline</a></li><li><a href="../paper/paper_improvement_cycles.html">paper_improvement_cycles</a></li><li><a href="../paper/paper_package_inventory.html">paper_package_inventory</a></li><li><a href="../paper/paper_readiness_map.html">paper_readiness_map</a></li><li><a href="../paper/protocols/budget_normalized_seed_policy_protocol.html">budget_normalized_seed_policy_protocol</a></li><li><a href="../paper/protocols/human_pairwise_evaluation_protocol.html">human_pairwise_evaluation_protocol</a></li><li><a href="../paper/protocols/minimal_baseline_protocol.html">minimal_baseline_protocol</a></li><li><a href="../paper/protocols/oracle_target_recovery_protocol.html">oracle_target_recovery_protocol</a></li><li><a href="../paper/protocols/updater_ablation_protocol.html">updater_ablation_protocol</a></li><li><a href="../paper/publication_plan.html">publication_plan</a></li><li><a href="../paper/reader_confusion_notes.html">reader_confusion_notes</a></li><li><a href="../paper/index.html">paper</a></li><li><a href="../paper/related_work_draft.html">related_work_draft</a></li><li><a href="../paper/related_work_scaffold.html">related_work_scaffold</a></li><li><a href="../paper/reproducibility_checklist.html">reproducibility_checklist</a></li><li><a href="../paper/results/baseline_matrix/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_summary.html">pilot_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_table.html">pilot_table</a></li><li><a href="../paper/results/baseline_matrix/index.html">baseline_matrix</a></li><li><a href="../paper/results/baseline_matrix/seed_robustness.html">seed_robustness</a></li><li><a href="../paper/results/budget_matched_direct_baselines/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/budget_matched_direct_baselines/index.html">budget_matched_direct_baselines</a></li><li><a href="../paper/results/human_pairwise_evaluation/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/human_pairwise_evaluation/index.html">human_pairwise_evaluation</a></li><li><a href="../paper/results/method_extension_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/method_extension_comparison/index.html">method_extension_comparison</a></li><li><a href="../paper/results/oracle_caption_metric_extension/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_caption_metric_extension/index.html">oracle_caption_metric_extension</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/index.html">oracle_incumbent_policy_compact</a></li><li><a href="../paper/results/oracle_inspired_methods/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_inspired_methods/index.html">oracle_inspired_methods</a></li><li><a href="../paper/results/oracle_multimetric_repeated/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_multimetric_repeated/index.html">oracle_multimetric_repeated</a></li><li><a href="../paper/results/oracle_plateau_escape/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape/index.html">oracle_plateau_escape</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/index.html">oracle_plateau_escape_soft_control</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/index.html">oracle_plateau_escape_stagnation_control</a></li><li><a href="../paper/results/oracle_plateau_reformulation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_reformulation/index.html">oracle_plateau_reformulation</a></li><li><a href="../paper/results/oracle_progress_diagnosis/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_diagnosis/index.html">oracle_progress_diagnosis</a></li><li><a href="../paper/results/oracle_progress_followup/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_followup/index.html">oracle_progress_followup</a></li><li><a href="../paper/results/oracle_target_recovery/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_target_recovery/index.html">oracle_target_recovery</a></li><li><a href="../paper/results/sampler_feedback_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/sampler_feedback_comparison/index.html">sampler_feedback_comparison</a></li><li><a href="../paper/results/seed_policy_slice/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/seed_policy_slice/index.html">seed_policy_slice</a></li><li><a href="../paper/results/steering_mode_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison/index.html">steering_mode_comparison</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/index.html">steering_mode_comparison_smoke</a></li><li><a href="../paper/results/updater_ablation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/updater_ablation/index.html">updater_ablation</a></li><li><a href="../paper/terminology_ledger.html">terminology_ledger</a></li><li><a href="../paper/title_abstract_variants.html">title_abstract_variants</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/configuration_manual.md">View source Markdown</a></p>
+        <h1 id="configuration-manual">Configuration Manual</h1>
+<h2 id="purpose">Purpose</h2>
+<p>This guide explains how StableSteering configuration works today, with a focus on the prompt-first session setup flow.</p>
+<p>It is the reference document for:</p>
+<ul>
+<li>per-session YAML configuration in the HTML setup page</li>
+<li>how YAML maps to backend <code>StrategyConfig</code> values</li>
+<li>which parameters affect generation, steering, and feedback behavior</li>
+<li>how to safely edit, reset, and validate session config</li>
+</ul>
+<p>For the shortest run path, see <a href="quick_start.html">quick_start.md</a>.
+For the code-level view, see <a href="developer_guide.html">developer_guide.md</a>.
+For the user-facing workflow, see <a href="user_guide.html">user_guide.md</a>.</p>
+<h2 id="where-configuration-lives">Where Configuration Lives</h2>
+<p>StableSteering currently uses configuration at two different levels.</p>
+<h3 id="1-runtime-environment-configuration">1. Runtime Environment Configuration</h3>
+<p>This controls how the app process runs.
+Examples include:</p>
+<ul>
+<li>active backend</li>
+<li>GPU/device policy</li>
+<li>model location</li>
+<li>filesystem roots</li>
+</ul>
+<p>These values are loaded from application settings in the backend and are not the same as per-session strategy choices.</p>
+<p>Relevant code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config.py">config.py</a></li>
+</ul>
+<h3 id="2-per-session-strategy-configuration">2. Per-Session Strategy Configuration</h3>
+<p>This controls how one user session behaves.
+Examples include:</p>
+<ul>
+<li>sampler</li>
+<li>updater</li>
+<li>feedback mode</li>
+<li>candidate count</li>
+<li>image size</li>
+<li>trust radius</li>
+</ul>
+<p>These values are edited as YAML in the setup page and are parsed into <code>StrategyConfig</code> for each new session.</p>
+<p>Relevant code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/schema.py">schema.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/frontend/templates/setup.html">setup.html</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/frontend/static/app.js">app.js</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/main.py">main.py</a></li>
+</ul>
+<h2 id="session-setup-flow">Session Setup Flow</h2>
+<p>The current setup flow is:</p>
+<ol>
+<li>open <code>/setup</code></li>
+<li>enter the user text prompt</li>
+<li>optionally edit the negative prompt</li>
+<li>edit the YAML strategy block</li>
+<li>submit the setup form</li>
+<li>backend validates the YAML and creates:
+   - an experiment
+   - a session linked to that experiment</li>
+<li>browser opens the new session view</li>
+</ol>
+<p>The YAML block is reloaded fresh from the backend template when:</p>
+<ul>
+<li>the setup page is rendered</li>
+<li>the user clicks <code>Reload default YAML</code></li>
+</ul>
+<p>That makes each session configuration explicit and editable instead of being spread across several independent form controls.</p>
+<h2 id="setup-endpoints">Setup Endpoints</h2>
+<p>The setup page now uses these routes:</p>
+<ul>
+<li>
+<p><code>GET /setup</code>
+  Renders the HTML page and injects the default YAML template.</p>
+</li>
+<li>
+<p><code>GET /setup/config-template</code>
+  Returns the canonical default YAML as JSON.</p>
+</li>
+<li>
+<p><code>POST /setup/session</code>
+  Accepts prompt fields plus <code>config_yaml</code>, validates the YAML, creates the experiment, then creates the session.</p>
+</li>
+</ul>
+<p>This means the YAML document is the source of truth for per-session strategy configuration.</p>
+<p><img alt="YAML-to-runtime diagram" src="assets/illustrations/config_to_generation.svg"></p>
+<h2 id="yaml-template">YAML Template</h2>
+<p>The setup page starts from a backend-generated YAML document similar to this:</p>
+<pre><code class="language-yaml">sampler: exploit_orthogonal
+updater: winner_average
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.55
+stagnation_patience: 0
+stagnation_trust_radius_scale: 1.0
+anchor_strength: 0.7
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>The exact default text is rendered by:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+</ul>
+<h2 id="parameter-reference">Parameter Reference</h2>
+<h3 id="sampler"><code>sampler</code></h3>
+<p>Controls how candidate steering vectors are proposed for a round.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>random_local</code></li>
+<li><code>exploit_orthogonal</code></li>
+<li><code>uncertainty_guided</code></li>
+<li><code>axis_sweep</code></li>
+<li><code>incumbent_mix</code></li>
+<li><code>diversity_shell</code></li>
+<li><code>line_search</code></li>
+<li><code>plateau_escape</code></li>
+<li><code>annealed_shell</code></li>
+<li><code>spherical_cover</code></li>
+<li><code>two_scale_cover</code></li>
+<li><code>quality_diversity_mix</code></li>
+<li><code>restart_bridge_mix</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes how exploration behaves around the current steering state</li>
+<li>changes the balance between exploitation and diversity</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/random_local.py">random_local.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/exploit_orthogonal.py">exploit_orthogonal.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/uncertainty.py">uncertainty.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/axis_sweep.py">axis_sweep.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/incumbent_mix.py">incumbent_mix.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/diversity_shell.py">diversity_shell.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/line_search.py">line_search.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/plateau_escape.py">plateau_escape.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/annealed_shell.py">annealed_shell.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/spherical_cover.py">spherical_cover.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/two_scale_cover.py">two_scale_cover.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/quality_diversity_mix.py">quality_diversity_mix.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/samplers/restart_bridge_mix.py">restart_bridge_mix.py</a></li>
+</ul>
+<h3 id="updater"><code>updater</code></h3>
+<p>Controls how user feedback updates the incumbent steering state.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>winner_average</code></li>
+<li><code>winner_copy</code></li>
+<li><code>linear_preference</code></li>
+<li><code>score_weighted_preference</code></li>
+<li><code>contrastive_preference</code></li>
+<li><code>softmax_preference</code></li>
+<li><code>borda_preference</code></li>
+<li><code>bradley_terry_preference</code></li>
+<li><code>challenger_mixture_preference</code></li>
+<li><code>plackett_luce_preference</code></li>
+<li><code>advantage_softmax_preference</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>determines how aggressively the system moves toward the selected winner</li>
+<li>determines whether feedback is treated as winner-only, score-like, or contrastive evidence</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/winner_average.py">winner_average.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/winner_copy.py">winner_copy.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/linear_pref.py">linear_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/score_weighted.py">score_weighted.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/contrastive_pref.py">contrastive_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/softmax_pref.py">softmax_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/borda_pref.py">borda_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/bradley_terry_pref.py">bradley_terry_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/challenger_mixture.py">challenger_mixture.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/plackett_luce_pref.py">plackett_luce_pref.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/updaters/advantage_softmax_pref.py">advantage_softmax_pref.py</a></li>
+</ul>
+<h3 id="feedback_mode"><code>feedback_mode</code></h3>
+<p>Controls how the UI feedback payload is interpreted.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>scalar_rating</code></li>
+<li><code>pairwise</code></li>
+<li><code>top_k</code></li>
+<li><code>winner_only</code></li>
+<li><code>approve_reject</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes which session controls the frontend renders</li>
+<li>changes how the browser collects explicit user preference signals before normalization</li>
+</ul>
+<p>Related code:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/feedback/normalization.py">normalization.py</a></li>
+</ul>
+<p><img alt="Feedback modes diagram" src="assets/illustrations/feedback_modes.svg"></p>
+<h3 id="seed_policy"><code>seed_policy</code></h3>
+<p>Controls how seeds are assigned across rounds.</p>
+<p>Current value used by the MVP:</p>
+<ul>
+<li><code>fixed-per-round</code></li>
+<li><code>fixed-per-candidate</code></li>
+<li><code>fixed-per-candidate-role</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>
+<p><code>fixed-per-round</code>
+  All newly rendered candidates in the round share one seed. This is the cleanest way to reduce within-round seed noise.</p>
+</li>
+<li>
+<p><code>fixed-per-candidate</code>
+  Each visible candidate position gets its own deterministic seed. This increases variation inside a batch.</p>
+</li>
+<li>
+<p><code>fixed-per-candidate-role</code>
+  Candidates with the same sampler role share one deterministic seed, while different roles get different seeds. This is useful when the sampler uses meaningful roles such as <code>explore</code>, <code>refine</code>, <code>challenger</code>, or <code>validation</code>.</p>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>round 1 baseline prompt and later carried-forward incumbents still participate in the policy metadata</li>
+<li>carried-forward incumbents preserve the original winning image and seed rather than being re-rendered under a new seed</li>
+<li>all policies are deterministic for the same session and round inputs</li>
+</ul>
+<h3 id="steering_mode"><code>steering_mode</code></h3>
+<p>Describes the steering representation family.</p>
+<p>Supported values:</p>
+<ul>
+<li><code>low_dimensional</code></li>
+<li><code>content_masked</code></li>
+<li><code>token_factorized</code></li>
+<li><code>token_vector_field</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>selects how the low-dimensional steering state is injected into prompt embeddings during generation</li>
+<li>changes whether the same hidden-space offset is shared by all tokens or modulated across content tokens</li>
+</ul>
+<p>Implemented behaviors:</p>
+<ul>
+<li><code>low_dimensional</code>
+  applies one shared hidden-space offset to every prompt token</li>
+<li><code>content_masked</code>
+  applies the same hidden-space offset only to content-bearing tokens and downweights special or padded tokens</li>
+<li><code>token_factorized</code>
+  applies a low-rank token-dependent offset so different prompt tokens can receive different steering perturbations</li>
+<li><code>token_vector_field</code>
+  applies a full token-by-hidden vector field so each content token receives its own steering vector rather than only a scaled copy of one shared hidden direction</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>all four modes use the same session-level steering vector <code>z_t</code></li>
+<li>the main difference is the operator that maps <code>z_t</code> into prompt-embedding space</li>
+<li>in the current compact oracle comparison, <code>content_masked</code> gave the strongest final CLIP score, while <code>low_dimensional</code> and <code>token_factorized</code> remained strongest on final DINOv2 and recovery delta</li>
+</ul>
+<h3 id="steering_dimension"><code>steering_dimension</code></h3>
+<p>Controls the size of the low-dimensional steering vector for the session.</p>
+<p>Typical values:</p>
+<ul>
+<li><code>3</code></li>
+<li><code>5</code></li>
+<li><code>8</code></li>
+</ul>
+<p>Effect:</p>
+<ul>
+<li>changes the length of the session steering vector <code>current_z</code></li>
+<li>changes the dimensionality samplers use when proposing candidate directions</li>
+<li>changes the baseline and incumbent vector length in replay, traces, and session state</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>this is a per-session YAML setting</li>
+<li>the same <code>steering_dimension</code> applies across <code>low_dimensional</code>, <code>content_masked</code>, <code>token_factorized</code>, and <code>token_vector_field</code></li>
+</ul>
+<h3 id="candidate_count"><code>candidate_count</code></h3>
+<p>Controls how many candidates are shown per round.</p>
+<p>Typical values:</p>
+<ul>
+<li><code>3</code></li>
+<li><code>4</code></li>
+<li><code>5</code></li>
+</ul>
+<p>Current round policy:</p>
+<ul>
+<li>round 1 includes the unmodified prompt baseline as candidate <code>0</code></li>
+<li>later rounds include the previous round winner as candidate <code>0</code></li>
+<li>remaining candidates come from the sampler</li>
+</ul>
+<p>This means <code>candidate_count</code> is the total visible batch size, not the number of newly sampled alternatives.</p>
+<h3 id="image_size"><code>image_size</code></h3>
+<p>Controls the rendered image size.</p>
+<p>Format:</p>
+<ul>
+<li><code>WIDTHxHEIGHT</code></li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li><code>512x512</code></li>
+<li><code>768x512</code></li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>the current real Diffusers path parses this string directly</li>
+<li>poor-quality settings can hurt output quality, especially with SD 1.5</li>
+</ul>
+<h3 id="trust_radius"><code>trust_radius</code></h3>
+<p>Controls how far the sampler is allowed to move from the current steering state.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values increase exploration</li>
+<li>smaller values keep proposals closer to the incumbent direction</li>
+</ul>
+<h3 id="stagnation_patience"><code>stagnation_patience</code></h3>
+<p>Controls how many consecutive rounds may end with the same selected image before the sampler widens challenger search.</p>
+<p>Effect:</p>
+<ul>
+<li><code>0</code> disables stagnation-triggered widening</li>
+<li>positive values activate a simple plateau detector based on repeated selected-image reuse across rounds</li>
+<li>when the threshold is reached, the orchestrator temporarily passes a larger effective trust radius into the sampler for the next round</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>this is a generic session-level control and is not tied to one specific sampler</li>
+<li>it is most useful with incumbent-carry-forward policies, where later rounds can otherwise freeze visibly</li>
+<li>the widening event is recorded in candidate generation metadata for trace and replay analysis</li>
+</ul>
+<h3 id="stagnation_trust_radius_scale"><code>stagnation_trust_radius_scale</code></h3>
+<p>Controls how much the effective trust radius is multiplied when stagnation escape is active.</p>
+<p>Effect:</p>
+<ul>
+<li>values above <code>1.0</code> widen challenger proposals after a plateau is detected</li>
+<li>larger values encourage more aggressive escape from repeated incumbent reuse</li>
+<li>values too large can reduce local refinement quality by over-exploring</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>only applies when <code>stagnation_patience</code> is greater than <code>0</code></li>
+<li>this setting affects sampling, not rendering directly</li>
+</ul>
+<h3 id="anchor_strength"><code>anchor_strength</code></h3>
+<p>Controls how strongly the latent steering vector perturbs the encoded prompt embedding.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values make candidate steering offsets more pronounced</li>
+<li>smaller values keep steered candidates closer to the raw prompt embedding</li>
+<li>this now directly affects Diffusers prompt-embedding steering and is persisted in candidate generation metadata</li>
+</ul>
+<h3 id="guidance_scale"><code>guidance_scale</code></h3>
+<p>Controls classifier-free guidance strength during image generation.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values usually push images to follow the prompt more literally</li>
+<li>smaller values allow looser, sometimes more varied interpretation</li>
+<li>this now directly affects both real Diffusers rendering and mock trace artifacts</li>
+</ul>
+<h3 id="num_inference_steps"><code>num_inference_steps</code></h3>
+<p>Controls how many denoising steps the diffusion pipeline runs per image.</p>
+<p>Effect:</p>
+<ul>
+<li>larger values typically improve quality and prompt faithfulness at the cost of latency</li>
+<li>smaller values are faster but can degrade image quality or stability</li>
+<li>this now directly affects both real Diffusers rendering and mock trace artifacts</li>
+</ul>
+<h3 id="model_name"><code>model_name</code></h3>
+<p>Selects the model checkpoint for the session.</p>
+<p>Current default:</p>
+<ul>
+<li><code>runwayml/stable-diffusion-v1-5</code></li>
+</ul>
+<p>Important note:</p>
+<ul>
+<li>if a prepared local model matching this Hugging Face id exists, the real backend loads and caches that model for the session</li>
+<li>if the model is missing, session generation fails clearly instead of silently ignoring the setting</li>
+<li>this field now directly affects the real generation backend and is stored in candidate generation metadata</li>
+</ul>
+<h2 id="validation-rules">Validation Rules</h2>
+<p>The YAML editor is flexible, but it is not free-form.
+The backend validates the YAML against <code>StrategyConfig</code>.</p>
+<p>Validation happens in:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/core/config_yaml.py">config_yaml.py</a></li>
+</ul>
+<p>Current validation behavior:</p>
+<ul>
+<li>invalid YAML syntax is rejected</li>
+<li>non-mapping YAML is rejected</li>
+<li>missing required structure falls back only where <code>StrategyConfig</code> defines defaults</li>
+<li>invalid enum-like values are rejected by schema validation</li>
+<li>invalid numeric types are rejected by schema validation</li>
+</ul>
+<p>If validation fails, the setup request returns a structured API error.</p>
+<h2 id="practical-editing-guidance">Practical Editing Guidance</h2>
+<p>Good workflow:</p>
+<ol>
+<li>start from the default YAML</li>
+<li>change one or two parameters at a time</li>
+<li>create a session</li>
+<li>observe the session behavior</li>
+<li>compare the resulting trace report and replay</li>
+</ol>
+<p>Recommended beginner changes:</p>
+<ul>
+<li>switch <code>sampler</code></li>
+<li>switch <code>updater</code></li>
+<li>change <code>candidate_count</code> from <code>5</code> to <code>3</code> or <code>6</code></li>
+<li>increase or decrease <code>trust_radius</code></li>
+</ul>
+<p>Changes to make carefully:</p>
+<ul>
+<li>unusual <code>image_size</code></li>
+<li>very large <code>candidate_count</code></li>
+<li>nonzero stagnation widening with already aggressive samplers</li>
+<li>combinations that make comparisons harder rather than easier</li>
+</ul>
+<h2 id="relationship-to-runtime-settings">Relationship To Runtime Settings</h2>
+<p>Per-session YAML does not override every backend runtime rule.</p>
+<p>Examples of process-level rules that still apply:</p>
+<ul>
+<li>GPU-only real Diffusers runtime by default</li>
+<li>no silent fallback to the mock backend</li>
+<li>model preparation requirements</li>
+<li>trace and artifact storage locations</li>
+</ul>
+<p>So the session YAML controls the strategy of the run, while the app settings control the environment in which the run is executed.</p>
+<h2 id="example-configurations">Example Configurations</h2>
+<h3 id="conservative-comparison-session">Conservative Comparison Session</h3>
+<pre><code class="language-yaml">sampler: random_local
+updater: winner_average
+feedback_mode: scalar_rating
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.25
+anchor_strength: 0.35
+guidance_scale: 7.0
+num_inference_steps: 20
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want stable nearby comparisons</li>
+<li>you want smoother updates between rounds</li>
+</ul>
+<h3 id="more-exploratory-session">More Exploratory Session</h3>
+<pre><code class="language-yaml">sampler: uncertainty_guided
+updater: linear_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.4
+anchor_strength: 0.45
+guidance_scale: 7.5
+num_inference_steps: 24
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want broader exploration around the current direction</li>
+<li>you want stronger movement after feedback</li>
+</ul>
+<h3 id="diversity-forward-search-session">Diversity-Forward Search Session</h3>
+<pre><code class="language-yaml">sampler: diversity_shell
+updater: linear_preference
+feedback_mode: winner_only
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want the first few rounds to cover clearly separated alternatives</li>
+<li>you want challenger candidates to probe farther from the incumbent</li>
+</ul>
+<h3 id="directional-search-session">Directional Search Session</h3>
+<pre><code class="language-yaml">sampler: line_search
+updater: linear_preference
+feedback_mode: winner_only
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want one batch to test forward, backtrack, and lateral moves explicitly</li>
+<li>you want candidate roles to read more like a local search step than a random spread</li>
+</ul>
+<h3 id="pairwise-preference-session">Pairwise Preference Session</h3>
+<pre><code class="language-yaml">sampler: exploit_orthogonal
+updater: winner_copy
+feedback_mode: pairwise
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 3
+image_size: 512x512
+trust_radius: 0.3
+anchor_strength: 0.35
+guidance_scale: 8.0
+num_inference_steps: 20
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want sharper A/B-style comparisons</li>
+<li>you want the winner to become the new incumbent exactly</li>
+</ul>
+<h3 id="axis-sweep-ranking-session">Axis Sweep Ranking Session</h3>
+<pre><code class="language-yaml">sampler: axis_sweep
+updater: linear_preference
+feedback_mode: top_k
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.34
+anchor_strength: 0.4
+guidance_scale: 7.5
+num_inference_steps: 22
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want more interpretable positive/negative axis probes</li>
+<li>you want to rank the full batch rather than select only one winner</li>
+</ul>
+<h3 id="score-weighted-rating-session">Score-Weighted Rating Session</h3>
+<pre><code class="language-yaml">sampler: exploit_orthogonal
+updater: score_weighted_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.55
+anchor_strength: 0.7
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want star ratings to influence the update more richly than winner-only selection</li>
+<li>you want strong ratings to pull the next state toward a weighted centroid</li>
+</ul>
+<h3 id="plateau-escape-session">Plateau-Escape Session</h3>
+<pre><code class="language-yaml">sampler: plateau_escape
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.78
+stagnation_patience: 1
+stagnation_trust_radius_scale: 1.35
+anchor_strength: 0.9
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want later rounds to keep proposing serious challengers instead of drifting into incumbent-only repetition</li>
+<li>you want score-rich feedback to update the next state with a softmax-weighted preference aggregation</li>
+<li>you are running oracle-style or analyst-style sessions where visible plateau behavior matters as much as final best score</li>
+</ul>
+<h3 id="restart-bridge-session">Restart-Bridge Session</h3>
+<pre><code class="language-yaml">sampler: restart_bridge_mix
+updater: advantage_softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+stagnation_patience: 1
+stagnation_trust_radius_scale: 1.2
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 12
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want one round to mix incumbent-adjacent refinements with partial restarts into new regions</li>
+<li>you want feedback to reward challengers that beat the incumbent without discarding the incumbent entirely</li>
+<li>you are diagnosing late-round plateauing and want a softer alternative to hard incumbent cooldown</li>
+</ul>
+<h3 id="annealed-shell-session">Annealed Shell Session</h3>
+<pre><code class="language-yaml">sampler: annealed_shell
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.68
+anchor_strength: 0.82
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want early rounds to explore broadly and later rounds to refine automatically</li>
+<li>you want a diversity-forward sampler that still becomes more local as the session progresses</li>
+</ul>
+<h3 id="spherical-cover-session">Spherical Cover Session</h3>
+<pre><code class="language-yaml">sampler: spherical_cover
+updater: softmax_preference
+feedback_mode: scalar_rating
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.68
+anchor_strength: 0.82
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want each round to cover more angularly separated challenger directions</li>
+<li>you want the sampler to behave more like a geometric cover than a local line probe</li>
+</ul>
+<h3 id="contrastive-ranking-session">Contrastive Ranking Session</h3>
+<pre><code class="language-yaml">sampler: exploit_orthogonal
+updater: contrastive_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.55
+anchor_strength: 0.7
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want the update to move toward the top-ranked subset and away from the bottom-ranked subset</li>
+<li>you want ranking information to matter more than a single winner</li>
+</ul>
+<h3 id="borda-ranking-session">Borda Ranking Session</h3>
+<pre><code class="language-yaml">sampler: diversity_shell
+updater: borda_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want a full batch ranking to matter, but in an ordinal rather than score-calibrated way</li>
+<li>you want the update to reward the whole upper ranking rather than only the winner</li>
+</ul>
+<h3 id="bradley-terry-ranking-session">Bradley-Terry Ranking Session</h3>
+<pre><code class="language-yaml">sampler: diversity_shell
+updater: bradley_terry_preference
+feedback_mode: top_k
+seed_policy: fixed-per-candidate
+steering_mode: low_dimensional
+steering_dimension: 5
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.65
+anchor_strength: 0.8
+guidance_scale: 7.5
+num_inference_steps: 15
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want ranking feedback to be interpreted as pairwise evidence over the whole candidate set</li>
+<li>you want a more explicit latent-utility model than winner-only or centroid-only updates</li>
+</ul>
+<h3 id="approve-reject-session">Approve / Reject Session</h3>
+<pre><code class="language-yaml">sampler: incumbent_mix
+updater: winner_average
+feedback_mode: approve_reject
+seed_policy: fixed-per-round
+steering_mode: low_dimensional
+candidate_count: 5
+image_size: 512x512
+trust_radius: 0.3
+anchor_strength: 0.35
+guidance_scale: 7.2
+num_inference_steps: 18
+model_name: runwayml/stable-diffusion-v1-5
+</code></pre>
+<p>Use this when:</p>
+<ul>
+<li>you want to quickly mark acceptable vs unacceptable options</li>
+<li>you still want one approved candidate to become the update target</li>
+</ul>
+<h2 id="where-to-learn-more">Where To Learn More</h2>
+<ul>
+<li><a href="quick_start.html">quick_start.md</a></li>
+<li><a href="user_guide.html">user_guide.md</a></li>
+<li><a href="developer_guide.html">developer_guide.md</a></li>
+<li><a href="student_tutorial.html">student_tutorial.md</a></li>
+<li><a href="system_specification.html">system_specification.md</a></li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

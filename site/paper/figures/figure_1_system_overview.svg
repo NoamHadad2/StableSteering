@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">StableSteering runtime flow</title>
+  <desc id="desc">Diagram showing the frontend, API, orchestrator, sampling, updating, generation, storage, and tracing flow.</desc>
+  <style>
+    .bg { fill: #fbfaf5; }
+    .panel { fill: #fffdf8; stroke: #2f3b52; stroke-width: 2; rx: 18; ry: 18; }
+    .core { fill: #e8f0ff; }
+    .io { fill: #e8f7ef; }
+    .trace { fill: #fff1db; }
+    .title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .label { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .body { font: 16px 'Segoe UI', Arial, sans-serif; fill: #344054; }
+    .small { font: 14px 'Segoe UI', Arial, sans-serif; fill: #475467; }
+    .arrow { stroke: #476082; stroke-width: 3.5; fill: none; marker-end: url(#arrow); }
+    .dash { stroke-dasharray: 10 8; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#476082"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="760"/>
+  <text class="title" x="60" y="58">StableSteering Runtime Architecture</text>
+
+  <rect class="panel io" x="60" y="110" width="240" height="150"/>
+  <text class="label" x="85" y="150">Frontend</text>
+  <text class="body" x="85" y="182">Prompt-first setup page</text>
+  <text class="body" x="85" y="208">Session view and progress UI</text>
+  <text class="body" x="85" y="234">Replay and trace-report links</text>
+
+  <rect class="panel core" x="360" y="110" width="240" height="150"/>
+  <text class="label" x="385" y="150">FastAPI Routes</text>
+  <text class="body" x="385" y="182">Session creation</text>
+  <text class="body" x="385" y="208">Async job endpoints</text>
+  <text class="body" x="385" y="234">Diagnostics and replay</text>
+
+  <rect class="panel core" x="660" y="110" width="260" height="170"/>
+  <text class="label" x="685" y="150">Orchestrator</text>
+  <text class="body" x="685" y="182">Session and round lifecycle</text>
+  <text class="body" x="685" y="208">Baseline and incumbent policy</text>
+  <text class="body" x="685" y="234">Feedback validation</text>
+  <text class="body" x="685" y="260">Replay export</text>
+
+  <rect class="panel io" x="980" y="110" width="160" height="150"/>
+  <text class="label" x="1005" y="150">SQLite</text>
+  <text class="body" x="1005" y="182">Experiments</text>
+  <text class="body" x="1005" y="208">Sessions</text>
+  <text class="body" x="1005" y="234">Rounds</text>
+
+  <rect class="panel core" x="300" y="360" width="220" height="150"/>
+  <text class="label" x="325" y="400">Samplers</text>
+  <text class="body" x="325" y="432">random_local</text>
+  <text class="body" x="325" y="458">axis_sweep</text>
+  <text class="body" x="325" y="484">incumbent_mix and others</text>
+
+  <rect class="panel core" x="560" y="360" width="220" height="150"/>
+  <text class="label" x="585" y="400">Updaters</text>
+  <text class="body" x="585" y="432">winner_average</text>
+  <text class="body" x="585" y="458">winner_copy</text>
+  <text class="body" x="585" y="484">linear_preference</text>
+
+  <rect class="panel io" x="820" y="340" width="260" height="190"/>
+  <text class="label" x="845" y="380">Generation Engine</text>
+  <text class="body" x="845" y="412">Diffusers pipeline on GPU</text>
+  <text class="body" x="845" y="438">Prompt plus steering offset</text>
+  <text class="body" x="845" y="464">Guidance, steps, image size</text>
+  <text class="body" x="845" y="490">Rendered candidate artifacts</text>
+
+  <rect class="panel trace" x="60" y="570" width="1080" height="130"/>
+  <text class="label" x="85" y="610">Tracing and Reports</text>
+  <text class="body" x="85" y="642">Backend events, frontend events, saved HTML session report, diagnostics snapshot, and replay-friendly provenance.</text>
+  <text class="small" x="85" y="672">Artifacts live on disk while structured records live in SQLite.</text>
+
+  <path class="arrow" d="M300 185 L360 185"/>
+  <path class="arrow" d="M600 185 L660 185"/>
+  <path class="arrow" d="M920 185 L980 185"/>
+  <path class="arrow" d="M770 280 L770 330"/>
+  <path class="arrow" d="M660 205 C590 230, 510 300, 450 360"/>
+  <path class="arrow" d="M730 280 C700 320, 690 330, 670 360"/>
+  <path class="arrow" d="M520 435 L560 435"/>
+  <path class="arrow" d="M780 435 L820 435"/>
+  <path class="arrow dash" d="M960 530 L960 570"/>
+  <path class="arrow dash" d="M770 280 C650 520, 420 555, 260 570"/>
+  <path class="arrow dash" d="M180 260 L180 570"/>
+
+  <text class="small" x="314" y="338">candidate proposals</text>
+  <text class="small" x="578" y="338">feedback-driven update</text>
+  <text class="small" x="835" y="320">render images</text>
+</svg>

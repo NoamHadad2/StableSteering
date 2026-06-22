@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>system_specification | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../paper/caption_style_guide.html">caption_style_guide</a></li><li><a href="../paper/case_study_summary.html">case_study_summary</a></li><li><a href="../paper/claim_audit.html">claim_audit</a></li><li><a href="../paper/claim_evidence_matrix.html">claim_evidence_matrix</a></li><li><a href="../paper/contribution_statement.html">contribution_statement</a></li><li><a href="../paper/evidence_inventory.html">evidence_inventory</a></li><li><a href="../paper/experiment_execution_queue.html">experiment_execution_queue</a></li><li><a href="../paper/experiment_matrix.html">experiment_matrix</a></li><li><a href="../paper/figure_table_inventory.html">figure_table_inventory</a></li><li><a href="../paper/improvement_log.html">improvement_log</a></li><li><a href="../paper/journal_appendix.html">journal_appendix</a></li><li><a href="../paper/journal_manuscript.html">journal_manuscript</a></li><li><a href="../paper/manuscript_draft.html">manuscript_draft</a></li><li><a href="../paper/manuscript_outline.html">manuscript_outline</a></li><li><a href="../paper/paper_improvement_cycles.html">paper_improvement_cycles</a></li><li><a href="../paper/paper_package_inventory.html">paper_package_inventory</a></li><li><a href="../paper/paper_readiness_map.html">paper_readiness_map</a></li><li><a href="../paper/protocols/budget_normalized_seed_policy_protocol.html">budget_normalized_seed_policy_protocol</a></li><li><a href="../paper/protocols/human_pairwise_evaluation_protocol.html">human_pairwise_evaluation_protocol</a></li><li><a href="../paper/protocols/minimal_baseline_protocol.html">minimal_baseline_protocol</a></li><li><a href="../paper/protocols/oracle_target_recovery_protocol.html">oracle_target_recovery_protocol</a></li><li><a href="../paper/protocols/updater_ablation_protocol.html">updater_ablation_protocol</a></li><li><a href="../paper/publication_plan.html">publication_plan</a></li><li><a href="../paper/reader_confusion_notes.html">reader_confusion_notes</a></li><li><a href="../paper/index.html">paper</a></li><li><a href="../paper/related_work_draft.html">related_work_draft</a></li><li><a href="../paper/related_work_scaffold.html">related_work_scaffold</a></li><li><a href="../paper/reproducibility_checklist.html">reproducibility_checklist</a></li><li><a href="../paper/results/baseline_matrix/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_summary.html">pilot_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_table.html">pilot_table</a></li><li><a href="../paper/results/baseline_matrix/index.html">baseline_matrix</a></li><li><a href="../paper/results/baseline_matrix/seed_robustness.html">seed_robustness</a></li><li><a href="../paper/results/budget_matched_direct_baselines/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/budget_matched_direct_baselines/index.html">budget_matched_direct_baselines</a></li><li><a href="../paper/results/human_pairwise_evaluation/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/human_pairwise_evaluation/index.html">human_pairwise_evaluation</a></li><li><a href="../paper/results/method_extension_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/method_extension_comparison/index.html">method_extension_comparison</a></li><li><a href="../paper/results/oracle_caption_metric_extension/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_caption_metric_extension/index.html">oracle_caption_metric_extension</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/index.html">oracle_incumbent_policy_compact</a></li><li><a href="../paper/results/oracle_inspired_methods/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_inspired_methods/index.html">oracle_inspired_methods</a></li><li><a href="../paper/results/oracle_multimetric_repeated/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_multimetric_repeated/index.html">oracle_multimetric_repeated</a></li><li><a href="../paper/results/oracle_plateau_escape/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape/index.html">oracle_plateau_escape</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/index.html">oracle_plateau_escape_soft_control</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/index.html">oracle_plateau_escape_stagnation_control</a></li><li><a href="../paper/results/oracle_plateau_reformulation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_reformulation/index.html">oracle_plateau_reformulation</a></li><li><a href="../paper/results/oracle_progress_diagnosis/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_diagnosis/index.html">oracle_progress_diagnosis</a></li><li><a href="../paper/results/oracle_progress_followup/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_followup/index.html">oracle_progress_followup</a></li><li><a href="../paper/results/oracle_target_recovery/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_target_recovery/index.html">oracle_target_recovery</a></li><li><a href="../paper/results/sampler_feedback_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/sampler_feedback_comparison/index.html">sampler_feedback_comparison</a></li><li><a href="../paper/results/seed_policy_slice/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/seed_policy_slice/index.html">seed_policy_slice</a></li><li><a href="../paper/results/steering_mode_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison/index.html">steering_mode_comparison</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/index.html">steering_mode_comparison_smoke</a></li><li><a href="../paper/results/updater_ablation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/updater_ablation/index.html">updater_ablation</a></li><li><a href="../paper/terminology_ledger.html">terminology_ledger</a></li><li><a href="../paper/title_abstract_variants.html">title_abstract_variants</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/system_specification.md">View source Markdown</a></p>
+        <h1 id="system-specification">System Specification</h1>
+<h2 id="1-document-role">1. Document Role</h2>
+<p>This document defines what the research platform must do, what components it contains, and what contracts must remain stable during implementation.</p>
+<p>It is the primary functional specification for:</p>
+<ul>
+<li>application structure</li>
+<li>state and data contracts</li>
+<li>API behavior</li>
+<li>session and round lifecycle</li>
+<li>replay and reproducibility requirements</li>
+</ul>
+<p>Related documents:</p>
+<ul>
+<li><a href="motivation.html">motivation.md</a></li>
+<li><a href="theoretical_background.html">theoretical_background.md</a></li>
+<li><a href="system_test_specification.html">system_test_specification.md</a></li>
+<li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint.md</a></li>
+</ul>
+<h2 id="2-scope">2. Scope</h2>
+<p>This specification covers the research prototype used to study interactive prompt-embedding steering for diffusion models.</p>
+<p>It includes:</p>
+<ul>
+<li>frontend behavior</li>
+<li>backend services</li>
+<li>experiment, session, round, and candidate state</li>
+<li>persistence and replay</li>
+<li>strategy interfaces and constraints</li>
+<li>logging and reproducibility</li>
+<li>tracing and debugging surfaces</li>
+</ul>
+<p>It does not define:</p>
+<ul>
+<li>production deployment architecture</li>
+<li>large-scale multi-tenant operations</li>
+<li>enterprise-grade security</li>
+<li>model training or fine-tuning pipelines</li>
+</ul>
+<h2 id="3-system-goals">3. System Goals</h2>
+<p>The system must:</p>
+<ul>
+<li>support repeatable interactive steering sessions</li>
+<li>support multiple sampling, feedback, and update strategies</li>
+<li>preserve enough state for replay and analysis</li>
+<li>isolate randomness as much as practical</li>
+<li>stay simple enough for rapid research iteration</li>
+</ul>
+<h2 id="4-high-level-system-overview">4. High-Level System Overview</h2>
+<p>The system consists of six major parts:</p>
+<ol>
+<li><strong>Frontend</strong>: interface for prompt entry, image display, feedback collection, replay, and export</li>
+<li><strong>Experiment Controller</strong>: orchestrates session lifecycle and round progression</li>
+<li><strong>Generation Engine</strong>: encodes prompts, applies steering, and renders images</li>
+<li><strong>Sampling Module</strong>: proposes steering candidates under a configured policy</li>
+<li><strong>Preference / Update Module</strong>: learns from feedback and computes the next incumbent</li>
+<li><strong>Storage and Evaluation Layer</strong>: persists state, computes metrics, and reconstructs replay data</li>
+</ol>
+<p><img alt="Runtime architecture diagram" src="assets/illustrations/runtime_flow.svg"></p>
+<h2 id="5-primary-user-workflow">5. Primary User Workflow</h2>
+<p>The canonical workflow is:</p>
+<ol>
+<li>create or load an experiment</li>
+<li>create a session with prompt and configuration</li>
+<li>encode the base prompt and initialize steering state</li>
+<li>propose round candidates</li>
+<li>render candidate images</li>
+<li>collect user feedback</li>
+<li>update preference state and incumbent steering vector</li>
+<li>repeat until the user stops</li>
+<li>export or replay the session</li>
+</ol>
+<h2 id="6-core-invariants">6. Core Invariants</h2>
+<p>The following must remain true:</p>
+<ul>
+<li>each session uses an immutable configuration snapshot</li>
+<li>each round belongs to exactly one session</li>
+<li>each candidate belongs to exactly one round</li>
+<li>feedback is attached to exactly one round</li>
+<li>feedback for a round is accepted at most once</li>
+<li>seed information is persisted for every rendered candidate</li>
+<li>replay data is sufficient to reconstruct decision history</li>
+<li>session state is durable after each completed round and feedback submission</li>
+<li>a new round cannot be generated while the session is still awaiting feedback for the current round</li>
+</ul>
+<h2 id="7-core-research-abstractions">7. Core Research Abstractions</h2>
+<h3 id="71-experiment">7.1 Experiment</h3>
+<p>An experiment defines a reusable research configuration.</p>
+<p>Required fields:</p>
+<ul>
+<li>experiment ID</li>
+<li>title</li>
+<li>description</li>
+<li>created timestamp</li>
+<li>model checkpoint</li>
+<li>steering mode</li>
+<li>sampler strategy</li>
+<li>feedback strategy</li>
+<li>update strategy</li>
+<li>seed policy</li>
+<li>candidate count</li>
+<li>trust-region settings</li>
+<li>anchoring settings</li>
+<li>status</li>
+<li>researcher notes</li>
+</ul>
+<h3 id="72-session">7.2 Session</h3>
+<p>A session is one interactive run of one experiment with one prompt.</p>
+<p>Required fields:</p>
+<ul>
+<li>session ID</li>
+<li>experiment ID</li>
+<li>prompt text</li>
+<li>negative prompt text</li>
+<li>model name</li>
+<li>base embedding cache key</li>
+<li>steering basis configuration</li>
+<li>current state <code>z_t</code></li>
+<li>current round index</li>
+<li>incumbent candidate ID if available</li>
+<li>session status</li>
+<li>final selected candidate if available</li>
+</ul>
+<h3 id="73-round">7.3 Round</h3>
+<p>A round is one propose-render-feedback-update cycle.</p>
+<p>Required fields:</p>
+<ul>
+<li>round ID</li>
+<li>session ID</li>
+<li>round index</li>
+<li>incumbent <code>z_t</code></li>
+<li>sampled candidate list</li>
+<li>seed policy used</li>
+<li>render status</li>
+<li>user feedback summary</li>
+<li>update summary</li>
+<li>latency metrics</li>
+</ul>
+<h3 id="74-candidate">7.4 Candidate</h3>
+<p>A candidate is one proposed point in steering space.</p>
+<p>Required fields:</p>
+<ul>
+<li>candidate ID</li>
+<li>round ID</li>
+<li>candidate index within round</li>
+<li>steering vector <code>z</code></li>
+<li>embedding offset metadata</li>
+<li>sampler role</li>
+<li>predicted score if available</li>
+<li>predicted uncertainty if available</li>
+<li>seed</li>
+<li>generation parameters</li>
+<li>image path or URL</li>
+<li>render status</li>
+</ul>
+<h3 id="75-feedback-event">7.5 Feedback Event</h3>
+<p>A feedback event records one user action on a round.</p>
+<p>Required fields:</p>
+<ul>
+<li>feedback ID</li>
+<li>round ID</li>
+<li>candidate IDs involved</li>
+<li>feedback type</li>
+<li>payload</li>
+<li>optional critique text</li>
+<li>timestamp</li>
+<li>normalized internal representation</li>
+</ul>
+<h2 id="8-lifecycle-state-model">8. Lifecycle State Model</h2>
+<h3 id="81-experiment-states">8.1 Experiment states</h3>
+<p>Recommended states:</p>
+<ul>
+<li><code>draft</code></li>
+<li><code>active</code></li>
+<li><code>paused</code></li>
+<li><code>completed</code></li>
+<li><code>archived</code></li>
+</ul>
+<h3 id="82-session-states">8.2 Session states</h3>
+<p>Recommended states:</p>
+<ul>
+<li><code>created</code></li>
+<li><code>ready</code></li>
+<li><code>awaiting_feedback</code></li>
+<li><code>updating</code></li>
+<li><code>completed</code></li>
+<li><code>failed</code></li>
+</ul>
+<p><img alt="Session lifecycle diagram" src="assets/illustrations/session_lifecycle.svg">
+- <code>paused</code></p>
+<h3 id="83-candidate-render-states">8.3 Candidate render states</h3>
+<p>Recommended states:</p>
+<ul>
+<li><code>pending</code></li>
+<li><code>rendering</code></li>
+<li><code>succeeded</code></li>
+<li><code>failed</code></li>
+</ul>
+<h2 id="9-frontend-specification">9. Frontend Specification</h2>
+<h3 id="91-design-principles">9.1 Design principles</h3>
+<p>The frontend should be intentionally simple:</p>
+<ul>
+<li>plain HTML with minimal JavaScript</li>
+<li>minimal hidden state</li>
+<li>easy DOM inspection and debugging</li>
+<li>accessible controls</li>
+<li>predictable interaction patterns across rounds</li>
+<li>a visible trace surface during interactive use</li>
+</ul>
+<h3 id="92-main-pages">9.2 Main pages</h3>
+<h4 id="a-experiment-dashboard">A. Experiment Dashboard</h4>
+<p>Purpose:</p>
+<ul>
+<li>create a new experiment</li>
+<li>list existing experiments</li>
+<li>resume a session</li>
+<li>compare results</li>
+<li>export logs</li>
+</ul>
+<p>Required elements:</p>
+<ul>
+<li>experiment list</li>
+<li>summary columns</li>
+<li>filters by model, strategy, and date</li>
+<li>create experiment action</li>
+<li>resume session action</li>
+<li>export links</li>
+</ul>
+<h4 id="b-session-setup-page">B. Session Setup Page</h4>
+<p>Required inputs:</p>
+<ul>
+<li>prompt text</li>
+<li>negative prompt text</li>
+<li>model checkpoint selector</li>
+<li>image size</li>
+<li>number of candidates per round</li>
+<li>seed policy selector</li>
+<li>sampler selector</li>
+<li>feedback selector</li>
+<li>updater selector</li>
+<li>trust-region parameters</li>
+<li>anchor strength</li>
+</ul>
+<p>Required actions:</p>
+<ul>
+<li>start session</li>
+<li>save preset</li>
+<li>load preset</li>
+</ul>
+<h4 id="c-interactive-steering-page">C. Interactive Steering Page</h4>
+<p>Required layout:</p>
+<ul>
+<li>header with experiment and round metadata</li>
+<li>control panel</li>
+<li>candidate image grid</li>
+<li>state summary panel</li>
+<li>trace panel</li>
+</ul>
+<p>Required actions:</p>
+<ul>
+<li>next round</li>
+<li>regenerate current round</li>
+<li>pause session</li>
+<li>revert to previous round if supported</li>
+<li>pin candidate as incumbent</li>
+<li>mark candidate as favorite</li>
+<li>export round data</li>
+</ul>
+<p>Required grid behavior:</p>
+<ul>
+<li>show 4 to 12 images per round</li>
+<li>use consistent candidate labeling</li>
+<li>display metadata on demand</li>
+<li>support image zoom</li>
+<li>preserve stable ordering within a round</li>
+</ul>
+<p>Required feedback widgets:</p>
+<ul>
+<li>scalar rating</li>
+<li>rating-driven pairwise derivation</li>
+<li>rating-driven top-k derivation</li>
+<li>shortlist selection</li>
+<li>text critique entry</li>
+</ul>
+<h4 id="d-replay-analysis-page">D. Replay / Analysis Page</h4>
+<p>Purpose:</p>
+<ul>
+<li>replay completed rounds in order</li>
+<li>inspect candidates and feedback</li>
+<li>inspect trajectory summaries</li>
+<li>inspect metrics and exports</li>
+</ul>
+<h3 id="93-frontend-state-model">9.3 Frontend state model</h3>
+<p>The frontend should maintain:</p>
+<ul>
+<li>active experiment config snapshot</li>
+<li>active session ID</li>
+<li>current round number</li>
+<li>current candidate set</li>
+<li>local unsaved feedback state</li>
+<li>request status</li>
+<li>recoverable error messages</li>
+</ul>
+<h3 id="94-accessibility-requirements">9.4 Accessibility requirements</h3>
+<p>The interface must support:</p>
+<ul>
+<li>keyboard navigation</li>
+<li>visible labels without hover dependence</li>
+<li>non-color-only distinctions</li>
+<li>screen-readable control labels</li>
+<li>focus visibility for active controls</li>
+</ul>
+<h3 id="95-frontend-failure-behavior">9.5 Frontend failure behavior</h3>
+<p>The UI must:</p>
+<ul>
+<li>surface per-candidate failures without hiding successful candidates</li>
+<li>preserve unsaved feedback where possible after recoverable errors</li>
+<li>prevent double submission when a request is already in flight</li>
+<li>show the current round status clearly</li>
+<li>make trace and error information inspectable during debugging</li>
+</ul>
+<h2 id="10-backend-specification">10. Backend Specification</h2>
+<h3 id="101-recommended-stack">10.1 Recommended stack</h3>
+<p>Baseline stack:</p>
+<ul>
+<li>Python 3.11+</li>
+<li>FastAPI</li>
+<li>Diffusers</li>
+<li>SQLite for local research</li>
+<li>filesystem image storage</li>
+<li>Pydantic models</li>
+</ul>
+<h3 id="102-backend-modules">10.2 Backend modules</h3>
+<h4 id="a-api-layer">A. API layer</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>experiment management</li>
+<li>session creation and retrieval</li>
+<li>round generation</li>
+<li>feedback submission</li>
+<li>replay and export delivery</li>
+<li>trace event intake for the frontend</li>
+</ul>
+<h4 id="b-orchestrator">B. Orchestrator</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>initialize session state</li>
+<li>call sampler</li>
+<li>call generation manager</li>
+<li>persist round data</li>
+<li>call updater after feedback</li>
+<li>enforce lifecycle transitions</li>
+</ul>
+<h4 id="c-embedding-manager">C. Embedding manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>encode prompts</li>
+<li>cache text embeddings</li>
+<li>construct steering basis</li>
+<li>apply steering vector <code>z</code></li>
+<li>support pooled and token-level modes</li>
+</ul>
+<h4 id="d-sampling-manager">D. Sampling manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>produce candidates from current state</li>
+<li>apply trust-region constraints</li>
+<li>enforce diversity constraints</li>
+<li>label candidates by role</li>
+</ul>
+<h4 id="e-generation-manager">E. Generation manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>render images from embeddings</li>
+<li>manage seed policy</li>
+<li>collect latency and failure metadata</li>
+<li>expose deterministic test hooks</li>
+</ul>
+<h4 id="f-preference-update-manager">F. Preference / update manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>normalize feedback</li>
+<li>update preference model</li>
+<li>compute next incumbent state</li>
+<li>compute update summary</li>
+<li>apply stabilization controls</li>
+</ul>
+<h4 id="g-evaluation-manager">G. Evaluation manager</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>compute online metrics</li>
+<li>compute aggregate session metrics</li>
+<li>prepare exports and plots</li>
+</ul>
+<h4 id="h-storage-layer">H. Storage layer</h4>
+<p>Responsibilities:</p>
+<ul>
+<li>persist structured state</li>
+<li>persist artifacts</li>
+<li>provide repository interfaces</li>
+<li>support replay queries</li>
+</ul>
+<h2 id="11-data-model-specification">11. Data Model Specification</h2>
+<h3 id="111-core-tables-or-collections">11.1 Core tables or collections</h3>
+<h4 id="experiments">experiments</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+<li><code>name</code></li>
+<li><code>description</code></li>
+<li><code>status</code></li>
+<li><code>config_json</code></li>
+</ul>
+<h4 id="sessions">sessions</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>experiment_id</code></li>
+<li><code>prompt</code></li>
+<li><code>negative_prompt</code></li>
+<li><code>model_name</code></li>
+<li><code>status</code></li>
+<li><code>basis_type</code></li>
+<li><code>current_round</code></li>
+<li><code>current_z_json</code></li>
+<li><code>incumbent_candidate_id</code></li>
+<li><code>created_at</code></li>
+<li><code>updated_at</code></li>
+</ul>
+<h4 id="rounds">rounds</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>session_id</code></li>
+<li><code>round_index</code></li>
+<li><code>incumbent_z_json</code></li>
+<li><code>trust_radius</code></li>
+<li><code>seed_policy</code></li>
+<li><code>render_status</code></li>
+<li><code>update_summary_json</code></li>
+<li><code>created_at</code></li>
+</ul>
+<h4 id="candidates">candidates</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>round_id</code></li>
+<li><code>candidate_index</code></li>
+<li><code>z_json</code></li>
+<li><code>sampler_role</code></li>
+<li><code>predicted_score</code></li>
+<li><code>predicted_uncertainty</code></li>
+<li><code>seed</code></li>
+<li><code>render_status</code></li>
+<li><code>image_path</code></li>
+<li><code>generation_params_json</code></li>
+</ul>
+<h4 id="feedback_events">feedback_events</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>round_id</code></li>
+<li><code>type</code></li>
+<li><code>payload_json</code></li>
+<li><code>normalized_payload_json</code></li>
+<li><code>critique_text</code></li>
+<li><code>created_at</code></li>
+</ul>
+<h4 id="artifacts">artifacts</h4>
+<ul>
+<li><code>id</code></li>
+<li><code>session_id</code></li>
+<li><code>type</code></li>
+<li><code>path</code></li>
+<li><code>metadata_json</code></li>
+<li><code>created_at</code></li>
+</ul>
+<h3 id="112-file-artifacts">11.2 File artifacts</h3>
+<p>Artifacts to store:</p>
+<ul>
+<li>generated images</li>
+<li>round manifests</li>
+<li>configuration snapshots</li>
+<li>exported replay bundles</li>
+<li>evaluation reports</li>
+<li>JSON trace logs</li>
+</ul>
+<h2 id="12-api-specification">12. API Specification</h2>
+<h3 id="121-api-conventions">12.1 API conventions</h3>
+<p>The API should follow these rules:</p>
+<ul>
+<li>all responses are JSON except artifact downloads</li>
+<li>all write operations return persisted identifiers</li>
+<li>every error returns a structured code and human-readable message</li>
+<li>session config becomes immutable once the session is created</li>
+<li>round generation is idempotent only when explicitly requested</li>
+</ul>
+<h3 id="122-example-endpoints">12.2 Example endpoints</h3>
+<h4 id="post-experiments">POST <code>/experiments</code></h4>
+<p>Create a new experiment.</p>
+<p>Request body:</p>
+<ul>
+<li><code>name</code></li>
+<li><code>description</code></li>
+<li><code>config</code></li>
+</ul>
+<p>Response:</p>
+<ul>
+<li><code>experiment_id</code></li>
+</ul>
+<h4 id="get-experiments">GET <code>/experiments</code></h4>
+<p>List experiments.</p>
+<h4 id="get-experimentsexperiment_id">GET <code>/experiments/{experiment_id}</code></h4>
+<p>Return full experiment metadata and configuration.</p>
+<h4 id="post-sessions">POST <code>/sessions</code></h4>
+<p>Create a session from an experiment or full config.</p>
+<p>Request body:</p>
+<ul>
+<li><code>experiment_id</code> or inline <code>config</code></li>
+<li><code>prompt</code></li>
+<li><code>negative_prompt</code></li>
+</ul>
+<p>Response:</p>
+<ul>
+<li><code>session_id</code></li>
+<li><code>initial_state</code></li>
+</ul>
+<h4 id="get-sessionssession_id">GET <code>/sessions/{session_id}</code></h4>
+<p>Return session summary and current state.</p>
+<h4 id="post-sessionssession_idroundsnext">POST <code>/sessions/{session_id}/rounds/next</code></h4>
+<p>Generate the next round of candidates.</p>
+<p>Response:</p>
+<ul>
+<li><code>round_id</code></li>
+<li><code>candidate_metadata</code></li>
+<li><code>image_urls</code></li>
+<li><code>state_summary</code></li>
+</ul>
+<h4 id="post-roundsround_idfeedback">POST <code>/rounds/{round_id}/feedback</code></h4>
+<p>Submit feedback for a round.</p>
+<p>Request body:</p>
+<ul>
+<li><code>feedback_type</code></li>
+<li><code>payload</code></li>
+<li>optional <code>critique_text</code></li>
+</ul>
+<p>Response:</p>
+<ul>
+<li><code>update_summary</code></li>
+<li><code>next_incumbent_state</code></li>
+</ul>
+<h4 id="get-sessionssession_idreplay">GET <code>/sessions/{session_id}/replay</code></h4>
+<p>Return ordered rounds, artifacts, and summaries for replay.</p>
+<h4 id="post-frontend-events">POST <code>/frontend-events</code></h4>
+<p>Persist browser-side trace events for debugging and auditability.</p>
+<h4 id="get-sessionssession_idexport">GET <code>/sessions/{session_id}/export</code></h4>
+<p>Export logs, metrics, and artifact manifest.</p>
+<h2 id="13-steering-representation-specification">13. Steering Representation Specification</h2>
+<h3 id="131-required-modes">13.1 Required modes</h3>
+<p>The system must support at least:</p>
+<ul>
+<li>low-dimensional latent code</li>
+<li>token-level offset mode</li>
+<li>pooled embedding mode</li>
+</ul>
+<h3 id="132-default-steering-equation">13.2 Default steering equation</h3>
+<p>For low-dimensional steering:</p>
+<p><code>E(z) = E0 + U z</code></p>
+<p>Where:</p>
+<ul>
+<li><code>E0</code> is the base embedding</li>
+<li><code>U</code> is the steering basis</li>
+<li><code>z</code> is the controllable code</li>
+</ul>
+<h3 id="133-basis-construction-strategies">13.3 Basis construction strategies</h3>
+<p>The system should support:</p>
+<ul>
+<li>random orthonormal basis</li>
+<li>PCA basis from prior accepted moves</li>
+<li>hand-defined semantic basis</li>
+<li>basis from prompt rewrite differences</li>
+<li>hybrid basis</li>
+</ul>
+<h3 id="134-representation-constraints">13.4 Representation constraints</h3>
+<p>The steering representation must support:</p>
+<ul>
+<li>trust-region clipping</li>
+<li>anchor-to-origin regularization</li>
+<li>optional subspace masks</li>
+<li>candidate diversity measurement</li>
+</ul>
+<h2 id="14-sampling-strategy-specification">14. Sampling Strategy Specification</h2>
+<h3 id="141-sampler-contract">14.1 Sampler contract</h3>
+<p>Each sampler must implement:</p>
+<ul>
+<li><code>propose(state, config, preference_model) -&gt; list[candidate]</code></li>
+<li>candidate role tagging</li>
+<li>reproducible behavior under fixed RNG state</li>
+</ul>
+<h3 id="142-required-baseline-samplers">14.2 Required baseline samplers</h3>
+<p>The system must include:</p>
+<ul>
+<li>random local sampler</li>
+<li>exploit-plus-orthogonal sampler</li>
+<li>uncertainty-guided sampler</li>
+</ul>
+<h3 id="143-optional-advanced-samplers">14.3 Optional advanced samplers</h3>
+<p>The system may later include:</p>
+<ul>
+<li>Thompson-style sampler</li>
+<li>quality-diversity sampler</li>
+<li>CMA-ES style sampler</li>
+<li>dueling-bandit sampler</li>
+<li>critique-conditioned sampler</li>
+<li>subspace-adaptive sampler</li>
+</ul>
+<h3 id="144-batch-composition-controls">14.4 Batch composition controls</h3>
+<p>Per round, the system should log and optionally constrain:</p>
+<ul>
+<li>exploit candidate count</li>
+<li>explore candidate count</li>
+<li>validation candidate count</li>
+<li>mirror candidate count</li>
+<li>replay candidate count</li>
+</ul>
+<h2 id="15-feedback-mechanism-specification">15. Feedback Mechanism Specification</h2>
+<h3 id="151-unified-schema">15.1 Unified schema</h3>
+<p>All frontend feedback must normalize into one internal event format.</p>
+<p>The backend should derive pairwise preferences from richer signals when useful.</p>
+<h3 id="152-required-feedback-modes">15.2 Required feedback modes</h3>
+<p>The system must support:</p>
+<ul>
+<li>scalar ratings</li>
+<li>pairwise comparison</li>
+<li>partial ranking</li>
+<li>winner plus critique</li>
+<li>select-all-that-fit</li>
+</ul>
+<h3 id="153-feedback-quality-controls">15.3 Feedback quality controls</h3>
+<p>The platform should support:</p>
+<ul>
+<li>hidden repeated comparisons</li>
+<li>user confidence reporting</li>
+<li>decision-time logging</li>
+<li>uncertain or skip actions</li>
+</ul>
+<h2 id="16-update-mechanism-specification">16. Update Mechanism Specification</h2>
+<h3 id="161-updater-contract">16.1 Updater contract</h3>
+<p>Each updater must implement:</p>
+<ul>
+<li><code>update(state, candidates, feedback, model) -&gt; new_state, update_summary</code></li>
+</ul>
+<h3 id="162-required-baseline-updaters">16.2 Required baseline updaters</h3>
+<p>The system must include:</p>
+<ul>
+<li>winner-copy updater</li>
+<li>winner-average updater</li>
+<li>linear preference updater</li>
+</ul>
+<h3 id="163-optional-advanced-updaters">16.3 Optional advanced updaters</h3>
+<p>The system may later include:</p>
+<ul>
+<li>Bradley-Terry / pairwise logistic updater</li>
+<li>Bayesian updater</li>
+<li>contextual bandit updater</li>
+<li>critique-conditioned updater</li>
+<li>trust-region policy optimizer</li>
+<li>multi-subspace updater</li>
+</ul>
+<h3 id="164-stabilization-controls">16.4 Stabilization controls</h3>
+<p>Each updater should optionally support:</p>
+<ul>
+<li>trust-region clipping</li>
+<li>anchor regularization</li>
+<li>momentum</li>
+<li>rollback on confidence drop</li>
+<li>incumbent preservation under instability</li>
+</ul>
+<h2 id="17-seed-policy-specification">17. Seed Policy Specification</h2>
+<h3 id="171-required-seed-modes">17.1 Required seed modes</h3>
+<p>The system must support:</p>
+<ul>
+<li>fixed-per-round</li>
+<li>fixed-per-candidate-role</li>
+<li>multi-seed averaging</li>
+</ul>
+<h3 id="172-seed-metadata-requirements">17.2 Seed metadata requirements</h3>
+<p>For every candidate, persist:</p>
+<ul>
+<li>seed</li>
+<li>scheduler settings</li>
+<li>inference step count</li>
+<li>guidance scale</li>
+<li>image resolution</li>
+</ul>
+<h2 id="18-evaluation-and-metrics-specification">18. Evaluation and Metrics Specification</h2>
+<p>The platform must support both online and offline evaluation.</p>
+<h3 id="181-interaction-metrics">18.1 Interaction metrics</h3>
+<ul>
+<li>average time per round</li>
+<li>average time per feedback action</li>
+<li>rounds until stop</li>
+<li>images generated per session</li>
+<li>user consistency score</li>
+</ul>
+<h3 id="182-optimization-metrics">18.2 Optimization metrics</h3>
+<ul>
+<li>preference improvement over rounds</li>
+<li>incumbent win rate against earlier incumbents</li>
+<li>regret proxy relative to best observed candidate</li>
+<li>model calibration where applicable</li>
+</ul>
+<h3 id="183-robustness-metrics">18.3 Robustness metrics</h3>
+<ul>
+<li>performance under alternate seeds</li>
+<li>rank stability across seeds</li>
+<li>score estimate variance</li>
+</ul>
+<h3 id="184-diversity-metrics">18.4 Diversity metrics</h3>
+<ul>
+<li>pairwise embedding distance</li>
+<li>perceptual image distance</li>
+<li>mode coverage proxy</li>
+</ul>
+<h3 id="185-drift-metrics">18.5 Drift metrics</h3>
+<ul>
+<li>distance from origin</li>
+<li>distance from previous incumbent</li>
+<li>semantic drift notes where available</li>
+</ul>
+<h3 id="186-human-centered-metrics">18.6 Human-centered metrics</h3>
+<ul>
+<li>perceived controllability</li>
+<li>perceived usefulness of feedback</li>
+<li>fatigue level</li>
+<li>final-image satisfaction</li>
+</ul>
+<h2 id="19-logging-and-reproducibility-specification">19. Logging and Reproducibility Specification</h2>
+<h3 id="191-mandatory-logging">19.1 Mandatory logging</h3>
+<p>Every experiment must log:</p>
+<ul>
+<li>full config snapshot</li>
+<li>random seeds</li>
+<li>software version</li>
+<li>model checkpoint identifier</li>
+<li>hardware metadata</li>
+<li>request and response manifests for each round</li>
+<li>serialized feedback events</li>
+<li>request-level backend traces</li>
+<li>browser-submitted frontend trace events</li>
+</ul>
+<h3 id="192-replay-requirements">19.2 Replay requirements</h3>
+<p>A replay must reconstruct:</p>
+<ul>
+<li>prompt and config</li>
+<li>round order</li>
+<li>candidate images</li>
+<li>feedback timeline</li>
+<li>updater summaries</li>
+</ul>
+<h3 id="193-versioning">19.3 Versioning</h3>
+<p>Version independently:</p>
+<ul>
+<li>frontend</li>
+<li>backend</li>
+<li>model wrapper</li>
+<li>sampler</li>
+<li>updater</li>
+<li>schema</li>
+</ul>
+<h2 id="20-error-handling-and-fault-tolerance">20. Error Handling and Fault Tolerance</h2>
+<p>The system must handle:</p>
+<ul>
+<li>one-candidate generation failure</li>
+<li>render timeout</li>
+<li>partial round completion</li>
+<li>duplicate feedback submission</li>
+<li>invalid ranking payload</li>
+<li>GPU out-of-memory events</li>
+<li>experiment resume after crash</li>
+</ul>
+<p>Behavioral requirements:</p>
+<ul>
+<li>failures are visible in the UI</li>
+<li>one failed candidate does not invalidate the whole round by default</li>
+<li>durable state is written after each completed round and feedback submission</li>
+<li>invalid lifecycle transitions return explicit conflict-style errors</li>
+</ul>
+<h2 id="21-security-and-privacy-notes">21. Security and Privacy Notes</h2>
+<p>Minimum requirements:</p>
+<ul>
+<li>no arbitrary file path input from the frontend</li>
+<li>input validation on all API endpoints</li>
+<li>critique text treated as user data</li>
+<li>exports must not leak server-local paths</li>
+<li>session isolation may be added later if multi-user support appears</li>
+</ul>
+<h2 id="22-operational-constraints">22. Operational Constraints</h2>
+<p>The v1 system should assume:</p>
+<ul>
+<li>local or single-node execution</li>
+<li>manual operator oversight</li>
+<li>limited concurrency</li>
+<li>reproducibility prioritized over throughput</li>
+</ul>
+<h2 id="23-suggested-project-structure">23. Suggested Project Structure</h2>
+<pre><code class="language-text">project/
+  app/
+    api/
+      routes_experiments.py
+      routes_sessions.py
+      routes_rounds.py
+      routes_exports.py
+    core/
+      config.py
+      logging.py
+      schema.py
+    engine/
+      prompt_encoder.py
+      steering_basis.py
+      generation.py
+      seeds.py
+    samplers/
+      base.py
+      random_local.py
+      exploit_orthogonal.py
+      uncertainty.py
+      thompson.py
+      quality_diversity.py
+    feedback/
+      normalization.py
+      validation.py
+    updaters/
+      base.py
+      winner_copy.py
+      winner_average.py
+      linear_pref.py
+      bradley_terry.py
+      bayesian.py
+    evaluation/
+      metrics.py
+      replay.py
+      reports.py
+    storage/
+      db.py
+      models.py
+      repository.py
+    frontend/
+      templates/
+        index.html
+        setup.html
+        session.html
+        replay.html
+      static/
+        styles.css
+        app.js
+  tests/
+    unit/
+    integration/
+    e2e/
+    fixtures/
+  scripts/
+    run_dev.py
+    export_session.py
+    replay_session.py
+  docs/
+    system_specification.md
+</code></pre>
+<h2 id="24-minimal-viable-research-prototype">24. Minimal Viable Research Prototype</h2>
+<h3 id="241-mandatory-capabilities">24.1 Mandatory capabilities</h3>
+<ul>
+<li>Stable Diffusion or SDXL backend through Diffusers</li>
+<li>low-dimensional steering mode</li>
+<li>one interactive session page</li>
+<li>one replay page</li>
+<li>at least three samplers</li>
+<li>at least three feedback modes</li>
+<li>at least three updaters</li>
+<li>fixed-per-round seed mode</li>
+<li>export support</li>
+<li>deterministic replay support</li>
+</ul>
+<h3 id="242-optional-v1-extensions">24.2 Optional v1 extensions</h3>
+<ul>
+<li>critique-conditioned updates</li>
+<li>Bayesian preference model</li>
+<li>multi-seed validation mode</li>
+<li>quality-diversity archive</li>
+<li>study report generation</li>
+</ul>
+<h2 id="25-implementation-deliverables">25. Implementation Deliverables</h2>
+<p>An implementation generated from this specification should produce:</p>
+<ol>
+<li>a Python FastAPI backend</li>
+<li>a simple HTML/CSS/JS frontend</li>
+<li>modular sampler interfaces</li>
+<li>modular updater interfaces</li>
+<li>a working diffusion wrapper</li>
+<li>persistence and export support</li>
+<li>a test suite aligned with the test specification</li>
+<li>local setup documentation</li>
+</ol>
+<h2 id="26-summary">26. Summary</h2>
+<p>This system is a controlled research platform for interactive user-guided image generation through prompt-embedding steering.</p>
+<p>Its architectural priorities are:</p>
+<ul>
+<li>modular experimentation</li>
+<li>durable state</li>
+<li>replayability</li>
+<li>controlled randomness</li>
+<li>low implementation complexity consistent with research use</li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

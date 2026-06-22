@@ -1,0 +1,79 @@
+suite_name: oracle_inspired_methods
+description: >
+  Compact hidden-target comparison inspired by quality-diversity search, listwise ranking models,
+  and multi-objective oracle selection.
+paper_figure_name: figure_17_oracle_inspired_methods.svg
+
+fixed_conditions:
+  steering_dimension: 5
+  candidate_count: 5
+  image_size: [512, 512]
+  trust_radius: 0.65
+  anchor_strength: 0.8
+  guidance_scale: 7.5
+  num_inference_steps: 12
+  seed_policy: fixed-per-candidate
+  model_name: runwayml/stable-diffusion-v1-5
+
+max_rounds: 6
+margin_epsilon: 0.015
+oracle_model: openai/clip-vit-large-patch14
+evaluation_models:
+  - id: openai/clip-vit-large-patch14
+    short_name: clip
+    label: CLIP cosine
+    kind: clip
+  - id: facebook/dinov2-base
+    short_name: dinov2
+    label: DINOv2 cosine
+    kind: dinov2
+
+targets:
+  - id: mountain_lake_landscape
+    label: Mountain lake landscape
+    caption: Serene alpine lake landscape with reflective blue water, evergreen trees, and a snow-capped mountain in the distance under crisp daylight.
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/Mountain%20lake.jpg
+  - id: black_white_cat_portrait
+    label: Black-and-white cat portrait
+    caption: Close-up portrait of a black-and-white house cat facing the camera with sharp eyes, soft indoor lighting, and shallow depth of field.
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/Cat_portrait_B%26W.JPG
+  - id: red_bicycle_street_photo
+    label: Red bicycle street photo
+    caption: Realistic street photograph of a bright red bicycle parked outdoors beside a wooden wall in daylight.
+    image_url: https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20Red%20Bicycle.%20%2815655615295%29.jpg
+
+policies:
+  - id: baseline_clip
+    label: Baseline CLIP oracle
+    sampler: exploit_orthogonal
+    updater: linear_preference
+    feedback_mode: winner_only
+    oracle_policy: clip_only
+
+  - id: bt_progress
+    label: Bradley-Terry progress-aware
+    sampler: two_scale_cover
+    updater: bradley_terry_preference
+    feedback_mode: top_k
+    oracle_policy: clip_margin_mix
+
+  - id: qd_sampler
+    label: Quality-diversity sampler
+    sampler: quality_diversity_mix
+    updater: linear_preference
+    feedback_mode: winner_only
+    oracle_policy: clip_only
+
+  - id: pl_listwise
+    label: Plackett-Luce listwise
+    sampler: quality_diversity_mix
+    updater: plackett_luce_preference
+    feedback_mode: top_k
+    oracle_policy: clip_only
+
+  - id: pareto_listwise
+    label: Pareto listwise
+    sampler: quality_diversity_mix
+    updater: plackett_luce_preference
+    feedback_mode: top_k
+    oracle_policy: pareto_frontier_mix

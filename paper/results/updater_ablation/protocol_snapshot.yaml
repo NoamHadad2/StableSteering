@@ -1,0 +1,54 @@
+version: 1
+name: fixed_sampler_updater_ablation
+purpose: Compare updater behavior under one fixed sampler and matched workflow budgets.
+fixed_conditions:
+  backend: diffusers
+  model_name: runwayml/stable-diffusion-v1-5
+  image_size:
+  - 512
+  - 512
+  guidance_scale: 7.0
+  num_inference_steps: 20
+  candidate_count: 5
+  feedback_mode: scalar_rating
+  steering_dimension: 5
+  sampler: exploit_orthogonal
+  seed_policy: fixed-per-candidate
+  stopping_rule: two_rounds
+baseline_overrides:
+  updater_winner_copy:
+    updater: winner_copy
+  updater_winner_average:
+    updater: winner_average
+  updater_linear_preference:
+    updater: linear_preference
+baselines:
+- id: updater_winner_copy
+  label: 'Updater: winner copy'
+  mode: steering_loop
+  description: Steering loop with a fixed sampler and winner-copy updater.
+- id: updater_winner_average
+  label: 'Updater: winner average'
+  mode: steering_loop
+  description: Steering loop with a fixed sampler and winner-average updater.
+- id: updater_linear_preference
+  label: 'Updater: linear preference'
+  mode: steering_loop
+  description: Steering loop with a fixed sampler and linear-preference updater.
+prompts:
+- id: product_hero_shot
+  label: Product hero shot
+  prompt: A premium cinematic product hero photo of an expedition-ready electric explorer
+    motorcycle parked at sunrise in a dramatic desert pass
+  negative_prompt: blur, flat lighting, distorted wheels, text, watermark, clutter
+- id: portrait_character
+  label: Portrait / character
+  prompt: A cinematic studio portrait of a robotics researcher holding a small hand-built
+    prototype, with soft rim light and a dark background
+  negative_prompt: blur, flat lighting, distorted hands, extra fingers, text, watermark,
+    clutter
+- id: landscape_environment
+  label: Landscape / environment
+  prompt: A wide cinematic landscape of a weathered coastal observatory at dusk with
+    strong atmosphere and layered depth
+  negative_prompt: blur, flat lighting, crooked horizon, text, watermark, clutter

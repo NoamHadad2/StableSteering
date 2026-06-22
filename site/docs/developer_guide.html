@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>developer_guide | StableSteering</title>
+    <link rel="stylesheet" href="../assets/site.css">
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1><a href="../index.html">StableSteering</a></h1>
+        <p class="tagline">Project documentation site</p>
+        <nav>
+          <ul>
+            <li><a href="../app/bootstrap/index.html">bootstrap</a></li><li><a href="../app/core/index.html">core</a></li><li><a href="../app/engine/index.html">engine</a></li><li><a href="../app/feedback/index.html">feedback</a></li><li><a href="../app/frontend/index.html">frontend</a></li><li><a href="../app/frontend/static/index.html">static</a></li><li><a href="../app/frontend/templates/index.html">templates</a></li><li><a href="../app/index.html">app</a></li><li><a href="../app/samplers/index.html">samplers</a></li><li><a href="../app/storage/index.html">storage</a></li><li><a href="../app/updaters/index.html">updaters</a></li><li><a href="../data/index.html">data</a></li><li><a href="configuration_manual.html">configuration_manual</a></li><li><a href="developer_guide.html">developer_guide</a></li><li><a href="document_audit.html">document_audit</a></li><li><a href="faq.html">faq</a></li><li><a href="motivation.html">motivation</a></li><li><a href="pre_implementation_blueprint.html">pre_implementation_blueprint</a></li><li><a href="quick_start.html">quick_start</a></li><li><a href="index.html">docs</a></li><li><a href="research_improvement_roadmap.html">research_improvement_roadmap</a></li><li><a href="student_tutorial.html">student_tutorial</a></li><li><a href="system_improvement_roadmap.html">system_improvement_roadmap</a></li><li><a href="system_spec_legacy_combined.html">system_spec_legacy_combined</a></li><li><a href="system_specification.html">system_specification</a></li><li><a href="system_test_specification.html">system_test_specification</a></li><li><a href="theoretical_background.html">theoretical_background</a></li><li><a href="user_guide.html">user_guide</a></li><li><a href="../INSTALL.html">INSTALL</a></li><li><a href="../models/index.html">models</a></li><li><a href="../output/index.html">output</a></li><li><a href="../paper/caption_style_guide.html">caption_style_guide</a></li><li><a href="../paper/case_study_summary.html">case_study_summary</a></li><li><a href="../paper/claim_audit.html">claim_audit</a></li><li><a href="../paper/claim_evidence_matrix.html">claim_evidence_matrix</a></li><li><a href="../paper/contribution_statement.html">contribution_statement</a></li><li><a href="../paper/evidence_inventory.html">evidence_inventory</a></li><li><a href="../paper/experiment_execution_queue.html">experiment_execution_queue</a></li><li><a href="../paper/experiment_matrix.html">experiment_matrix</a></li><li><a href="../paper/figure_table_inventory.html">figure_table_inventory</a></li><li><a href="../paper/improvement_log.html">improvement_log</a></li><li><a href="../paper/journal_appendix.html">journal_appendix</a></li><li><a href="../paper/journal_manuscript.html">journal_manuscript</a></li><li><a href="../paper/manuscript_draft.html">manuscript_draft</a></li><li><a href="../paper/manuscript_outline.html">manuscript_outline</a></li><li><a href="../paper/paper_improvement_cycles.html">paper_improvement_cycles</a></li><li><a href="../paper/paper_package_inventory.html">paper_package_inventory</a></li><li><a href="../paper/paper_readiness_map.html">paper_readiness_map</a></li><li><a href="../paper/protocols/budget_normalized_seed_policy_protocol.html">budget_normalized_seed_policy_protocol</a></li><li><a href="../paper/protocols/human_pairwise_evaluation_protocol.html">human_pairwise_evaluation_protocol</a></li><li><a href="../paper/protocols/minimal_baseline_protocol.html">minimal_baseline_protocol</a></li><li><a href="../paper/protocols/oracle_target_recovery_protocol.html">oracle_target_recovery_protocol</a></li><li><a href="../paper/protocols/updater_ablation_protocol.html">updater_ablation_protocol</a></li><li><a href="../paper/publication_plan.html">publication_plan</a></li><li><a href="../paper/reader_confusion_notes.html">reader_confusion_notes</a></li><li><a href="../paper/index.html">paper</a></li><li><a href="../paper/related_work_draft.html">related_work_draft</a></li><li><a href="../paper/related_work_scaffold.html">related_work_scaffold</a></li><li><a href="../paper/reproducibility_checklist.html">reproducibility_checklist</a></li><li><a href="../paper/results/baseline_matrix/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_summary.html">pilot_summary</a></li><li><a href="../paper/results/baseline_matrix/pilot_table.html">pilot_table</a></li><li><a href="../paper/results/baseline_matrix/index.html">baseline_matrix</a></li><li><a href="../paper/results/baseline_matrix/seed_robustness.html">seed_robustness</a></li><li><a href="../paper/results/budget_matched_direct_baselines/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/budget_matched_direct_baselines/index.html">budget_matched_direct_baselines</a></li><li><a href="../paper/results/human_pairwise_evaluation/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/human_pairwise_evaluation/index.html">human_pairwise_evaluation</a></li><li><a href="../paper/results/method_extension_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/method_extension_comparison/index.html">method_extension_comparison</a></li><li><a href="../paper/results/oracle_caption_metric_extension/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_caption_metric_extension/index.html">oracle_caption_metric_extension</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_incumbent_policy_compact/index.html">oracle_incumbent_policy_compact</a></li><li><a href="../paper/results/oracle_inspired_methods/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_inspired_methods/index.html">oracle_inspired_methods</a></li><li><a href="../paper/results/oracle_multimetric_repeated/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_multimetric_repeated/index.html">oracle_multimetric_repeated</a></li><li><a href="../paper/results/oracle_plateau_escape/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape/index.html">oracle_plateau_escape</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_soft_control/index.html">oracle_plateau_escape_soft_control</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_escape_stagnation_control/index.html">oracle_plateau_escape_stagnation_control</a></li><li><a href="../paper/results/oracle_plateau_reformulation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_plateau_reformulation/index.html">oracle_plateau_reformulation</a></li><li><a href="../paper/results/oracle_progress_diagnosis/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_diagnosis/index.html">oracle_progress_diagnosis</a></li><li><a href="../paper/results/oracle_progress_followup/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_progress_followup/index.html">oracle_progress_followup</a></li><li><a href="../paper/results/oracle_target_recovery/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/oracle_target_recovery/index.html">oracle_target_recovery</a></li><li><a href="../paper/results/sampler_feedback_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/sampler_feedback_comparison/index.html">sampler_feedback_comparison</a></li><li><a href="../paper/results/seed_policy_slice/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/seed_policy_slice/index.html">seed_policy_slice</a></li><li><a href="../paper/results/steering_mode_comparison/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison/index.html">steering_mode_comparison</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/steering_mode_comparison_smoke/index.html">steering_mode_comparison_smoke</a></li><li><a href="../paper/results/updater_ablation/analysis/analysis_summary.html">analysis_summary</a></li><li><a href="../paper/results/updater_ablation/index.html">updater_ablation</a></li><li><a href="../paper/terminology_ledger.html">terminology_ledger</a></li><li><a href="../paper/title_abstract_variants.html">title_abstract_variants</a></li><li><a href="../index.html">StableSteering</a></li><li><a href="../RELEASE.html">RELEASE</a></li><li><a href="../RELEASE_NOTES_v0.1.0.html">RELEASE_NOTES_v0.1.0</a></li><li><a href="../RELEASE_NOTES_v0.1.1.html">RELEASE_NOTES_v0.1.1</a></li><li><a href="../scripts/index.html">scripts</a></li><li><a href="../tests/e2e/index.html">e2e</a></li><li><a href="../tests/index.html">tests</a></li>
+          </ul>
+        </nav>
+      </aside>
+      <main class="content">
+        <p class="source-link"><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/docs/developer_guide.md">View source Markdown</a></p>
+        <h1 id="developer-guide">Developer Guide</h1>
+<h2 id="1-purpose">1. Purpose</h2>
+<p>This guide explains how the current StableSteering prototype is organized, how to run it locally, and how to extend it safely.</p>
+<p>It is intended for developers who want to:</p>
+<ul>
+<li>run the app locally</li>
+<li>understand the code layout</li>
+<li>add new samplers or updaters</li>
+<li>change storage or generation behavior</li>
+<li>maintain test coverage while evolving the system</li>
+</ul>
+<p>For a student-oriented conceptual walkthrough, start with <a href="student_tutorial.html">student_tutorial.md</a>.</p>
+<h2 id="2-current-implementation-scope">2. Current Implementation Scope</h2>
+<p>The current implementation is a minimal research MVP with:</p>
+<ul>
+<li>a FastAPI backend</li>
+<li>a simple HTML/CSS/JS frontend</li>
+<li>SQLite-backed local persistence</li>
+<li>a GPU-only real Diffusers runtime by default</li>
+<li>deterministic mock SVG generation for tests only</li>
+<li>basic replay export</li>
+<li>asynchronous round-generation and feedback jobs with visible progress status</li>
+<li>rich backend logging and persisted trace events</li>
+<li>per-session HTML trace reports saved by the backend</li>
+<li>frontend trace capture and visible trace panels</li>
+<li>automated tests for feedback, lifecycle, tracing, and replay export</li>
+<li>a reusable real GPU-backed example-run generator for demos and teaching</li>
+</ul>
+<p>It does not yet include:</p>
+<ul>
+<li>shared multi-user persistence beyond the local SQLite repository</li>
+<li>authentication</li>
+<li>multi-user coordination</li>
+</ul>
+<h2 id="3-project-structure">3. Project Structure</h2>
+<p>Key directories:</p>
+<ul>
+<li>
+<p><a href="../app/index.html">app</a>
+  Main application code.</p>
+</li>
+<li>
+<p><a href="../app/core/index.html">app/core</a>
+  Shared settings and Pydantic schemas.</p>
+</li>
+<li>
+<p><a href="../app/engine/index.html">app/engine</a>
+  Generation and orchestration logic.</p>
+</li>
+<li>
+<p><a href="../app/storage/index.html">app/storage</a>
+  SQLite repository implementation.</p>
+</li>
+<li>
+<p><a href="../app/samplers/index.html">app/samplers</a>
+  Candidate proposal strategies.</p>
+</li>
+<li>
+<p><a href="../app/updaters/index.html">app/updaters</a>
+  Steering-state update strategies.</p>
+</li>
+<li>
+<p><a href="../app/feedback/index.html">app/feedback</a>
+  Feedback normalization logic.</p>
+</li>
+<li>
+<p><a href="../app/frontend/index.html">app/frontend</a>
+  Jinja templates and static frontend assets.</p>
+</li>
+<li>
+<p><a href="../tests/index.html">tests</a>
+  Automated tests.</p>
+</li>
+<li>
+<p><a href="../scripts/index.html">scripts</a>
+  Convenience scripts such as the local dev launcher.</p>
+</li>
+</ul>
+<h2 id="4-local-development-setup">4. Local Development Setup</h2>
+<p>Install the project with development dependencies:</p>
+<pre><code class="language-bash">python -m pip install -e .[dev]
+</code></pre>
+<p>Install inference dependencies for the real Diffusers backend:</p>
+<pre><code class="language-bash">python -m pip install -e .[dev,inference]
+</code></pre>
+<p>Run the local server:</p>
+<pre><code class="language-bash">python scripts/run_dev.py
+</code></pre>
+<p>To prefer the real Diffusers backend after preparing model assets:</p>
+<pre><code class="language-bash">set STABLE_STEERING_GENERATION_BACKEND=diffusers
+python scripts/run_dev.py
+</code></pre>
+<p>The real Diffusers path is GPU-only and explicitly targets <code>cuda</code>. The default
+server runtime now requires that path and should fail fast when a CUDA-capable
+GPU is not available.</p>
+<p>Run the standalone real-model smoke test:</p>
+<pre><code class="language-bash">python scripts/smoke_real_diffusers.py
+</code></pre>
+<p>Generate the full example walkthrough bundle:</p>
+<pre><code class="language-bash">python scripts/create_real_e2e_example.py
+</code></pre>
+<p>Open:</p>
+<pre><code class="language-text">http://127.0.0.1:8000
+</code></pre>
+<p>Run the tests:</p>
+<pre><code class="language-bash">python -m pytest
+</code></pre>
+<p>Run browser tests:</p>
+<pre><code class="language-bash">npm install
+npm run test:e2e:chrome
+</code></pre>
+<p>Run a headed single-worker debug session in Chrome:</p>
+<pre><code class="language-bash">npm run test:e2e:debug
+</code></pre>
+<p>Prepare Hugging Face assets:</p>
+<pre><code class="language-bash">python scripts/setup_huggingface.py
+</code></pre>
+<p>Warm all experiment models once for reuse across paper runs:</p>
+<pre><code class="language-bash">python scripts/preload_experiment_models.py --include-default-diffusion
+</code></pre>
+<p>This scans the protocol YAML files under <code>paper/protocols/</code>, prepares the
+referenced diffusion snapshots under <code>models/</code>, and caches CLIP/DINO-family
+evaluation models under <code>models/hf_cache/</code>. Protocols that reference caption
+generation or supplementary similarity metrics also preload:</p>
+<ul>
+<li>BLIP captioning weights</li>
+<li>SigLIP image-embedding weights</li>
+<li>LPIPS perceptual-distance weights</li>
+</ul>
+<p>Generate the curated caption artifact for the caption-extended oracle study:</p>
+<pre><code class="language-bash">python scripts/generate_oracle_dataset_captions.py
+</code></pre>
+<p>Run the caption-source and multi-metric oracle extension:</p>
+<pre><code class="language-bash">python scripts/run_paper_oracle_caption_metric_extension.py
+</code></pre>
+<p>Inspect persisted trace files:</p>
+<pre><code class="language-text">data/traces/
+</code></pre>
+<p>Per-session run bundles live under:</p>
+<pre><code class="language-text">data/traces/sessions/&lt;session_id&gt;/
+</code></pre>
+<p>That bundle includes:</p>
+<ul>
+<li><code>backend-events.jsonl</code></li>
+<li><code>frontend-events.jsonl</code></li>
+<li><code>report.html</code></li>
+</ul>
+<h2 id="5-runtime-flow">5. Runtime Flow</h2>
+<p>The current runtime flow is:</p>
+<ol>
+<li>create an experiment</li>
+<li>create a session from that experiment</li>
+<li>request the next round</li>
+<li>sampler proposes candidates</li>
+<li>Diffusers renders candidate images on GPU</li>
+<li>frontend displays the candidate images</li>
+<li>frontend starts async jobs for round generation and feedback submission</li>
+<li>users see progress and status while the job runs</li>
+<li>frontend and backend trace the active flow</li>
+<li>feedback is normalized and validated against the round</li>
+<li>updater computes the next incumbent state</li>
+<li>replay export exposes the persisted trajectory</li>
+<li>the backend refreshes the saved HTML trace report for the session</li>
+</ol>
+<p><img alt="Runtime architecture diagram" src="assets/illustrations/runtime_flow.svg"></p>
+<p>When a prepared local model is available and the backend is set to <code>diffusers</code>,
+the generation step uses a real Stable Diffusion pipeline, pins inference to
+GPU, and applies a deterministic steering offset to <code>prompt_embeds</code> before
+rendering. If the model or GPU requirements are not satisfied, startup fails.</p>
+<p>The current generation engine supports four prompt-embedding steering modes:</p>
+<ul>
+<li><code>low_dimensional</code>
+  one hidden-space offset is broadcast across all prompt tokens</li>
+<li><code>content_masked</code>
+  the same hidden-space offset is applied selectively to content-bearing tokens while suppressing padding and special tokens</li>
+<li><code>token_factorized</code>
+  a low-rank token-aware perturbation allows different prompt tokens to receive different steering offsets</li>
+<li><code>token_vector_field</code>
+  a full token-by-hidden vector field gives each content token its own steering vector rather than only a token-specific scalar over one shared hidden direction</li>
+</ul>
+<p>These modes share the same session-level steering vector and outer loop. They
+only change the operator that maps the steering state into prompt-embedding
+space, which makes them suitable for controlled method comparisons.</p>
+<h2 id="51-async-api-endpoints">5.1 Async API Endpoints</h2>
+<p>Long-running session actions are exposed as asynchronous job endpoints:</p>
+<ul>
+<li>
+<p><code>POST /sessions/{session_id}/rounds/next/async</code>
+  Queues next-round generation and returns a job handle.</p>
+</li>
+<li>
+<p><code>POST /rounds/{round_id}/feedback/async</code>
+  Queues feedback application and returns a job handle.</p>
+</li>
+<li>
+<p><code>GET /jobs/{job_id}</code>
+  Returns the current job snapshot.</p>
+</li>
+</ul>
+<p>The async <code>POST</code> routes return:</p>
+<ul>
+<li><code>job_id</code></li>
+<li><code>status_url</code></li>
+<li>initial <code>state</code></li>
+</ul>
+<p>The job status payload includes:</p>
+<ul>
+<li><code>state</code></li>
+<li><code>progress</code></li>
+<li><code>status_message</code></li>
+<li><code>result</code> when complete</li>
+<li><code>error</code> when failed</li>
+</ul>
+<p>Current job states are:</p>
+<ul>
+<li><code>queued</code></li>
+<li><code>running</code></li>
+<li><code>succeeded</code></li>
+<li><code>failed</code></li>
+</ul>
+<h2 id="52-progress-behavior">5.2 Progress Behavior</h2>
+<p>The browser session view uses the async endpoints by default.</p>
+<p>During round generation and feedback submission:</p>
+<ul>
+<li>the clicked action button is disabled</li>
+<li>a visible progress panel is shown</li>
+<li>the page polls <code>GET /jobs/{job_id}</code></li>
+<li><code>status_message</code> is rendered as human-readable progress text</li>
+<li><code>progress</code> updates the progress bar</li>
+<li>the page refreshes automatically after success</li>
+<li>errors are shown inline if the job fails</li>
+<li>impossible async requests are rejected before queueing when the session or round is already in a conflicting state</li>
+</ul>
+<p>This keeps the UI responsive while the real GPU-backed backend works in the background.</p>
+<p>Current progress phrases are intentionally operation-specific. For example:</p>
+<ul>
+<li>round generation reports phases such as <code>Checking session readiness</code>, <code>Sampling 5 candidate directions</code>, <code>Rendering candidate images on the model backend</code>, and <code>Refreshing trace report and replay data</code></li>
+<li>feedback submission reports phases such as <code>Normalizing and validating user preferences</code>, <code>Updating the steering model from your feedback</code>, and <code>Feedback applied and next round unlocked</code></li>
+</ul>
+<p><img alt="Session lifecycle diagram" src="assets/illustrations/session_lifecycle.svg"></p>
+<h2 id="6-core-extension-points">6. Core Extension Points</h2>
+<h3 id="61-add-a-sampler">6.1 Add a sampler</h3>
+<p>To add a sampler:</p>
+<ol>
+<li>create a new module under <a href="../app/samplers/index.html">app/samplers</a></li>
+<li>implement <code>propose(session, seed) -&gt; list[Candidate]</code></li>
+<li>register the sampler in <a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/engine/orchestrator.py">orchestrator.py</a></li>
+<li>add tests for deterministic behavior and output shape</li>
+</ol>
+<h3 id="62-add-an-updater">6.2 Add an updater</h3>
+<p>To add an updater:</p>
+<ol>
+<li>create a new module under <a href="../app/updaters/index.html">app/updaters</a></li>
+<li>implement <code>update(session, candidates, feedback) -&gt; (next_z, summary)</code></li>
+<li>register the updater in <a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/engine/orchestrator.py">orchestrator.py</a></li>
+<li>add tests for update behavior and edge cases</li>
+</ol>
+<h3 id="63-evolve-generation">6.3 Evolve generation</h3>
+<p>To evolve the generation backend further:</p>
+<ol>
+<li>keep the same high-level contract as <a href="https://github.com/ApartsinProjects/StableSteering/blob/main/app/engine/generation.py">MockGenerationEngine</a></li>
+<li>preserve deterministic testability by keeping the mock path available only in tests</li>
+<li>avoid letting generation concerns leak into API routes</li>
+<li>keep artifact paths stable enough for replay</li>
+</ol>
+<p>Before running or extending the real generator, stage a compatible model snapshot locally with:</p>
+<pre><code class="language-bash">python scripts/setup_huggingface.py --model-id runwayml/stable-diffusion-v1-5 --output-root models
+</code></pre>
+<p>The setup script downloads the expected diffusers module directories and writes a local manifest so the prepared snapshot is easier to inspect and reuse.</p>
+<p>The runtime contract is:</p>
+<ul>
+<li><code>diffusers</code> means "use the real model on GPU"</li>
+<li>the default app runtime enforces <code>diffusers</code></li>
+<li>runtime code never falls back to <code>mock</code></li>
+<li><code>mock</code> remains available only for explicitly constructed test harnesses that set <code>STABLE_STEERING_ALLOW_TEST_MOCK_BACKEND=true</code></li>
+</ul>
+<p>The current browser test contract is:</p>
+<ul>
+<li><code>npm run test:e2e:chrome</code> covers the UI flow and replay export API smoke path</li>
+<li><code>npm run test:e2e:debug</code> runs the same suite headed for interactive debugging</li>
+<li><code>npm run test:e2e:real</code> provides an opt-in real-backend browser smoke path for CUDA-capable environments with prepared model assets</li>
+</ul>
+<p>The current API quality contract is:</p>
+<ul>
+<li>JSON API errors use the structured <code>ApiError</code> payload shape</li>
+<li>replay exports include explicit schema and app versions</li>
+<li>long-running session actions are exposed as async jobs with pollable status</li>
+<li>session trace reports are backend-owned artifacts, not frontend-only console output</li>
+<li>setup-time config validation rejects unsupported sampler and updater values before a session is created</li>
+</ul>
+<p>The current feedback-mode contract is:</p>
+<ul>
+<li><code>scalar_rating</code> uses explicit clickable star ratings</li>
+<li><code>pairwise</code> uses explicit winner and loser selection controls</li>
+<li><code>winner_only</code> uses an explicit winner selection control</li>
+<li><code>approve_reject</code> uses explicit approval checkboxes plus winner selection</li>
+<li><code>top_k</code> uses explicit rank inputs with uniqueness validation</li>
+<li>the backend rejects submissions whose <code>feedback_type</code> does not match the session's configured <code>feedback_mode</code></li>
+</ul>
+<p>The current seed policy contract is:</p>
+<ul>
+<li><code>fixed-per-round</code> shares one seed across newly rendered candidates in the round</li>
+<li><code>fixed-per-candidate</code> assigns a deterministic seed per visible candidate slot</li>
+<li><code>fixed-per-candidate-role</code> shares seeds across candidates with the same sampler role</li>
+<li>carried-forward incumbents keep the original winning image and seed instead of being re-rendered</li>
+</ul>
+<p>The current sampler and updater surface also includes the newer research-facing modules:</p>
+<ul>
+<li>samplers:</li>
+<li><code>diversity_shell</code></li>
+<li><code>line_search</code></li>
+<li><code>plateau_escape</code></li>
+<li><code>annealed_shell</code></li>
+<li><code>spherical_cover</code></li>
+<li><code>two_scale_cover</code></li>
+<li><code>quality_diversity_mix</code></li>
+<li><code>restart_bridge_mix</code></li>
+<li>updaters:</li>
+<li><code>score_weighted_preference</code></li>
+<li><code>contrastive_preference</code></li>
+<li><code>softmax_preference</code></li>
+<li><code>borda_preference</code></li>
+<li><code>bradley_terry_preference</code></li>
+<li><code>challenger_mixture_preference</code></li>
+<li><code>plackett_luce_preference</code></li>
+<li><code>advantage_softmax_preference</code></li>
+</ul>
+<p>The current stagnation-control contract is:</p>
+<ul>
+<li><code>stagnation_patience</code> counts repeated selected-image carry-forward before search widening activates</li>
+<li><code>stagnation_trust_radius_scale</code> multiplies the effective trust radius for the next proposal step</li>
+<li>widened challenger rounds are annotated in candidate generation metadata so trace and paper experiments can detect when escape logic was active</li>
+</ul>
+<p>The current roadmap also includes expanding steering support beyond prompt-only generation into:</p>
+<ul>
+<li>image-prompt or image-variation workflows</li>
+<li>inpainting workflows</li>
+<li>ControlNet-guided workflows</li>
+</ul>
+<p>The current paper experiment surface now also includes oracle-policy comparisons that are not part of the session YAML UI:</p>
+<ul>
+<li><code>clip_only</code></li>
+<li><code>clip_dino_ensemble</code></li>
+<li><code>clip_novelty_bonus</code></li>
+</ul>
+<p>These are experiment-layer oracle selectors used by the paper runners rather than interactive frontend configuration knobs. The current comparison runner for that layer is:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/scripts/run_paper_method_extension_comparison.py">run_paper_method_extension_comparison.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/paper/protocols/method_extension_comparison_suite.yaml">method_extension_comparison_suite.yaml</a></li>
+</ul>
+<p>The current focused oracle-stagnation diagnosis surface adds one more compact paper runner:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/scripts/run_paper_oracle_progress_diagnosis.py">run_paper_oracle_progress_diagnosis.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/paper/protocols/oracle_progress_diagnosis_suite.yaml">oracle_progress_diagnosis_suite.yaml</a></li>
+</ul>
+<p>A newer inspired-methods slice extends that same runner with:</p>
+<ul>
+<li>a quality-diversity multi-emitter sampler</li>
+<li>a listwise Plackett-Luce updater</li>
+<li>a Pareto-style oracle selector that balances CLIP, DINOv2, and novelty-to-incumbent</li>
+</ul>
+<p>The compact suite for that comparison is:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/paper/protocols/oracle_inspired_methods_suite.yaml">oracle_inspired_methods_suite.yaml</a></li>
+</ul>
+<p>That runner was added after the repeated oracle studies revealed a concrete failure mode: the carried-forward incumbent often kept winning and visible progress stopped after the early rounds. The compact diagnosis bundle compares targeted fixes across:</p>
+<ul>
+<li>sampler geometry</li>
+<li>richer feedback modeling</li>
+<li>softer oracle selection when challengers are close to the incumbent</li>
+</ul>
+<p>The newest compact reformulation bundle extends that diagnosis again with:</p>
+<ul>
+<li>a restart-style sampler that mixes bridge refinements with partial restarts</li>
+<li>an incumbent-aware softmax updater that rewards challengers by advantage over the incumbent</li>
+<li>oracle selectors that score either directional progress toward the hidden target or challenger advantage relative to the incumbent</li>
+</ul>
+<p>That compact suite is:</p>
+<ul>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/scripts/run_paper_oracle_progress_diagnosis.py">run_paper_oracle_progress_diagnosis.py</a></li>
+<li><a href="https://github.com/ApartsinProjects/StableSteering/blob/main/paper/protocols/oracle_plateau_reformulation_suite.yaml">oracle_plateau_reformulation_suite.yaml</a></li>
+</ul>
+<p>The most important lesson from that bundle is that anti-plateau policy is not one-dimensional:</p>
+<ul>
+<li><code>restart_directional</code> maximizes visible late-round movement and removes plateauing entirely in the compact slice</li>
+<li><code>restart_advantage</code> recovers the strongest final CLIP score in the same slice</li>
+<li>these do not coincide, so the design problem is balancing challenger pressure against final proxy alignment rather than simply forcing motion</li>
+</ul>
+<h3 id="64-evolve-persistence">6.4 Evolve persistence</h3>
+<p>To move from SQLite to PostgreSQL or another shared store:</p>
+<ol>
+<li>keep repository method names stable</li>
+<li>preserve session and round ordering</li>
+<li>preserve replay export shape</li>
+<li>add migration-safe tests before swapping implementations</li>
+</ol>
+<h2 id="7-coding-conventions-for-this-project">7. Coding Conventions for This Project</h2>
+<ul>
+<li>prefer small, focused modules</li>
+<li>keep orchestration logic out of route handlers</li>
+<li>keep feedback normalization separate from update logic</li>
+<li>keep persistence inspectable and replay-friendly</li>
+<li>preserve deterministic behavior in tests</li>
+<li>add docstrings when adding new services or public models</li>
+</ul>
+<h2 id="8-testing-expectations">8. Testing Expectations</h2>
+<p>Before merging meaningful behavior changes:</p>
+<ul>
+<li>run <code>python -m pytest</code></li>
+<li>run <code>npm run test:e2e:chrome</code> for UI-impacting changes</li>
+<li>use <code>npm run test:e2e:debug</code> when you need to watch the browser flow interactively</li>
+<li>use <code>npm run test:e2e:real</code> when you need browser validation against the real Diffusers backend</li>
+<li>add or update at least one relevant test when changing lifecycle behavior</li>
+<li>preserve replay export compatibility where possible</li>
+<li>keep the explicitly injected mock test path working even if the runtime stays GPU-only</li>
+<li>keep tracing outputs stable enough for debugging and auditability</li>
+<li>keep <code>report.html</code> readable when changing trace payload shapes</li>
+</ul>
+<h2 id="9-common-development-tasks">9. Common Development Tasks</h2>
+<h3 id="start-fresh-local-data">Start fresh local data</h3>
+<p>Delete the local data directory if you want a clean environment:</p>
+<pre><code class="language-text">data/
+</code></pre>
+<h3 id="inspect-persisted-state">Inspect persisted state</h3>
+<p>Look in:</p>
+<pre><code class="language-text">data/stablesteering.db
+data/artifacts/
+data/traces/
+</code></pre>
+<p>Open the readable report for one session:</p>
+<pre><code class="language-text">/sessions/{session_id}/trace-report
+</code></pre>
+<h3 id="validate-the-browser-flow">Validate the browser flow</h3>
+<p>Minimal manual smoke test:</p>
+<ol>
+<li>open <code>/setup</code></li>
+<li>create an experiment</li>
+<li>open the session page</li>
+<li>generate a round</li>
+<li>submit ratings</li>
+<li>open replay</li>
+</ol>
+<h2 id="10-recommended-next-engineering-steps">10. Recommended Next Engineering Steps</h2>
+<ul>
+<li>add export packaging for session trace bundles</li>
+<li>add richer end-to-end browser tests</li>
+</ul>
+      </main>
+    </div>
+  </body>
+</html>

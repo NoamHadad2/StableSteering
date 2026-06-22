@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Feedback modes</title>
+  <desc id="desc">Diagram summarizing the feedback modes supported by the session UI and what signal each one sends to the backend.</desc>
+  <style>
+    .bg { fill: #fbfaf6; }
+    .box { fill: #ffffff; stroke: #31445e; stroke-width: 2.2; rx: 18; ry: 18; }
+    .head { fill: #eef4ff; }
+    .title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .label { font: 700 18px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+    .body { font: 15px 'Segoe UI', Arial, sans-serif; fill: #344054; }
+    .small { font: 14px 'Segoe UI', Arial, sans-serif; fill: #475467; }
+    .arrow { stroke: #4f6384; stroke-width: 3.2; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#4f6384"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1200" height="760"/>
+  <text class="title" x="60" y="58">Feedback Modes and Their Signals</text>
+
+  <rect class="box head" x="440" y="90" width="320" height="90"/>
+  <text class="label" x="470" y="130">Session UI</text>
+  <text class="body" x="470" y="156">The active mode determines which controls are shown.</text>
+
+  <rect class="box" x="70" y="240" width="200" height="150"/>
+  <text class="label" x="95" y="278">scalar_rating</text>
+  <text class="body" x="95" y="310">Per-candidate score</text>
+  <text class="body" x="95" y="336">Good for broad ranking</text>
+  <text class="small" x="95" y="366">Signal: ratings map</text>
+
+  <rect class="box" x="300" y="240" width="200" height="150"/>
+  <text class="label" x="325" y="278">pairwise</text>
+  <text class="body" x="325" y="310">Explicit winner and loser</text>
+  <text class="body" x="325" y="336">Good for clear comparisons</text>
+  <text class="small" x="325" y="366">Signal: ordered pair</text>
+
+  <rect class="box" x="530" y="240" width="200" height="150"/>
+  <text class="label" x="555" y="278">winner_only</text>
+  <text class="body" x="555" y="310">Choose one best candidate</text>
+  <text class="body" x="555" y="336">Fastest elicitation mode</text>
+  <text class="small" x="555" y="366">Signal: winner id</text>
+
+  <rect class="box" x="760" y="240" width="200" height="150"/>
+  <text class="label" x="785" y="278">approve_reject</text>
+  <text class="body" x="785" y="310">Mark acceptable options</text>
+  <text class="body" x="785" y="336">Then choose the best approved</text>
+  <text class="small" x="785" y="366">Signal: approved set plus winner</text>
+
+  <rect class="box" x="990" y="240" width="140" height="150"/>
+  <text class="label" x="1012" y="278">top_k</text>
+  <text class="body" x="1012" y="310">Rank the best few</text>
+  <text class="body" x="1012" y="336">Useful for listwise signal</text>
+  <text class="small" x="1012" y="366">Signal: ranked ids</text>
+
+  <rect class="box head" x="360" y="500" width="480" height="130"/>
+  <text class="label" x="390" y="540">Normalization and Update</text>
+  <text class="body" x="390" y="572">The frontend collects an explicit mode-specific payload.</text>
+  <text class="body" x="390" y="596">The backend validates it, normalizes it, and passes a consistent signal to the updater.</text>
+
+  <path class="arrow" d="M600 180 L170 240"/>
+  <path class="arrow" d="M600 180 L400 240"/>
+  <path class="arrow" d="M600 180 L630 240"/>
+  <path class="arrow" d="M600 180 L860 240"/>
+  <path class="arrow" d="M600 180 L1060 240"/>
+  <path class="arrow" d="M170 390 L450 500"/>
+  <path class="arrow" d="M400 390 L510 500"/>
+  <path class="arrow" d="M630 390 L600 500"/>
+  <path class="arrow" d="M860 390 L690 500"/>
+  <path class="arrow" d="M1060 390 L760 500"/>
+</svg>

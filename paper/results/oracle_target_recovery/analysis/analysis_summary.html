@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Oracle Target-Recovery Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Oracle Target-Recovery Analysis</h1>
+<p>This bundle measures how closely StableSteering can recover a held-out real target image when initialized only from a manually written caption.</p>
+<h2>Scope</h2>
+<ul>
+<li>targets: <code>3</code></li>
+<li>rounds per target: <code>10</code></li>
+<li>candidates per round: <code>4</code></li>
+</ul>
+<h2>Aggregate summary</h2>
+<ul>
+<li>mean round-one baseline similarity: <code>0.825</code></li>
+<li>mean round-ten best-candidate similarity: <code>0.896</code></li>
+<li>mean improvement from baseline to round ten: <code>0.071</code></li>
+</ul>
+<h2>Target-level summary</h2>
+<table>
+<thead>
+<tr>
+<th>target</th>
+<th style="text-align: right;">baseline</th>
+<th style="text-align: right;">round 1 best</th>
+<th style="text-align: right;">round 10 best</th>
+<th style="text-align: right;">delta baseline -&gt; round 10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mountain lake landscape</td>
+<td style="text-align: right;">0.784</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0.876</td>
+<td style="text-align: right;">0.092</td>
+</tr>
+<tr>
+<td>Black-and-white cat portrait</td>
+<td style="text-align: right;">0.852</td>
+<td style="text-align: right;">0.870</td>
+<td style="text-align: right;">0.893</td>
+<td style="text-align: right;">0.040</td>
+</tr>
+<tr>
+<td>Red bicycle street photo</td>
+<td style="text-align: right;">0.838</td>
+<td style="text-align: right;">0.919</td>
+<td style="text-align: right;">0.919</td>
+<td style="text-align: right;">0.081</td>
+</tr>
+</tbody>
+</table>
+<h2>Interpretation boundary</h2>
+<ul>
+<li>The oracle selects candidates using CLIP image-embedding similarity to the hidden target.</li>
+<li>This is a target-recovery proxy task, not a human-quality judgment.</li>
+<li>Improvement should therefore be interpreted as recovery in oracle space rather than broad visual superiority.</li>
+</ul>
+<h2>Figures</h2>
+<p><img alt="Oracle convergence" src="oracle_convergence.svg"></p>
+<p><img alt="Oracle progression contact sheet" src="oracle_progression_contact_sheet.png"></p></article></main>
+  </body>
+</html>

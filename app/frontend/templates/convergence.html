@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Convergence — {{ session.prompt }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero compact">
+        <p class="eyebrow">Convergence Report</p>
+        <h1>{{ session.prompt }}</h1>
+        <p class="lede">Steering convergence analysis for this session.</p>
+        <div class="actions">
+          <a class="button secondary" href="/sessions/{{ session.id }}/view">Back to session</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Status</h2>
+          {% if convergence.converged %}
+            <span class="status-badge" style="background:#edfaf3;color:#1a5c38;border:1px solid #7dd9a8;">✓ Converged</span>
+          {% else %}
+            <span class="status-badge" style="background:#f0f4ff;color:#2a3f8f;border:1px solid #c7d4f5;">◎ In progress</span>
+          {% endif %}
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Rounds completed</span>
+            <strong>{{ convergence.rounds_completed }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Converged at round</span>
+            <strong>{{ convergence.rounds_to_convergence if convergence.rounds_to_convergence else "—" }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Quiet streak</span>
+            <strong>{{ convergence.quiet_streak }} / {{ convergence.patience }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Latest step size</span>
+            <strong>{{ "%.4f"|format(convergence.latest_step) if convergence.latest_step is not none else "—" }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Convergence threshold</span>
+            <strong>{{ "%.4f"|format(convergence.min_delta * 0.55) }}</strong>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Reason</span>
+            <strong>{{ convergence.reason | replace("_", " ") }}</strong>
+          </div>
+        </div>
+      </section>
+
+      {% if convergence.step_magnitudes %}
+      <section class="card">
+        <div class="section-head">
+          <h2>Step size per round</h2>
+          <span>How far the steering vector moved each round</span>
+        </div>
+        <table class="convergence-table">
+          <thead>
+            <tr>
+              <th>Round</th>
+              <th>Step size (‖Δz‖)</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set threshold = convergence.min_delta * 0.55 %}
+            {% for step in convergence.step_magnitudes %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ "%.4f"|format(step) }}</td>
+              <td>
+                {% if step <= threshold %}
+                  <span class="step-quiet">Quiet ✓</span>
+                {% else %}
+                  <span class="step-moving">Moving</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      {% endif %}
+
+    </main>
+  </body>
+</html>

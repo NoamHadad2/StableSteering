@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repeated-Seed Multi-Metric Oracle Analysis</title>
+    <style>
+      body { margin: 0; background: #f3ece2; color: #201a15; font-family: Georgia, "Times New Roman", serif; }
+      main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+      article { background: #fffdfa; border: 1px solid #d9cdbc; border-radius: 18px; padding: 34px 38px 42px; }
+      h1, h2, h3 { line-height: 1.2; }
+      p, li { line-height: 1.68; font-size: 1.03rem; text-align: justify; text-justify: inter-word; }
+      figure { margin: 1.4rem auto; text-align: center; }
+      figure img { max-width: 100%; border: 1px solid #d9cdbc; border-radius: 12px; background: white; }
+      figcaption { margin-top: 0.7rem; color: #40352b; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.3rem; }
+      th, td { border: 1px solid #d9cdbc; padding: 0.7rem 0.78rem; text-align: left; vertical-align: top; }
+      th { background: #f2e8da; }
+    </style>
+  </head>
+  <body>
+    <main><article><h1>Repeated-Seed Multi-Metric Oracle Analysis</h1>
+<p>This study repeats the oracle target-recovery protocol three times per target and evaluates the resulting trajectories under two pretrained image-embedding families.</p>
+<h2>Scope</h2>
+<ul>
+<li>targets: <code>3</code></li>
+<li>repeats per target: <code>3</code></li>
+<li>total runs: <code>9</code></li>
+<li>total rounds: <code>90</code></li>
+</ul>
+<h2>Aggregate summary</h2>
+<ul>
+<li>CLIP cosine: baseline <code>0.841</code>, final <code>0.869</code>, delta <code>0.028</code> (sd <code>0.031</code>)</li>
+<li>DINOv2 cosine: baseline <code>0.507</code>, final <code>0.598</code>, delta <code>0.091</code> (sd <code>0.151</code>)</li>
+</ul>
+<h2>Target-level summary</h2>
+<table>
+<thead>
+<tr>
+<th>target</th>
+<th style="text-align: right;">repeats</th>
+<th style="text-align: right;">clip final (mean ± sd)</th>
+<th style="text-align: right;">dinov2 final (mean ± sd)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Black-and-white cat portrait</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.871 ± 0.012</td>
+<td style="text-align: right;">0.627 ± 0.075</td>
+</tr>
+<tr>
+<td>Mountain lake landscape</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.826 ± 0.010</td>
+<td style="text-align: right;">0.444 ± 0.060</td>
+</tr>
+<tr>
+<td>Red bicycle street photo</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.910 ± 0.006</td>
+<td style="text-align: right;">0.723 ± 0.014</td>
+</tr>
+</tbody>
+</table>
+<h2>Interpretation boundary</h2>
+<ul>
+<li>CLIP remains the oracle selection metric.</li>
+<li>DINOv2 is added as an independent evaluation metric rather than an oracle.</li>
+<li>Repeated seeds reduce the chance that the observed trend is a single-session artifact.</li>
+<li>The study is still a proxy target-recovery evaluation, not a human-preference study.</li>
+</ul>
+<h2>Figure</h2>
+<p><img alt="Repeated-seed multi-metric oracle convergence" src="oracle_multimetric_repeated.svg"></p></article></main>
+  </body>
+</html>

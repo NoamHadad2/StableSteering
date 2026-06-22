@@ -1,0 +1,129 @@
+# Quick Start
+
+## 1. Install
+
+Published HTML documentation:
+
+- [GitHub Pages Docs](https://apartsinprojects.github.io/StableSteering/)
+
+If you want the conceptual walkthrough first, read [Student Tutorial](student_tutorial.md).
+
+From the repository root:
+
+```bash
+python -m pip install -e .[dev]
+```
+
+## 2. Run the App
+
+```bash
+python scripts/run_dev.py
+```
+
+This server run is GPU-only by default and expects a CUDA-capable machine with
+the real Diffusers backend configured.
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+## 3. Create Your First Session
+
+1. open `/setup`
+2. enter a text prompt
+3. enter an experiment name
+4. keep the default YAML configuration for your first run
+5. submit the form
+
+## 4. Run One Steering Cycle
+
+1. click `Generate next round`
+2. watch the progress bar while the async generation job runs
+3. use the visible controls for the active feedback mode
+4. click `Submit feedback`
+5. watch the status message while the async feedback job runs
+6. click `Generate next round` again
+
+## 5. Review Replay
+
+Open the replay page from the session view to inspect the stored rounds and update summaries.
+
+You can also open the session trace report from the session or replay page to inspect:
+
+- proposed images
+- frontend actions
+- normalized preferences
+- backend diagnostics
+
+## 6. Run the Tests
+
+```bash
+python -m pytest
+```
+
+Browser end-to-end tests:
+
+```bash
+npm install
+npm run test:e2e:chrome
+```
+
+Headed Chrome debug run:
+
+```bash
+npm run test:e2e:debug
+```
+
+The browser suite also includes a replay export API smoke test in addition to the click-through UI flow.
+
+## 7. Prepare Hugging Face Model Assets
+
+If you want to stage the real Diffusers model snapshot:
+
+```bash
+python scripts/setup_huggingface.py
+```
+
+Example with an explicit output directory:
+
+```bash
+python scripts/setup_huggingface.py --model-id runwayml/stable-diffusion-v1-5 --output-root models
+```
+
+Install inference dependencies and enable the real backend:
+
+```bash
+python -m pip install -e .[dev,inference]
+set STABLE_STEERING_GENERATION_BACKEND=diffusers
+python scripts/run_dev.py
+```
+
+Real Diffusers inference runs on GPU only. If CUDA is unavailable, the app
+refuses to start instead of falling back to mock. The mock generator is test-only.
+
+Tracing is enabled by default. Backend and frontend trace events are persisted under:
+
+```text
+data/traces/
+```
+
+Per-session bundles are persisted under:
+
+```text
+data/traces/sessions/<session_id>/
+```
+
+Create a real GPU-backed example bundle with images and HTML walkthrough:
+
+```bash
+python scripts/create_real_e2e_example.py
+```
+
+## 8. Where to Read Next
+
+- [Student Tutorial](student_tutorial.md)
+- [User Guide](user_guide.md)
+- [Developer Guide](developer_guide.md)
+- [FAQ](faq.md)
