@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This report documents two independent features added to the StableSteering research platform. Both features were designed to address gaps explicitly listed in the professor's research roadmap (`docs/research_improvement_roadmap.md`). All additions are **strictly additive** — no existing algorithm, updater, sampler, or feedback mode was modified. The platform's 102 original tests continue to pass, and 8 new tests were added, bringing the total to **110 passing tests**.
+This report documents two independent features added to the StableSteering research platform. Both features were designed to address gaps explicitly listed in the supervisor's research roadmap (`docs/research_improvement_roadmap.md`). All additions are **strictly additive** — no existing algorithm, updater, sampler, or feedback mode was modified. The platform's 102 original tests continue to pass, and 8 new tests were added, bringing the total to **110 passing tests**.
 
 ### At a Glance
 
@@ -36,7 +36,7 @@ How the two features plug into the existing pipeline:
 
 ### Motivation
 
-The platform had no mechanism to tell a user or researcher when a steering session had "settled." Every session ran for a fixed number of rounds with no signal that the steering vector `z` had stopped meaningfully moving. The professor's roadmap (§5, §8.4) listed convergence tracking as a prerequisite for studying session efficiency and comparing strategies.
+The platform had no mechanism to tell a user or researcher when a steering session had "settled." Every session ran for a fixed number of rounds with no signal that the steering vector `z` had stopped meaningfully moving. The supervisor's roadmap (§5, §8.4) listed convergence tracking as a prerequisite for studying session efficiency and comparing strategies.
 
 ### How It Works
 
@@ -87,7 +87,7 @@ Setting `convergence_patience = 0` disables detection entirely (backward-compati
 
 ### Motivation
 
-The professor's roadmap (§7.4) explicitly states:
+The supervisor's roadmap (§7.4) explicitly states:
 
 > *"some workflows may benefit more from shortlist, **critique**, or incumbent-comparison interactions"*  
 > *"test **critique-aware models** that combine discrete selections with structured or free-text reasons"*
