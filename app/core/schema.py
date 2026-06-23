@@ -185,6 +185,9 @@ class FeedbackEvent(BaseModel):
     normalized_payload: dict[str, Any]
     critique_text: str | None = None
     critique_tags: dict[str, list[str]] = Field(default_factory=dict)
+    dimension_ratings: dict[str, dict[str, int]] = Field(default_factory=dict)
+    dimension_priorities: dict[str, dict[str, int]] = Field(default_factory=dict)
+    negative_pins: dict[str, list[str]] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=utc_now)
 
 
@@ -269,6 +272,9 @@ class FeedbackRequest(BaseModel):
     feedback_type: FeedbackType
     payload: dict[str, Any]
     critique_text: str | None = None
+    dimension_ratings: dict[str, dict[str, int]] = Field(default_factory=dict)
+    dimension_priorities: dict[str, dict[str, int]] = Field(default_factory=dict)
+    negative_pins: dict[str, list[str]] = Field(default_factory=dict)
 
 
 class FeedbackResponse(BaseModel):

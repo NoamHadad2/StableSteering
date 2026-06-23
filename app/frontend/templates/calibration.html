@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Aesthetic Calibration</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page narrow">
+      <section class="hero compact">
+        <p class="eyebrow">Step 0 — Optional</p>
+        <h1>What's your visual style?</h1>
+        <p class="lede">Pick the styles that resonate with you. This helps the model understand your taste before the first image is generated — fewer rounds to reach what you want.</p>
+      </section>
+
+      <section class="card">
+        <p id="calibration-status" class="status-message" role="status" aria-live="polite" hidden></p>
+        <div class="calibration-grid" id="calibration-grid">
+
+          <button class="calibration-card" data-tag="photorealistic" aria-pressed="false">
+            <div class="calibration-icon">📷</div>
+            <strong>Photorealistic</strong>
+            <span>Looks like a real photograph — high detail, natural lighting</span>
+          </button>
+
+          <button class="calibration-card" data-tag="cinematic" aria-pressed="false">
+            <div class="calibration-icon">🎬</div>
+            <strong>Cinematic</strong>
+            <span>Movie-like framing, dramatic contrast, widescreen feel</span>
+          </button>
+
+          <button class="calibration-card" data-tag="painterly" aria-pressed="false">
+            <div class="calibration-icon">🎨</div>
+            <strong>Painterly</strong>
+            <span>Artistic brush strokes, impressionistic, textured</span>
+          </button>
+
+          <button class="calibration-card" data-tag="warm_tones" aria-pressed="false">
+            <div class="calibration-icon">🌅</div>
+            <strong>Warm Tones</strong>
+            <span>Golden hour light, amber and orange hues, cozy feel</span>
+          </button>
+
+          <button class="calibration-card" data-tag="cool_tones" aria-pressed="false">
+            <div class="calibration-icon">🌙</div>
+            <strong>Cool Tones</strong>
+            <span>Blue and teal palette, crisp, calm atmosphere</span>
+          </button>
+
+          <button class="calibration-card" data-tag="minimalist" aria-pressed="false">
+            <div class="calibration-icon">⬜</div>
+            <strong>Minimalist</strong>
+            <span>Clean, uncluttered, strong negative space</span>
+          </button>
+
+          <button class="calibration-card" data-tag="dramatic_lighting" aria-pressed="false">
+            <div class="calibration-icon">⚡</div>
+            <strong>Dramatic Lighting</strong>
+            <span>High contrast, deep shadows, strong highlights</span>
+          </button>
+
+          <button class="calibration-card" data-tag="soft_light" aria-pressed="false">
+            <div class="calibration-icon">☁️</div>
+            <strong>Soft Light</strong>
+            <span>Diffused, gentle illumination, no harsh shadows</span>
+          </button>
+
+          <button class="calibration-card" data-tag="high_detail" aria-pressed="false">
+            <div class="calibration-icon">🔬</div>
+            <strong>High Detail</strong>
+            <span>Sharp textures, intricate elements, crisp edges</span>
+          </button>
+
+          <button class="calibration-card" data-tag="wide_angle" aria-pressed="false">
+            <div class="calibration-icon">🌄</div>
+            <strong>Wide Angle</strong>
+            <span>Expansive landscape view, sense of scale and space</span>
+          </button>
+
+          <button class="calibration-card" data-tag="moody" aria-pressed="false">
+            <div class="calibration-icon">🌫️</div>
+            <strong>Moody</strong>
+            <span>Atmospheric, evocative, emotional depth</span>
+          </button>
+
+          <button class="calibration-card" data-tag="vibrant" aria-pressed="false">
+            <div class="calibration-icon">🌈</div>
+            <strong>Vibrant</strong>
+            <span>Saturated colors, energetic, eye-catching palette</span>
+          </button>
+
+        </div>
+        <p class="hint">Select as many as you like. Your choices are saved in this browser and pre-loaded into your next session.</p>
+        <div class="actions">
+          <button class="button" id="save-calibration-button">Save and go to Setup</button>
+          <a class="button secondary" href="/setup">Skip and go to Setup</a>
+        </div>
+      </section>
+    </main>
+    <script>
+      const cards = Array.from(document.querySelectorAll(".calibration-card"));
+      const saved = JSON.parse(localStorage.getItem("aesthetic_profile") || "[]");
+
+      cards.forEach((card) => {
+        if (saved.includes(card.dataset.tag)) {
+          card.setAttribute("aria-pressed", "true");
+          card.classList.add("selected");
+        }
+        card.addEventListener("click", () => {
+          const pressed = card.getAttribute("aria-pressed") === "true";
+          card.setAttribute("aria-pressed", pressed ? "false" : "true");
+          card.classList.toggle("selected", !pressed);
+        });
+      });
+
+      document.getElementById("save-calibration-button").addEventListener("click", () => {
+        const selected = cards
+          .filter((c) => c.getAttribute("aria-pressed") === "true")
+          .map((c) => c.dataset.tag);
+        localStorage.setItem("aesthetic_profile", JSON.stringify(selected));
+        window.location.href = "/setup";
+      });
+    </script>
+  </body>
+</html>

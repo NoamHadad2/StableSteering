@@ -85,6 +85,9 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         normalized_payload=normalized,
         critique_text=request.critique_text,
         critique_tags=normalized.get("critique_tags", {}),
+        dimension_ratings=request.dimension_ratings,
+        dimension_priorities=request.dimension_priorities,
+        negative_pins=request.negative_pins,
     )
 
 

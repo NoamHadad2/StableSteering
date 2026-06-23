@@ -68,6 +68,40 @@
         {% endif %}
       </section>
 
+      {% if taste_profile and taste_profile.rounds_used > 0 %}
+      <section class="card taste-profile-card">
+        <div class="section-head">
+          <h2>Taste Profile</h2>
+          <span class="taste-confidence">Profile confidence: {{ taste_profile.confidence }}%</span>
+        </div>
+        <p class="hint">What the model has learned about your preferences so far — based on {{ taste_profile.rounds_used }} round{% if taste_profile.rounds_used != 1 %}s{% endif %} of feedback.</p>
+        <div class="taste-dims">
+          {% for dim, data in taste_profile.dimensions.items() %}
+          <div class="taste-dim-row">
+            <span class="taste-dim-name">{{ dim }}</span>
+            <div class="taste-bar-track">
+              <div class="taste-bar" style="width: {{ data.signal_pct }}%"></div>
+            </div>
+            <span class="taste-pct">{{ data.signal_pct }}%</span>
+            <span class="taste-trend taste-trend-{{ data.trend }}" title="Trend across rounds">
+              {% if data.trend == "growing" %}↑{% elif data.trend == "declining" %}↓{% elif data.trend == "stable" %}→{% else %}●{% endif %}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        {% if taste_profile.negative_pins %}
+        <div class="taste-pins">
+          <span class="dimension-label">Recurring issues</span>
+          <div class="negative-pin-pills" style="margin-top:0.4rem">
+            {% for issue, count in taste_profile.negative_pins.items() %}
+            <span class="negative-pin-pill active">{{ issue }} ×{{ count }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </section>
+      {% endif %}
+
       <section class="card" id="round-container">
         <div class="section-head">
           <h2>Round history</h2>
@@ -82,20 +116,35 @@
                 <span class="round-summary-meta">{{ round.candidates|length }} candidates{% if round.feedback_events %} · feedback recorded{% else %} · awaiting feedback{% endif %}</span>
               </summary>
               <div class="round-body">
+                {% if is_current_round and not round.feedback_events %}
+                <div class="priority-section card">
+                  <span class="dimension-label">Priority order — drag to rank what matters most ↕</span>
+                  <div class="dimension-list global-priority-list">
+                    {% for dim in prompt_dimensions %}
+                    <div class="dimension-row" draggable="true" data-dimension="{{ dim }}" data-priority="{{ loop.index }}">
+                      <span class="priority-badge">{{ loop.index }}</span>
+                      <span class="dimension-name">{{ dim }}</span>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <p class="weighted-score-hint">Higher priority = more weight in the overall score.</p>
+                </div>
+                {% endif %}
                 <div class="image-grid">
                   {% for candidate in round.candidates %}
-                    <article class="image-card">
-                      <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}">
+                    <article class="image-card" data-candidate-id="{{ candidate.id }}">
+                      <img src="{{ candidate.image_path }}" alt="Candidate {{ candidate.candidate_index }}" class="candidate-image" data-candidate-id="{{ candidate.id }}">
                       <h3>Candidate {{ candidate.candidate_index + 1 }}</h3>
                       <p class="candidate-subtitle">{{ candidate.id }}</p>
                       <div class="candidate-meta">
                         <p>Role <span class="help-tip inline" tabindex="0" role="note" aria-label="Candidate role help" data-tooltip="Baseline is the raw prompt, incumbent is the previous winner, and sampler roles describe how other candidates were proposed.">?</span>: <strong>{{ candidate.sampler_role }}</strong></p>
                       </div>
                       {% if is_current_round and not round.feedback_events %}
-                        <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode.value }}">
+                        <div class="candidate-controls" data-feedback-mode="{{ session.config.feedback_mode.value }}"
+                             data-candidate-id="{{ candidate.id }}">
                           {% if session.config.feedback_mode.value == "scalar_rating" %}
                             <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
-                              <span class="rating-label">Rating</span>
+                              <span class="rating-label">Overall rating</span>
                               <div class="star-rating" role="radiogroup" aria-label="Rate candidate {{ candidate.id }}">
                                 {% for star in [1, 2, 3, 4, 5] %}
                                   <button
@@ -110,6 +159,29 @@
                               </div>
                               <input type="hidden" class="rating-input" data-candidate-id="{{ candidate.id }}" value="0">
                               <p class="star-rating-caption" data-candidate-id="{{ candidate.id }}">No rating selected yet</p>
+                            </div>
+                            <div class="dimension-rating-section" data-candidate-id="{{ candidate.id }}">
+                              <span class="dimension-label">Rate each dimension</span>
+                              {% for dim in prompt_dimensions %}
+                              <div class="dimension-row-static">
+                                <span class="dimension-name">{{ dim }}</span>
+                                <div class="dimension-stars" role="radiogroup">
+                                  {% for star in [1, 2, 3, 4, 5] %}
+                                  <button type="button" class="dim-star-button"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-dimension="{{ dim }}"
+                                    data-value="{{ star }}"
+                                    aria-pressed="false">★</button>
+                                  {% endfor %}
+                                </div>
+                                <input type="hidden" class="dim-rating-input"
+                                  data-candidate-id="{{ candidate.id }}"
+                                  data-dimension="{{ dim }}" value="0">
+                              </div>
+                              {% endfor %}
+                              <p class="weighted-score-hint" data-candidate-id="{{ candidate.id }}">
+                                Overall score updates automatically based on priority order above.
+                              </p>
                             </div>
                           {% elif session.config.feedback_mode.value == "pairwise" %}
                             <label class="choice-row">

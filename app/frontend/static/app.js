@@ -299,10 +299,126 @@ function collectCritiqueTags() {
   return tags;
 }
 
+// ── Dimension ratings ────────────────────────────────────────────────────────
+function getpriorities() {
+  const priorities = {};
+  document.querySelectorAll(".global-priority-list .dimension-row[data-dimension]").forEach((row) => {
+    priorities[row.dataset.dimension] = parseInt(row.dataset.priority, 10);
+  });
+  return priorities;
+}
+
+function recalcWeightedScore(candidateId) {
+  const priorities = getpriorities();
+  const dims = Object.keys(priorities);
+  if (dims.length === 0) return;
+  const N = dims.length;
+  let weightedSum = 0;
+  let totalWeight = 0;
+  dims.forEach((dim) => {
+    const priorityIndex = priorities[dim] - 1;
+    const weight = N - priorityIndex;
+    const input = document.querySelector(`.dim-rating-input[data-candidate-id="${candidateId}"][data-dimension="${dim}"]`);
+    const score = input ? parseInt(input.value, 10) || 0 : 0;
+    weightedSum += weight * score;
+    totalWeight += weight;
+  });
+  if (totalWeight === 0) return;
+  const weighted = weightedSum / totalWeight;
+  const rounded = Math.round(weighted);
+  applyStarRating(candidateId, rounded);
+  const hint = document.querySelector(`.weighted-score-hint[data-candidate-id="${candidateId}"]`);
+  if (hint) hint.textContent = `Weighted score: ${weighted.toFixed(2)} / 5`;
+}
+
+document.querySelectorAll(".dim-star-button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const candidateId = btn.dataset.candidateId;
+    const dim = btn.dataset.dimension;
+    const val = parseInt(btn.dataset.value, 10);
+    const input = document.querySelector(`.dim-rating-input[data-candidate-id="${candidateId}"][data-dimension="${dim}"]`);
+    if (input) input.value = String(val);
+    document.querySelectorAll(`.dim-star-button[data-candidate-id="${candidateId}"][data-dimension="${dim}"]`).forEach((b) => {
+      const active = parseInt(b.dataset.value, 10) <= val;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    recalcWeightedScore(candidateId);
+  });
+});
+
+function collectDimensionRatings() {
+  const result = {};
+  document.querySelectorAll(".image-card[data-candidate-id]").forEach((card) => {
+    const cid = card.dataset.candidateId;
+    const dims = {};
+    card.querySelectorAll(".dim-rating-input").forEach((input) => {
+      const v = parseInt(input.value, 10);
+      if (v > 0) dims[input.dataset.dimension] = v;
+    });
+    if (Object.keys(dims).length > 0) result[cid] = dims;
+  });
+  return result;
+}
+
+function collectDimensionPriorities() {
+  const priorities = getpriorities();
+  if (Object.keys(priorities).length === 0) return {};
+  const result = {};
+  document.querySelectorAll(".image-card[data-candidate-id]").forEach((card) => {
+    result[card.dataset.candidateId] = priorities;
+  });
+  return result;
+}
+
+
+// ── Drag-to-rank priority ─────────────────────────────────────────────────────
+let _dragRow = null;
+document.querySelectorAll(".global-priority-list").forEach((list) => {
+  list.addEventListener("dragstart", (e) => {
+    _dragRow = e.target.closest(".dimension-row");
+    if (_dragRow) _dragRow.classList.add("dragging");
+  });
+  list.addEventListener("dragend", () => {
+    if (_dragRow) _dragRow.classList.remove("dragging");
+    _dragRow = null;
+  });
+  list.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    if (!_dragRow) return;
+    const target = e.target.closest(".dimension-row");
+    if (target && target !== _dragRow) {
+      const rect = target.getBoundingClientRect();
+      const after = e.clientY > rect.top + rect.height / 2;
+      list.insertBefore(_dragRow, after ? target.nextSibling : target);
+      list.querySelectorAll(".dimension-row").forEach((row, i) => {
+        row.dataset.priority = String(i + 1);
+        const badge = row.querySelector(".priority-badge");
+        if (badge) badge.textContent = String(i + 1);
+      });
+      document.querySelectorAll(".image-card[data-candidate-id]").forEach((card) => {
+        recalcWeightedScore(card.dataset.candidateId);
+      });
+    }
+  });
+});
+
+// ── Setup form — aesthetic calibration injection ──────────────────────────────
 const setupForm = document.getElementById("setup-form");
 const setupSubmitButton = document.getElementById("setup-submit-button");
 if (setupForm) {
   traceFrontend("page.loaded", { view: "setup" });
+  try {
+    const aestheticRaw = localStorage.getItem("aesthetic_profile");
+    if (aestheticRaw) {
+      const styles = JSON.parse(aestheticRaw);
+      if (Array.isArray(styles) && styles.length > 0) {
+        const banner = document.getElementById("aesthetic-banner");
+        const tags = document.getElementById("aesthetic-tags");
+        if (banner && tags) { tags.textContent = styles.map((s) => s.replace(/_/g, " ")).join(", "); banner.style.display = ""; }
+      }
+    }
+  } catch (_) {}
   reloadConfigButton?.addEventListener("click", async () => {
     reloadConfigButton.disabled = true;
     setStatus("Reloading default YAML template...");
@@ -327,17 +443,30 @@ if (setupForm) {
     setStatus("Creating experiment and session from YAML configuration...");
     try {
       const form = new FormData(setupForm);
+      let prompt = form.get("prompt") || "";
+      try {
+        const aestheticRaw = localStorage.getItem("aesthetic_profile");
+        if (aestheticRaw) {
+          const styles = JSON.parse(aestheticRaw);
+          if (Array.isArray(styles) && styles.length > 0) {
+            const styleTag = styles.map((s) => s.replace(/_/g, " ")).join(", ");
+            if (!prompt.toLowerCase().includes(styles[0].replace(/_/g, " ").toLowerCase())) {
+              prompt = prompt.trimEnd().replace(/,\s*$/, "") + ", " + styleTag;
+            }
+          }
+        }
+      } catch (_) {}
       const payload = await postJson("/setup/session", {
         experiment_name: form.get("experiment_name"),
         description: form.get("description"),
-        prompt: form.get("prompt"),
+        prompt,
         negative_prompt: form.get("negative_prompt"),
         config_yaml: form.get("config_yaml"),
       });
       traceFrontend("experiment.created", { experiment_id: payload.experiment.id });
       traceFrontend("session.created", { session_id: payload.session.id });
       setStatus("Session created. Opening the interactive view...");
-      window.location.href = `/sessions/${payload.session.id}/view`;
+      window.location.href = `/sessions/${payload.session.id}/style-calibration`;
     } catch (error) {
       setStatus(error.message, true);
     } finally {
@@ -406,6 +535,9 @@ if (submitFeedbackButton) {
     const sessionId = submitFeedbackButton.dataset.sessionId;
     try {
       const request = buildFeedbackPayload(feedbackMode);
+      request.dimension_ratings = collectDimensionRatings();
+      request.dimension_priorities = collectDimensionPriorities();
+
       traceFrontend("feedback.submit.clicked", {
         round_id: submitFeedbackButton.dataset.roundId,
         feedback_mode: feedbackMode,
@@ -443,3 +575,81 @@ if (submitFeedbackButton) {
     }
   });
 }
+
+// ── Style Calibration page ────────────────────────────────────────────────────
+const generateCalButton = document.getElementById("generate-cal-button");
+if (generateCalButton) {
+  generateCalButton.addEventListener("click", async () => {
+    const sessionId = generateCalButton.dataset.sessionId;
+    generateCalButton.disabled = true;
+    setStatus("Generating 15 style images — this takes a few minutes...");
+    setProgress(5, "Starting calibration generation");
+    try {
+      const job = await postJson(`/sessions/${sessionId}/style-calibration/generate/async`, {});
+      await pollJob(job.status_url, {
+        onProgress: (snapshot) => {
+          setStatus(snapshot.status_message);
+          setProgress(snapshot.progress, snapshot.status_message || "Generating calibration images");
+        },
+      });
+      setStatus("Images ready! Reloading...");
+      setProgress(100, "Done");
+      window.location.reload();
+    } catch (error) {
+      setStatus(error.message, true);
+      clearProgress();
+      generateCalButton.disabled = false;
+    }
+  });
+}
+
+const submitCalButton = document.getElementById("submit-cal-button");
+if (submitCalButton) {
+  const _selectedCal = new Set();
+
+  document.querySelectorAll(".cal-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const cid = card.dataset.candidateId;
+      if (_selectedCal.has(cid)) {
+        _selectedCal.delete(cid);
+        card.classList.remove("cal-selected");
+      } else if (_selectedCal.size < 5) {
+        _selectedCal.add(cid);
+        card.classList.add("cal-selected");
+      }
+      const count = document.getElementById("selection-count");
+      if (count) count.textContent = `${_selectedCal.size} / 5 selected`;
+      submitCalButton.disabled = _selectedCal.size !== 5;
+    });
+  });
+
+  submitCalButton.addEventListener("click", async () => {
+    const sessionId = submitCalButton.dataset.sessionId;
+    submitCalButton.disabled = true;
+    setStatus("Saving your style preferences...");
+    try {
+      await postJson(`/sessions/${sessionId}/style-calibration/submit`, {
+        selected_ids: Array.from(_selectedCal),
+      });
+      window.location.href = `/sessions/${sessionId}/view`;
+    } catch (error) {
+      setStatus(error.message, true);
+      submitCalButton.disabled = false;
+    }
+  });
+}
+
+// ── Delete session (index page) ───────────────────────────────────────────────
+document.querySelectorAll(".delete-session-button").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const sessionId = btn.dataset.sessionId;
+    if (!confirm("Delete this session and all its rounds? This cannot be undone.")) return;
+    btn.disabled = true;
+    try {
+      await fetch(`/sessions/${sessionId}`, { method: "DELETE" });
+      btn.closest("tr")?.remove();
+    } catch {
+      btn.disabled = false;
+    }
+  });
+});

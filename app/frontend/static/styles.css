@@ -490,3 +490,55 @@ code { background: #f2ebdf; padding: 2px 6px; border-radius: 8px; }
   border-color: #f0a5a5;
   color: #8f2a2a;
 }
+
+/* ── Style Calibration ─────────────────────────────────────────────── */
+.cal-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
+.cal-card { position: relative; cursor: pointer; border: 3px solid transparent; border-radius: 10px; transition: border-color 0.15s, transform 0.12s; }
+.cal-card:hover { transform: translateY(-2px); border-color: #9ca3af; }
+.cal-card.cal-selected { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.25); }
+.cal-select-overlay { display: none; position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: #4f46e5; border-radius: 50%; align-items: center; justify-content: center; }
+.cal-card.cal-selected .cal-select-overlay { display: flex; }
+.cal-check { color: #fff; font-size: 1rem; font-weight: 700; line-height: 1; }
+
+
+/* ── Dimension star buttons ─────────────────────────────────────────── */
+.dimension-rating-section { margin-top: 1rem; }
+.dimension-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+.dimension-row-static { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.dimension-name { font-size: 0.82rem; flex: 1; color: var(--text-1); }
+.dimension-stars { display: flex; gap: 2px; }
+.dim-star-button { background: none; border: 1px solid #d1d5db; border-radius: 4px; width: 26px; height: 26px; font-size: 0.85rem; cursor: pointer; color: #9ca3af; transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
+.dim-star-button:hover { border-color: #d28d2f; color: #d28d2f; }
+.dim-star-button.active { background: linear-gradient(180deg,#fff4cc,#ffd98a); border-color: #d28d2f; color: #9a5700; }
+.weighted-score-hint { font-size: 0.78rem; color: var(--text-2); margin-top: 0.4rem; font-style: italic; }
+
+/* ── Negative pinning ───────────────────────────────────────────────── */
+.negative-pin-section { margin-top: 1rem; }
+.negative-pin-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem; }
+.negative-pin-pill { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 999px; border: 1px solid #d1d5db; background: #f9fafb; color: #4b5563; cursor: pointer; transition: all 0.12s; }
+.negative-pin-pill:hover { border-color: #f87171; color: #b91c1c; }
+.negative-pin-pill.active, .negative-pin-pill[aria-pressed="true"] { background: #fee2e2; border-color: #f87171; color: #b91c1c; font-weight: 600; }
+
+/* ── Priority drag list ─────────────────────────────────────────────── */
+.priority-section { margin-bottom: 1rem; padding: 1rem; }
+.dimension-list { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.5rem 0; }
+.dimension-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb; cursor: grab; user-select: none; transition: background 0.1s; }
+.dimension-row:hover { background: #f0f4ff; border-color: #a5b4fc; }
+.dimension-row.dragging { opacity: 0.4; }
+.priority-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #4f46e5; color: #fff; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+
+/* ── Taste Profile ──────────────────────────────────────────────────── */
+.taste-profile-card { }
+.taste-confidence { font-size: 0.82rem; color: var(--text-2); font-weight: 500; }
+.taste-dims { display: flex; flex-direction: column; gap: 0.5rem; margin: 1rem 0; }
+.taste-dim-row { display: flex; align-items: center; gap: 0.6rem; }
+.taste-dim-name { width: 110px; font-size: 0.82rem; color: var(--text-1); text-transform: capitalize; flex-shrink: 0; }
+.taste-bar-track { flex: 1; height: 8px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+.taste-bar { height: 100%; background: linear-gradient(90deg, #4f46e5, #818cf8); border-radius: 999px; transition: width 0.4s ease; }
+.taste-pct { width: 36px; font-size: 0.78rem; color: var(--text-2); text-align: right; flex-shrink: 0; }
+.taste-trend { font-size: 0.9rem; font-weight: 700; width: 16px; flex-shrink: 0; }
+.taste-trend-growing { color: #16a34a; }
+.taste-trend-declining { color: #dc2626; }
+.taste-trend-stable { color: #6b7280; }
+.taste-trend-new { color: #9ca3af; }
+.taste-pins { margin-top: 1rem; }

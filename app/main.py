@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from contextlib import asynccontextmanager
 from pathlib import Path
 from time import perf_counter
@@ -21,9 +22,18 @@ from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
 from app.frontend_trace import FrontendTraceEvent
 from app.updaters.critique_weighted_pref import CRITIQUE_TAGS
+from app.feedback.taste_profile import compute_taste_profile
 
 configure_logging()
 templates = Jinja2Templates(directory=str(Path("app/frontend/templates")))
+
+_STOP_WORDS = {"a","an","the","of","in","on","at","to","and","or","with","from","by","for","is","are","was","were"}
+_STYLE_DIMENSIONS = ["lighting", "color", "mood", "style", "realism", "composition", "detail"]
+
+def extract_prompt_dimensions(prompt: str) -> list[str]:
+    words = re.findall(r"[a-zA-Z]+", prompt.lower())
+    content_dims = [w for w in words if w not in _STOP_WORDS and len(w) > 3][:4]
+    return list(dict.fromkeys(content_dims + _STYLE_DIMENSIONS[:3]))
 
 
 def humanize_token(value: object) -> str:
@@ -215,6 +225,11 @@ def diagnostics_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("diagnostics.html", {"request": request, "diagnostics": payload})
 
 
+@app.get("/calibration", response_class=HTMLResponse)
+def calibration_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse("calibration.html", {"request": request})
+
+
 @app.get("/setup", response_class=HTMLResponse)
 def setup_page(request: Request) -> HTMLResponse:
     """Render the session setup page."""
@@ -244,7 +259,8 @@ def session_page(request: Request, session_id: str) -> HTMLResponse:
     session = request.app.state.orchestrator.get_session(session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
-    rounds = request.app.state.orchestrator.get_session_rounds(session_id)
+    all_rounds = request.app.state.orchestrator.get_session_rounds(session_id)
+    rounds = [r for r in all_rounds if r.round_index > 0]
     current_round = rounds[-1] if rounds else None
     runtime_diagnostics = request.app.state.orchestrator.generator.diagnostics()
     convergence = request.app.state.orchestrator.get_session_convergence(session_id)
@@ -258,6 +274,8 @@ def session_page(request: Request, session_id: str) -> HTMLResponse:
             "runtime_diagnostics": runtime_diagnostics,
             "convergence": convergence,
             "critique_tags": CRITIQUE_TAGS,
+            "prompt_dimensions": extract_prompt_dimensions(session.prompt),
+            "taste_profile": compute_taste_profile(all_rounds),
         },
     )
 
@@ -365,6 +383,58 @@ def get_session(session_id: str):
     if session is None:
         return api_error_response(404, "not_found", "Session not found")
     return session
+
+
+@app.delete("/sessions/{session_id}", status_code=204)
+def delete_session(session_id: str):
+    """Delete a session and all its rounds."""
+
+    app.state.orchestrator.delete_session(session_id)
+
+
+@app.get("/sessions/{session_id}/style-calibration", response_class=HTMLResponse)
+def style_calibration_page(request: Request, session_id: str) -> HTMLResponse:
+    """Render the style calibration page for a new session."""
+
+    session = app.state.orchestrator.get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    rounds = app.state.orchestrator.get_session_rounds(session_id)
+    cal_round = next((r for r in rounds if r.round_index == 0), None)
+    return templates.TemplateResponse(
+        "style_calibration.html",
+        {
+            "request": request,
+            "session": session,
+            "cal_round": cal_round,
+        },
+    )
+
+
+@app.post("/sessions/{session_id}/style-calibration/generate/async", status_code=202)
+async def style_calibration_generate_async(session_id: str):
+    """Kick off async generation of the 15 calibration images."""
+
+    try:
+        job = await app.state.job_manager.submit(
+            operation=f"calibration_round:{session_id}",
+            fn=lambda progress: app.state.orchestrator.generate_calibration_round(session_id, progress),
+        )
+    except KeyError as exc:
+        return api_error_response(404, "not_found", str(exc))
+    return {"job_id": job.id, "status_url": f"/jobs/{job.id}", "state": job.state}
+
+
+@app.post("/sessions/{session_id}/style-calibration/submit")
+def style_calibration_submit(session_id: str, body: dict):
+    """Accept the user's top picks and set the session's initial z vector."""
+
+    selected_ids = body.get("selected_ids", [])
+    try:
+        app.state.orchestrator.submit_calibration(session_id, selected_ids)
+    except (KeyError, ValueError) as exc:
+        return api_error_response(400, "invalid_input", str(exc))
+    return {"ok": True}
 
 
 @app.get("/sessions/{session_id}/convergence", response_class=HTMLResponse)

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Style Calibration — {{ session.id }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero compact">
+        <p class="eyebrow">Style Calibration</p>
+        <h1>Pick your 5 favorites</h1>
+        <p class="lede">We'll generate 15 images in very different styles from your prompt. Choose the 5 that feel closest to what you want — this sets the starting direction for the steering.</p>
+      </section>
+
+      <section class="card">
+        <p id="page-status" class="status-message" role="status" aria-live="polite" hidden></p>
+        <div id="progress-panel" class="progress-panel" hidden>
+          <div class="progress-head">
+            <strong id="progress-label">Working...</strong>
+            <span id="progress-value">0%</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        {% if not cal_round %}
+          <div class="soft-callout">
+            <strong>Ready to generate</strong>
+            <p>15 diverse style variants will be generated from your prompt: <em>{{ session.prompt }}</em></p>
+          </div>
+          <div class="actions">
+            <button class="button" id="generate-cal-button" data-session-id="{{ session.id }}">Generate 15 style images</button>
+            <a class="button secondary" href="/sessions/{{ session.id }}/view">Skip calibration</a>
+          </div>
+        {% else %}
+          <div class="section-head">
+            <h2>Select your 5 favorites</h2>
+            <span id="selection-count">0 / 5 selected</span>
+          </div>
+          <p class="hint">Click on images to select them. You need exactly 5.</p>
+          <div class="image-grid cal-grid">
+            {% for candidate in cal_round.candidates %}
+              <article class="image-card cal-card" data-candidate-id="{{ candidate.id }}">
+                <img src="{{ candidate.image_path }}" alt="Style {{ loop.index }}" class="candidate-image">
+                <div class="cal-select-overlay">
+                  <span class="cal-check">✓</span>
+                </div>
+                <h3>Style {{ loop.index }}</h3>
+              </article>
+            {% endfor %}
+          </div>
+          <div class="actions" style="margin-top:1.5rem">
+            <button class="button" id="submit-cal-button" data-session-id="{{ session.id }}" disabled>
+              Confirm selection and start session
+            </button>
+            <a class="button secondary" href="/sessions/{{ session.id }}/view">Skip — use default start</a>
+          </div>
+        {% endif %}
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

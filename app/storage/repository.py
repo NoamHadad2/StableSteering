@@ -176,6 +176,13 @@ class SQLiteRepository:
             return None
         return Session.model_validate(self._load_payload(row["payload_json"]))
 
+    def delete_session(self, session_id: str) -> None:
+        """Delete a session and all its rounds from storage."""
+
+        with self._lock, self._connect() as connection:
+            connection.execute("DELETE FROM rounds WHERE session_id = ?", (session_id,))
+            connection.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+
     def list_sessions(self) -> list[Session]:
         """Return all stored sessions with newest activity first."""
 

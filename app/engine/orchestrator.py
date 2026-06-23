@@ -168,6 +168,92 @@ class Orchestrator:
 
         return self.repository.list_sessions()
 
+    def delete_session(self, session_id: str) -> None:
+        """Delete a session and its rounds from storage."""
+
+        self.repository.delete_session(session_id)
+
+    def generate_calibration_round(
+        self,
+        session_id: str,
+        progress_callback: Callable[[int, str], None] | None = None,
+    ) -> RoundResponse:
+        """Generate 15 diverse style-exploration candidates for user calibration.
+
+        This runs before round 1. The candidates use a full-sphere spread at
+        maximum trust radius so the user sees the widest possible style range.
+        """
+
+        self._report_progress(progress_callback, 10, "Preparing calibration candidates")
+        session = self._require_session(session_id)
+
+        from copy import deepcopy as _deepcopy
+        cal_session = _deepcopy(session)
+        cal_session.config = _deepcopy(session.config)
+        cal_session.config.candidate_count = 15
+        cal_session.config.trust_radius = 1.0
+
+        sampler = self.samplers["spherical_cover"]
+        seed = self._seed_token(session.id, 0, "calibration")
+
+        self._report_progress(progress_callback, 20, "Sampling 15 diverse style directions")
+        proposed = sampler.propose(cal_session, seed)
+
+        round_obj = Round(
+            session_id=session.id,
+            round_index=0,
+            incumbent_z=session.current_z,
+            trust_radius=1.0,
+            seed_policy=session.config.seed_policy,
+        )
+
+        total = len(proposed)
+        for index, candidate in enumerate(proposed):
+            self._report_progress(
+                progress_callback,
+                20 + int(70 * index / total),
+                f"Generating calibration image {index + 1} of {total}",
+            )
+            candidate.round_id = round_obj.id
+            candidate.seed = self._seed_token(session.id, index, "cal_img")
+            candidate.generation_params["image_size"] = session.config.image_size
+            candidate.generation_params["calibration"] = True
+            candidate.sampler_role = "style_probe"
+            candidate = self.generator.render_candidate(session, candidate)
+            candidate.render_status = RenderStatus.succeeded
+
+        round_obj.candidates = proposed
+        round_obj.render_status = RenderStatus.succeeded
+        self.repository.save_round(round_obj)
+
+        self._report_progress(progress_callback, 95, "Calibration images ready")
+        return RoundResponse(
+            round_id=round_obj.id,
+            candidate_metadata=proposed,
+            image_urls=[c.image_path or "" for c in proposed],
+            state_summary={"session_id": session.id, "calibration": True},
+        )
+
+    def submit_calibration(self, session_id: str, selected_ids: list[str]) -> None:
+        """Average the z vectors of the chosen calibration candidates and set as initial state."""
+
+        if not selected_ids:
+            raise ValueError("At least one calibration candidate must be selected")
+        session = self._require_session(session_id)
+        rounds = self.repository.list_rounds_for_session(session_id)
+        cal_round = next((r for r in rounds if r.round_index == 0), None)
+        if cal_round is None:
+            raise KeyError("Calibration round not found")
+        id_to_z = {c.id: c.z for c in cal_round.candidates}
+        chosen_zs = [id_to_z[cid] for cid in selected_ids if cid in id_to_z]
+        if not chosen_zs:
+            raise ValueError("None of the selected IDs match calibration candidates")
+        dim = len(chosen_zs[0])
+        avg_z = [sum(z[i] for z in chosen_zs) / len(chosen_zs) for i in range(dim)]
+        session.current_z = avg_z
+        session.updated_at = utc_now()
+        self.repository.save_session(session)
+
     def get_session_rounds(self, session_id: str) -> list[Round]:
         """Return ordered rounds for a given session."""
 
