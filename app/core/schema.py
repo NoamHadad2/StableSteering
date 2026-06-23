@@ -51,6 +51,7 @@ class FeedbackType(str, Enum):
     top_k = "top_k"
     winner_only = "winner_only"
     approve_reject = "approve_reject"
+    critique_rating = "critique_rating"
 
 
 class SeedPolicy(str, Enum):
@@ -87,6 +88,7 @@ class UpdaterType(str, Enum):
     challenger_mixture_preference = "challenger_mixture_preference"
     plackett_luce_preference = "plackett_luce_preference"
     advantage_softmax_preference = "advantage_softmax_preference"
+    critique_weighted_preference = "critique_weighted_preference"
 
 
 class SteeringMode(str, Enum):
@@ -110,6 +112,8 @@ class StrategyConfig(BaseModel):
     trust_radius: float = Field(default=0.55, gt=0.0, le=1.0)
     stagnation_patience: int = Field(default=0, ge=0, le=10)
     stagnation_trust_radius_scale: float = Field(default=1.0, ge=1.0, le=3.0)
+    convergence_patience: int = Field(default=2, ge=0, le=10)
+    convergence_min_delta: float = Field(default=0.04, ge=0.0, le=1.0)
     anchor_strength: float = Field(default=0.7, ge=0.0, le=2.0)
     guidance_scale: float = Field(default=7.5, gt=0.0, le=20.0)
     num_inference_steps: int = Field(default=15, ge=1, le=100)
@@ -180,6 +184,7 @@ class FeedbackEvent(BaseModel):
     payload: dict[str, Any]
     normalized_payload: dict[str, Any]
     critique_text: str | None = None
+    critique_tags: dict[str, list[str]] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=utc_now)
 
 
@@ -212,6 +217,8 @@ class Session(BaseModel):
     basis_type: str = "random_orthonormal"
     current_round: int = 0
     current_z: list[float] = Field(default_factory=list)
+    converged: bool = False
+    rounds_to_convergence: int | None = None
     incumbent_candidate_id: str | None = None
     final_selected_candidate: str | None = None
     base_embedding_cache_key: str = Field(default_factory=lambda: new_id("emb"))
@@ -225,6 +232,26 @@ class SessionSummary(BaseModel):
 
     session: Session
     rounds: list[Round]
+
+
+class ConvergenceReport(BaseModel):
+    """Quantified view of how settled a session's steering trajectory is.
+
+    The steering loop moves a low-dimensional vector ``z`` each round. This
+    report measures how far ``z`` keeps moving and whether the session has
+    effectively stopped changing (converged) for a configured number of rounds.
+    """
+
+    rounds_completed: int = 0
+    step_magnitudes: list[float] = Field(default_factory=list)
+    latest_step: float | None = None
+    mean_recent_step: float | None = None
+    quiet_streak: int = 0
+    patience: int = 0
+    min_delta: float = 0.0
+    converged: bool = False
+    rounds_to_convergence: int | None = None
+    reason: str = "not_converged"
 
 
 class RoundResponse(BaseModel):

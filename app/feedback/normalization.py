@@ -25,6 +25,8 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         sorted_ratings = sorted(ratings.items(), key=lambda entry: (-entry[1], entry[0]))
         winner_candidate_id = sorted_ratings[0][0]
         normalized = {"winner_candidate_id": winner_candidate_id, "ratings": ratings}
+    elif request.feedback_type == FeedbackType.critique_rating:
+        normalized = _normalize_critique_rating(payload)
     elif request.feedback_type == FeedbackType.pairwise:
         winner_candidate_id = payload.get("winner_candidate_id")
         loser_candidate_id = payload.get("loser_candidate_id")
@@ -82,4 +84,42 @@ def normalize_feedback(round_id: str, request: FeedbackRequest) -> FeedbackEvent
         payload=payload,
         normalized_payload=normalized,
         critique_text=request.critique_text,
+        critique_tags=normalized.get("critique_tags", {}),
     )
+
+
+def _normalize_critique_rating(payload: dict) -> dict:
+    """Normalize critique-assisted ratings (stars plus structured reason tags).
+
+    This rides on the scalar_rating shape so every existing updater keeps working,
+    while additionally carrying a ``critique_tags`` map (candidate_id -> list of
+    reason tags) that critique-aware updaters can consume.
+    """
+
+    ratings = payload.get("ratings", {})
+    if not isinstance(ratings, dict):
+        raise ValueError("critique_rating feedback requires ratings to be a mapping")
+    if not ratings:
+        raise ValueError("critique_rating feedback requires at least one rating")
+    invalid_ratings = [candidate_id for candidate_id, score in ratings.items() if not isinstance(score, (int, float))]
+    if invalid_ratings:
+        raise ValueError("critique_rating feedback requires numeric ratings")
+
+    raw_tags = payload.get("critique_tags", {})
+    if not isinstance(raw_tags, dict):
+        raise ValueError("critique_rating feedback requires critique_tags to be a mapping")
+    critique_tags: dict[str, list[str]] = {}
+    for candidate_id, tags in raw_tags.items():
+        if not isinstance(tags, list):
+            raise ValueError("critique_rating feedback requires each candidate's tags to be a list")
+        cleaned = [str(tag) for tag in tags if str(tag).strip()]
+        if cleaned:
+            critique_tags[candidate_id] = cleaned
+
+    sorted_ratings = sorted(ratings.items(), key=lambda entry: (-entry[1], entry[0]))
+    winner_candidate_id = sorted_ratings[0][0]
+    return {
+        "winner_candidate_id": winner_candidate_id,
+        "ratings": ratings,
+        "critique_tags": critique_tags,
+    }

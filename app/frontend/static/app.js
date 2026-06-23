@@ -255,6 +255,21 @@ function buildFeedbackPayload(feedbackMode) {
     };
   }
 
+  if (feedbackMode === "critique_rating") {
+    const ratingEntries = collectRatings();
+    if (!ratingEntries.length) {
+      throw new Error("Critique rating feedback requires at least one explicit rating.");
+    }
+    const ratings = Object.fromEntries(ratingEntries.map((entry) => [entry.candidateId, entry.rating]));
+    return {
+      feedback_type: "critique_rating",
+      payload: {
+        ratings,
+        critique_tags: collectCritiqueTags(),
+      },
+    };
+  }
+
   const ratingEntries = collectRatings();
   if (!ratingEntries.length) {
     throw new Error("Scalar rating feedback requires at least one explicit rating.");
@@ -266,6 +281,22 @@ function buildFeedbackPayload(feedbackMode) {
     feedback_type: "scalar_rating",
     payload: { ratings },
   };
+}
+
+function collectCritiqueTags() {
+  const tags = {};
+  Array.from(document.querySelectorAll(".critique-tag-pill[aria-pressed='true']")).forEach((pill) => {
+    const candidateId = pill.dataset.candidateId;
+    const tag = pill.dataset.tag;
+    if (!candidateId || !tag) {
+      return;
+    }
+    if (!tags[candidateId]) {
+      tags[candidateId] = [];
+    }
+    tags[candidateId].push(tag);
+  });
+  return tags;
 }
 
 const setupForm = document.getElementById("setup-form");
@@ -349,6 +380,20 @@ Array.from(document.querySelectorAll(".star-button")).forEach((button) => {
     const value = Number(button.dataset.ratingValue || 0);
     applyStarRating(candidateId, value);
     traceFrontend("feedback.rating.selected", { candidate_id: candidateId, rating: value });
+  });
+});
+
+Array.from(document.querySelectorAll(".critique-tag-pill")).forEach((pill) => {
+  pill.addEventListener("click", () => {
+    if (pill.disabled) return;
+    const selected = pill.getAttribute("aria-pressed") === "true";
+    pill.setAttribute("aria-pressed", selected ? "false" : "true");
+    pill.classList.toggle("selected", !selected);
+    traceFrontend("feedback.critique_tag.toggled", {
+      candidate_id: pill.dataset.candidateId,
+      tag: pill.dataset.tag,
+      selected: !selected,
+    });
   });
 });
 

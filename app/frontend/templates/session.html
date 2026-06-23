@@ -50,6 +50,22 @@
           </div>
         </div>
         <p class="hint">{% if session.current_round == 0 %}Start by generating the first round. You will see one raw prompt baseline plus additional sampled variants.{% elif session.status == "awaiting_feedback" %}Review this round and submit feedback to unlock the next one.{% else %}Feedback is complete for the current round. You can continue exploring or open replay to review the history.{% endif %}</p>
+
+        {% if convergence and convergence.rounds_completed > 0 %}
+        <div class="convergence-banner {% if convergence.converged %}convergence-done{% else %}convergence-progress{% endif %}">
+          {% if convergence.converged %}
+            <span class="convergence-icon">✓</span>
+            <strong>Steering converged</strong> at round {{ convergence.rounds_to_convergence }} — the steering vector has settled.
+          {% else %}
+            <span class="convergence-icon">◎</span>
+            <strong>Converging…</strong>
+            Quiet rounds: {{ convergence.quiet_streak }}/{{ convergence.patience }} &nbsp;·&nbsp;
+            Step size: {{ "%.3f"|format(convergence.latest_step) }} &nbsp;·&nbsp;
+            Threshold: {{ "%.3f"|format(convergence.min_delta * 0.55) }}
+          {% endif %}
+          <a class="convergence-link" href="/sessions/{{ session.id }}/convergence" target="_blank">Full report →</a>
+        </div>
+        {% endif %}
       </section>
 
       <section class="card" id="round-container">
@@ -122,6 +138,35 @@
                             <label>Rank
                               <input type="number" min="1" max="{{ round.candidates|length }}" class="rank-input" data-candidate-id="{{ candidate.id }}" inputmode="numeric">
                             </label>
+                          {% elif session.config.feedback_mode.value == "critique_rating" %}
+                            <div class="rating-widget" data-candidate-id="{{ candidate.id }}">
+                              <span class="rating-label">Rating</span>
+                              <div class="star-rating" role="radiogroup" aria-label="Rate candidate {{ candidate.id }}">
+                                {% for star in [1, 2, 3, 4, 5] %}
+                                  <button
+                                    type="button"
+                                    class="star-button"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-rating-value="{{ star }}"
+                                    aria-label="{{ star }} star{% if star > 1 %}s{% endif %}"
+                                    aria-pressed="false"
+                                  >★</button>
+                                {% endfor %}
+                              </div>
+                              <input type="hidden" class="rating-input" data-candidate-id="{{ candidate.id }}" value="0">
+                              <p class="star-rating-caption" data-candidate-id="{{ candidate.id }}">No rating selected yet</p>
+                              <div class="critique-tags" data-candidate-id="{{ candidate.id }}">
+                                {% for tag in critique_tags %}
+                                  <button
+                                    type="button"
+                                    class="critique-tag-pill {% if tag.startswith('good_') %}positive{% else %}negative{% endif %}"
+                                    data-candidate-id="{{ candidate.id }}"
+                                    data-tag="{{ tag }}"
+                                    aria-pressed="false"
+                                  >{{ tag.replace('_', ' ') }}</button>
+                                {% endfor %}
+                              </div>
+                            </div>
                           {% endif %}
                         </div>
                       {% endif %}
@@ -140,6 +185,8 @@
                       Mark approved candidates, then choose the preferred winner from the approved set.
                     {% elif session.config.feedback_mode.value == "top_k" %}
                       Assign unique ranks starting at 1. Lower numbers mean better preference.
+                    {% elif session.config.feedback_mode.value == "critique_rating" %}
+                      Rate each candidate with stars, then optionally tag what you liked or disliked. Pair it with the <code>critique_weighted_preference</code> updater to let the tags steer the next round.
                     {% endif %}
                   </p>
                   <div class="actions">

@@ -20,6 +20,7 @@ from app.core.tracing import TraceRecorder
 from app.engine.generation import build_generation_engine
 from app.engine.orchestrator import Orchestrator
 from app.frontend_trace import FrontendTraceEvent
+from app.updaters.critique_weighted_pref import CRITIQUE_TAGS
 
 configure_logging()
 templates = Jinja2Templates(directory=str(Path("app/frontend/templates")))
@@ -246,6 +247,7 @@ def session_page(request: Request, session_id: str) -> HTMLResponse:
     rounds = request.app.state.orchestrator.get_session_rounds(session_id)
     current_round = rounds[-1] if rounds else None
     runtime_diagnostics = request.app.state.orchestrator.generator.diagnostics()
+    convergence = request.app.state.orchestrator.get_session_convergence(session_id)
     return templates.TemplateResponse(
         "session.html",
         {
@@ -254,6 +256,8 @@ def session_page(request: Request, session_id: str) -> HTMLResponse:
             "rounds": rounds,
             "current_round": current_round,
             "runtime_diagnostics": runtime_diagnostics,
+            "convergence": convergence,
+            "critique_tags": CRITIQUE_TAGS,
         },
     )
 
@@ -361,6 +365,30 @@ def get_session(session_id: str):
     if session is None:
         return api_error_response(404, "not_found", "Session not found")
     return session
+
+
+@app.get("/sessions/{session_id}/convergence", response_class=HTMLResponse)
+def get_session_convergence(request: Request, session_id: str) -> HTMLResponse:
+    """Render the convergence report page for one session."""
+
+    session = request.app.state.orchestrator.get_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    convergence = request.app.state.orchestrator.get_session_convergence(session_id)
+    return templates.TemplateResponse(
+        "convergence.html",
+        {"request": request, "session": session, "convergence": convergence},
+    )
+
+
+@app.get("/sessions/{session_id}/convergence/json")
+def get_session_convergence_json(session_id: str):
+    """Return the raw convergence report as JSON."""
+
+    try:
+        return app.state.orchestrator.get_session_convergence(session_id)
+    except KeyError:
+        return api_error_response(404, "not_found", "Session not found")
 
 
 @app.get("/jobs/{job_id}")

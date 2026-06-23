@@ -8,6 +8,7 @@ from typing import Callable
 from app.core.config import settings
 from app.core.schema import (
     Candidate,
+    ConvergenceReport,
     Experiment,
     ExperimentCreate,
     FeedbackRequest,
@@ -23,6 +24,7 @@ from app.core.schema import (
     utc_now,
 )
 from app.core.logging import logger
+from app.engine.convergence import evaluate_convergence
 from app.core.tracing import TraceRecorder
 from app.feedback.normalization import normalize_feedback
 from app.samplers.axis_sweep import AxisSweepSampler
@@ -42,6 +44,7 @@ from app.samplers.uncertainty import UncertaintyGuidedSampler
 from app.updaters.advantage_softmax_pref import AdvantageSoftmaxPreferenceUpdater
 from app.storage.repository import JsonRepository
 from app.updaters.contrastive_pref import ContrastivePreferenceUpdater
+from app.updaters.critique_weighted_pref import CritiqueWeightedPreferenceUpdater
 from app.updaters.borda_pref import BordaPreferenceUpdater
 from app.updaters.bradley_terry_pref import BradleyTerryPreferenceUpdater
 from app.updaters.challenger_mixture import ChallengerMixturePreferenceUpdater
@@ -93,6 +96,7 @@ class Orchestrator:
             "challenger_mixture_preference": ChallengerMixturePreferenceUpdater(),
             "plackett_luce_preference": PlackettLucePreferenceUpdater(),
             "advantage_softmax_preference": AdvantageSoftmaxPreferenceUpdater(),
+            "critique_weighted_preference": CritiqueWeightedPreferenceUpdater(),
         }
 
     @staticmethod
@@ -290,8 +294,12 @@ class Orchestrator:
         session.incumbent_candidate_id = update_summary["winner_candidate_id"]
         session.status = SessionStatus.ready
         session.updated_at = utc_now()
-        self._report_progress(progress_callback, 72, "Saving updated session state")
+        # Persist the round first so convergence sees this round's update_summary.
         self.repository.save_round(round_obj)
+        convergence = self._evaluate_session_convergence(session)
+        session.converged = convergence.converged
+        session.rounds_to_convergence = convergence.rounds_to_convergence
+        self._report_progress(progress_callback, 72, "Saving updated session state")
         self.repository.save_session(session)
         logger.info("Applied feedback to round %s for session %s", round_obj.id, session.id)
         self.trace_recorder.append_backend(
@@ -306,6 +314,10 @@ class Orchestrator:
                 "winner_candidate_id": update_summary["winner_candidate_id"],
                 "next_incumbent_state": next_z,
             },
+        )
+        self.trace_recorder.append_backend(
+            "round.convergence.evaluated",
+            {"session_id": session.id, "round_id": round_obj.id, **convergence.model_dump(mode="json")},
         )
         self._report_progress(progress_callback, 90, "Refreshing trace report with the new preference outcome")
         self.generate_trace_report(session.id)
@@ -325,6 +337,21 @@ class Orchestrator:
             rounds=rounds,
         )
         return replay.model_dump(mode="json")
+
+    def get_session_convergence(self, session_id: str) -> ConvergenceReport:
+        """Return the convergence report for one session.
+
+        Raises KeyError if the session does not exist, mirroring other lookups.
+        """
+
+        session = self._require_session(session_id)
+        return self._evaluate_session_convergence(session)
+
+    def _evaluate_session_convergence(self, session: Session) -> ConvergenceReport:
+        """Compute convergence from the session's persisted round history."""
+
+        rounds = self.repository.list_rounds_for_session(session.id)
+        return evaluate_convergence(session, rounds)
 
     def generate_trace_report(self, session_id: str):
         """Regenerate the saved HTML trace report for one session."""
